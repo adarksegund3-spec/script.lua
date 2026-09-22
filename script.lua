@@ -1,3 +1,6 @@
+--==============================================
+-- ZKY PARKOUR EB V3.5
+--==============================================
 _G.ZKY_OK=false
 do
     local KEY="Akira007"
@@ -8,6 +11,7 @@ do
     if not g.Parent then g.Parent=game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui") end
     local f=Instance.new("Frame",g) f.Size=UDim2.new(0,280,0,220) f.Position=UDim2.new(0.5,-140,0.5,-110) f.BackgroundColor3=Color3.fromRGB(20,20,25)
     Instance.new("UICorner",f).CornerRadius=UDim.new(0,10)
+    Instance.new("TextLabel",f).Size=UDim2.new(1,0,0,36) Instance.new("TextLabel",f).BackgroundTransparency=1
     local t=Instance.new("TextLabel",f) t.Size=UDim2.new(1,0,0,36) t.BackgroundTransparency=1 t.Text="ZKY PARKOUR - KEY" t.TextColor3=Color3.new(1,1,1) t.Font=Enum.Font.GothamBold t.TextSize=16
     local box=Instance.new("TextBox",f) box.Size=UDim2.new(1,-30,0,34) box.Position=UDim2.new(0,15,0,42) box.BackgroundColor3=Color3.fromRGB(35,35,42) box.TextColor3=Color3.new(1,1,1) box.PlaceholderText="Cole a key aqui" box.Text="" box.ClearTextOnFocus=false box.Font=Enum.Font.Gotham box.TextSize=14
     Instance.new("UICorner",box).CornerRadius=UDim.new(0,8)
@@ -18,43 +22,42 @@ do
     Instance.new("UICorner",bc).CornerRadius=UDim.new(0,8)
     local st=Instance.new("TextLabel",f) st.Size=UDim2.new(1,-20,0,18) st.Position=UDim2.new(0,10,1,-20) st.BackgroundTransparency=1 st.Text="" st.TextColor3=Color3.fromRGB(200,200,200) st.Font=Enum.Font.Gotham st.TextSize=11
     bp.MouseButton1Click:Connect(function() pcall(function() setclipboard(LINK) end) pcall(function() game:GetService("GuiService"):OpenBrowserWindow(LINK) end) st.Text="Link copiado!" end)
-    bc.MouseButton1Click:Connect(function() if box.Text:gsub("%s",""):lower()==KEY:lower() then _G.ZKY_OK=true g:Destroy() else st.Text="Key inválida." end end)
+    bc.MouseButton1Click:Connect(function() if box.Text:gsub("%s",""):lower()==KEY:lower() then _G.ZKY_OK=true g:Destroy() else st.Text="Key invalida." end end)
 end
 repeat task.wait() until _G.ZKY_OK
 
--- ============================================
 local _I,_U2,_UO,_UD,_RGB,_V2=Instance.new,UDim2.new,UDim2.fromOffset,UDim.new,Color3.fromRGB,Vector2.new
 local GB,GM,XL,XC=Enum.Font.GothamBold,Enum.Font.GothamMedium,Enum.TextXAlignment.Left,Enum.TextXAlignment.Center
 local P=game:GetService("Players") local T=game:GetService("TweenService") local U=game:GetService("UserInputService") local R=game:GetService("RunService")
-local HS=game:GetService("HttpService") local TCS=game:GetService("TextChatService") local RS=game:GetService("ReplicatedStorage") local Pl=P.LocalPlayer
-local PG=Pl:WaitForChild("PlayerGui")
+local HS=game:GetService("HttpService") local TCS=game:GetService("TextChatService") local RS=game:GetService("ReplicatedStorage")
+local Pl=P.LocalPlayer local PG=Pl:WaitForChild("PlayerGui")
 local char,hum,hrp
 local CFG={LineThickness=.15,LineTransparency=.2,LineColor=_RGB(255,145,45),JumpCooldown=.28,PlaybackSpeed=1,WalkToSpeed=16,GroundOffset=1.66}
 local PK={Modo="Dummy"}
 local IAC={ApiKey="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",Endpoint="https://api.groq.com/openai/v1/chat/completions",Modelo="openai/gpt-oss-120b",Timeout=10,
-SystemPrompt="Você é um corretor gramatical extremamente rigoroso de português do Brasil. Corrija TODOS os erros da mensagem do usuário, sem deixar passar nenhum, incluindo: letras maiúsculas no início de frases e em nomes próprios; todos os acentos gráficos (agudo, circunflexo, til, crase) e a cedilha; toda a pontuação, como vírgulas, pontos finais, pontos de interrogação e de exclamação; concordância verbal e nominal; ortografia e separação de palavras. Não deixe nenhuma palavra sem acento ou sem maiúscula onde for necessário, nem nenhuma frase sem pontuação final. Não resuma, não reescreva o estilo, não mude o significado, o tom nem o tamanho da mensagem: apenas corrija a gramática, a ortografia e a pontuação, mantendo as mesmas palavras sempre que possível. Responda APENAS com a mensagem corrigida, sem explicações, aspas, comentários extras ou qualquer texto adicional."}
+SystemPrompt="Voce e um corretor gramatical rigoroso do portugues do Brasil. Corrija todos os erros de acentuacao, pontuacao, ortografia, concordancia e uso de maiusculas. Responda APENAS com o texto corrigido, sem explicacoes."}
 local IAT={ApiKey="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",Endpoint="https://api.groq.com/openai/v1/chat/completions",Modelo="openai/gpt-oss-120b",Timeout=15,
-SystemPrompt="Você é um militar do Exército Brasileiro em um jogo de Roblox (roleplay militar). Escreva um texto curto, humano, gramaticalmente correto e patriótico sobre o tema fornecido. REGRAS OBRIGATÓRIAS: (1) O texto DEVE ter entre 130 e 180 caracteres, contando espaços. (2) No máximo 2 frases curtas. (3) Sem saudações, sem aspas, sem emojis, sem formatação. (4) Tom realista e militar, não exagerado nem infantil. (5) Responda APENAS com o texto final, nada mais."}
+SystemPrompt="Voce e um militar do Exercito Brasileiro em um jogo de Roblox (roleplay militar). Escreva um texto curto, humano, gramaticalmente correto e patriotico sobre o tema fornecido. REGRAS: (1) O texto DEVE ter entre 130 e 180 caracteres. (2) No maximo 2 frases curtas. (3) Sem saudacoes, sem aspas, sem emojis. (4) Tom realista e militar. (5) Responda APENAS com o texto final, nada mais."}
 local http=request or(syn and syn.request) or(http and http.request) or http_request
-local PB={Lento="https://pastebin.com/raw/M7DvRgTc",["Rápido"]="https://pastebin.com/raw/pBk8vYXE",["Mais Rápido"]="https://pastebin.com/raw/yz7gZmYr",["Sem Burla"]="https://pastebin.com/raw/N1j0iRDA"}
-local CAT={"Lento","Rápido","Mais Rápido","Sem Burla"}
-local TPB={["Torre 1"]={["Única"]="https://pastebin.com/raw/HxXb4Mr3"},["Torre 2"]={Frente="https://pastebin.com/raw/Y2arCYHb",["Atrás"]="https://pastebin.com/raw/rXxZX7CQ",Esquerda="https://pastebin.com/raw/FtpTHhGt",Direita="https://pastebin.com/raw/4u5Wjtkg"}}
-local T2RO={"Frente","Atrás","Esquerda","Direita"}
-local routes={Lento={},["Rápido"]={},["Mais Rápido"]={},["Sem Burla"]={}}
-local tRoutes={["Torre 1"]={},["Torre 2"]={Frente={},["Atrás"]={},Esquerda={},Direita={}}}
+local PB={Lento="https://pastebin.com/raw/M7DvRgTc",Rapido="https://pastebin.com/raw/pBk8vYXE",MaisRapido="https://pastebin.com/raw/yz7gZmYr",SemBurla="https://pastebin.com/raw/N1j0iRDA"}
+local CAT={"Lento","Rapido","Mais Rapido","Sem Burla"}
+local CAT_LABEL={Lento="Lento",Rapido="Rapido",MaisRapido="Mais Rapido",SemBurla="Sem Burla"}
+local TPB={["Torre 1"]={Unica="https://pastebin.com/raw/HxXb4Mr3"},["Torre 2"]={Frente="https://pastebin.com/raw/Y2arCYHb",Atras="https://pastebin.com/raw/rXxZX7CQ",Esquerda="https://pastebin.com/raw/FtpTHhGt",Direita="https://pastebin.com/raw/4u5Wjtkg"}}
+local T2RO={"Frente","Atras","Esquerda","Direita"}
+local routes={Lento={},Rapido={},MaisRapido={},SemBurla={}}
+local tRoutes={["Torre 1"]={},["Torre 2"]={Frente={},Atras={},Esquerda={},Direita={}}}
 local selCat,expPk={},{} local selT2="Frente" local expT2=false
 local CurPage="EBDelta" local lineFolder
 local Pb={Running=false,Conn=nil,Route=nil,StartClock=0,Idx=1,LastJump=-math.huge,Cat=nil,Pk=nil,Tower=nil,TowerRoute=nil,Walking=false,WalkConn=nil}
 local SavedDir=nil local Turning=false
 local Old=PG:FindFirstChild("ZKY_PARKOUR") if Old then Old:Destroy()end
 local K={Bg=_RGB(18,18,20),Panel=_RGB(24,24,27),Card=_RGB(31,31,35),CardHover=_RGB(39,39,43),Sel=_RGB(55,55,60),Stroke=_RGB(65,65,70),SLight=_RGB(85,85,90),White=_RGB(245,245,245),Gray=_RGB(175,175,180),DGray=_RGB(115,115,120),Success=_RGB(80,210,125),Err=_RGB(230,85,85),Orange=_RGB(255,145,45),SelRed=_RGB(225,70,70),SelRedD=_RGB(75,32,32),Primary=_RGB(185,185,185),Purple=_RGB(150,80,255)}
-
 local function Cor(o,r) local c=_I("UICorner") c.CornerRadius=_UD(0,r) c.Parent=o end
 local function Sk(o,c,t) local s=_I("UIStroke") s.Color=c s.Thickness=t or 1 s.Parent=o return s end
 local function Pad(o,t,b,l,r) local p=_I("UIPadding") p.PaddingTop=_UD(0,t or 0) p.PaddingBottom=_UD(0,b or 0) p.PaddingLeft=_UD(0,l or 0) p.PaddingRight=_UD(0,r or 0) p.Parent=o end
 local function New(cls,props,parent) local o=_I(cls) if props then for k,v in pairs(props)do o[k]=v end end if parent then o.Parent=parent end return o end
 
--- NOTIFICAÇÕES
+-- NOTIFICACOES
 local NH=New("Frame",{Name="Notifs",AnchorPoint=_V2(1,1),Position=_U2(1,-15,1,-15),Size=_UO(270,300),BackgroundTransparency=1,ZIndex=200},PG)
 New("UIListLayout",{VerticalAlignment=Enum.VerticalAlignment.Bottom,HorizontalAlignment=Enum.HorizontalAlignment.Right,Padding=_UD(0,7)},NH)
 local function Notify(tt,msg,nt)
@@ -79,7 +82,6 @@ end
 local function Refresh() char=Pl.Character if not char or not char.Parent then return false end hum=char:FindFirstChildOfClass("Humanoid") hrp=char:FindFirstChild("HumanoidRootPart") return hum~=nil and hrp~=nil end
 Pl.CharacterAdded:Connect(function() task.wait(.2) Refresh() end) Refresh()
 
-local function N2(v) return v and tonumber(v) end
 local function ParseRoutes(raw)
     local parsed,blocks={},{} local sp=1
     while true do
@@ -98,7 +100,7 @@ local function ParseRoutes(raw)
             local j=string.match(f,"j%s*=%s*([%w]+)")
             local rx=string.match(f,"rx%s*=%s*([%d%.%-]+)") local ry=string.match(f,"ry%s*=%s*([%d%.%-]+)") local rz=string.match(f,"rz%s*=%s*([%d%.%-]+)")
             if t and x and y and z then
-                local q={t=N2(t),position=Vector3.new(N2(x),N2(y),N2(z)),j=j=="true",rx=N2(rx),ry=N2(ry),rz=N2(rz)}
+                local q={t=tonumber(t),position=Vector3.new(tonumber(x),tonumber(y),tonumber(z)),j=j=="true",rx=tonumber(rx),ry=tonumber(ry),rz=tonumber(rz)}
                 if q.rx and q.ry and q.rz then q.rotation=CFrame.Angles(q.rx,q.ry,q.rz) end
                 table.insert(frames,q)
             end
@@ -205,6 +207,7 @@ local function StartRoute(data,cat,num,tower,tRoute)
     Pb.Running=true Pb.Walking=true Pb.Route=data Pb.Cat=cat Pb.Pk=num Pb.Tower=tower Pb.TowerRoute=tRoute Pb.Idx=1
     ShowLines(data)
     local name = tower and ((tower=="Torre 1") and "Torre 1" or ("Torre 2 - "..tRoute)) or ("Parkour "..num.." - "..cat)
+    -- FIX: modo Dummy/Direto vale para parkour E torres
     if PK.Modo=="Dummy" then
         Notify("MARCADOR CRIADO","Ande ate o marcador: "..name,"Orange")
         MakeDummy(tgt,GetRot(first))
@@ -275,30 +278,31 @@ local function Corrigir(texto)
     if not txt or txt=="" then return nil,"Resposta vazia" end
     return txt:gsub("^%s+",""):gsub("%s+$",""):gsub('^["\']+',""):gsub('["\']+$',"")
 end
+-- FIX IA: prompt simples + max_tokens 120 (o que funcionava)
 local function GerarTexto(tema)
     local body=HS:JSONEncode({model=IAT.Modelo,messages={{role="system",content=IAT.SystemPrompt},{role="user",content=tema}},temperature=0.8,max_tokens=120})
     local resp,err=HttpReq(IAT.Endpoint,body,IAT.ApiKey,IAT.Timeout)
     if not resp then return nil,err end
     local ok,d=pcall(function()return HS:JSONDecode(resp.Body)end)
     if not ok or not d.choices or not d.choices[1] then return nil,"Resposta invalida" end
-    local txt=d.choices[1].message and d.choices[1].message.content
+    local m=d.choices[1].message local txt=m and m.content
     if not txt or txt=="" then return nil,"Resposta vazia" end
-    return txt:gsub("^%s+",""):gsub("%s+$",""):gsub('^["\']+',""):gsub('["\']+$',"")
+    txt=txt:gsub("^%s+",""):gsub("%s+$",""):gsub('^["\']+',""):gsub('["\']+$',"")
+    if #txt<10 then return nil,"Texto muito curto. Tente novamente." end
+    return txt
 end
 
--- ============================================
--- GUI PRINCIPAL
--- ============================================
+--============ GUI PRINCIPAL ============
 local Gui=New("ScreenGui",{Name="ZKY_PARKOUR",ResetOnSpawn=false,IgnoreGuiInset=true,ZIndexBehavior=Enum.ZIndexBehavior.Sibling},PG)
-local Logo=New("TextButton",{Name="ZKY_Logo",Size=_UO(58,58),Position=_UO(12,65),BackgroundColor3=_RGB(10,10,10),BorderSizePixel=0,Text="ZKY",TextColor3=K.White,TextSize=18,Font=GB,AutoButtonColor=false},Gui)
+local Logo=New("TextButton",{Name="ZKY_Logo",Size=_UO(58,58),Position=_UO(12,65),BackgroundColor3=_RGB(10,10,10),BorderSizePixel=0,Text="Z",TextColor3=K.White,TextSize=26,Font=GB,AutoButtonColor=false},Gui)
 Cor(Logo,29) Sk(Logo,K.SLight)
 local Main=New("Frame",{Name="Main",AnchorPoint=_V2(.5,.5),Position=UDim2.fromScale(.5,.5),Size=UDim2.fromScale(.78,.65),BackgroundColor3=K.Bg,BorderSizePixel=0,Visible=false,ClipsDescendants=true,ZIndex=10},Gui)
 Cor(Main,14) Sk(Main,K.Stroke)
 local Header=New("Frame",{Size=_U2(1,-16,0,54),Position=_UO(8,8),BackgroundColor3=K.Panel,BorderSizePixel=0,ZIndex=20},Main)
 Cor(Header,10) Sk(Header,K.Stroke)
 New("TextLabel",{BackgroundTransparency=1,Position=_UO(13,7),Size=_U2(.55,0,0,23),Text="ZKY PARKOUR EB",TextColor3=K.White,TextSize=17,Font=GB,TextXAlignment=XL,ZIndex=22},Header)
-New("TextLabel",{BackgroundTransparency=1,Position=_UO(14,31),Size=_U2(.65,0,0,15),Text="Auto Parkour - V3.4",TextColor3=K.DGray,TextSize=9,Font=GM,TextXAlignment=XL,ZIndex=22},Header)
-local Ver=New("TextLabel",{BackgroundColor3=K.Card,AnchorPoint=_V2(.5,.5),Position=_U2(.5,0,.5,0),Size=_UO(55,25),Text="V3.4",TextColor3=K.Gray,TextSize=10,Font=GB,ZIndex=22},Header)
+New("TextLabel",{BackgroundTransparency=1,Position=_UO(14,31),Size=_U2(.65,0,0,15),Text="Auto Parkour - V3.5",TextColor3=K.DGray,TextSize=9,Font=GM,TextXAlignment=XL,ZIndex=22},Header)
+local Ver=New("TextLabel",{BackgroundColor3=K.Card,AnchorPoint=_V2(.5,.5),Position=_U2(.5,0,.5,0),Size=_UO(55,25),Text="V3.5",TextColor3=K.Gray,TextSize=10,Font=GB,ZIndex=22},Header)
 Cor(Ver,8) Sk(Ver,K.Stroke)
 local BtnX=New("TextButton",{Size=_UO(34,34),Position=_U2(1,-42,.5,-17),BackgroundColor3=K.Card,BorderSizePixel=0,Text="x",TextColor3=K.Gray,TextSize=22,Font=GM,AutoButtonColor=false,ZIndex=25},Header)
 Cor(BtnX,10) Sk(BtnX,K.Stroke)
@@ -329,14 +333,16 @@ local function ClearAll(keep)
 end
 local function RestoreCanvas() task.defer(function() task.wait() Content.CanvasPosition=savedCanvas end) end
 
--- TAFFS
-local TAFFS={ {N="CIE",E="CIE",C=_RGB(70,130,180),F={{"CIE","Centro de Inteligencia do Exercito"},{"Criador","vicofjgfhf"},{"Sub criador","RIP_dabfj8w"},{"Comandante","eriqurrr."},{"Subcomandante","nohanrtop"},{"Lema","Inteligencia para Vitoria & Saber para Prever."},{"Saudacao","Saudacoes, senhores Agentes."},{"Saudacao","Saudacoes, senhores Fantasmas."},{"Saudacao","Saudacoes, senhor Agente."},{"Saudacao","Saudacoes, senhor Fantasma."}} },
-{N="REC MEC",E="RECMEC",C=_RGB(220,180,60),F={{"REC MEC","Regimento de Cavalaria Mecanizado"},{"Comandante","terro_2433."},{"Subcomandante","Contanum5bl"},{"Lema","Haverá sempre uma Cavalaria!"},{"Saudacao","Saudacoes, senhores Cavaleiros."},{"Saudacao","Saudacoes, senhor Cavaleiro."},{"Comando","ATENCAO TURNO, PREPARAR PARA MARCHAR!"},{"Comando","ATENCAO TURNO, MARCHEM!"}} },
-{N="BPE",E="BPE",C=_RGB(60,180,120),F={{"BPE","Batalhao de Policia do Exercito"},{"Comandante","zCostasz."},{"Subcomandante","Matheuslindo587."},{"Lema","Orientar o Responsavel, Corrigir o Irresponsavel, Prender o Incorrigivel."},{"Saudacao","Saudacoes, senhores Policiais."},{"Saudacao","Saudacoes, senhor Policial."}} },
-{N="BFE",E="BFE",C=_RGB(200,70,70),F={{"BFE","Batalhao de Forcas Especiais"},{"Criador","NATANHMELLO4."},{"Criado","1983"},{"Comandante","RenanFoxiy."},{"Subcomandante","TILAPIA_PROFISSIONAL."},{"Lema","Qualquer missao, em qualquer lugar, a qualquer hora, de qualquer maneira."},{"Saudacao","Saudacoes, senhores Fantasmas."},{"Saudacao","Saudacoes, senhor Fantasma."}} },
-{N="CYBER",E="CYBER",C=_RGB(150,100,200),F={{"CYBER","Comando de Defesa Cibernetica"},{"Criador","wAnTee16j5156."},{"Donos","MaxTheJp1 | ItsMeLyrio | Gabriel2444q."},{"Comandante","highanddry98"},{"Lema","Seguranca no ciberespaco, soberania para a Nacao."},{"Saudacao","Saudacoes, senhores Analistas."}} },
-{N="BAC",E="BAC",C=_RGB(220,100,50),F={{"BAC","Batalhao de Acoes de Comandos"},{"Dono","MateusHgz."},{"Comandante","SasukePro202."},{"Subcomandante","DanielSxS2."},{"Lema","O maximo de confusao, morte e destruicao na retaguarda do inimigo."},{"Saudacao","Saudacoes, senhor Comando."},{"Saudacao","Saudacoes, senhores Comandos."}} },
-{N="CAAT",E="CAAT",C=_RGB(50,150,80),F={{"CAAT","Batalhao de Infantaria de Caatinga"},{"Comandante","Nao tem."},{"Subcomandante","gabrielcm04."},{"Lema","O pai cria, a mae educa e a Caatinga elimina."},{"Saudacao","Saudacoes, senhores Guardioes da Caatinga."}} } }
+-- ============ TAFFS ============
+local TAFFS={
+    {N="CIE",C=_RGB(70,130,180),F={{"CIE","Centro de Inteligencia do Exercito"},{"Criador","vicofjgfhf"},{"Sub criador","RIP_dabfj8w"},{"Comandante","eriqurrr."},{"Subcomandante","nohanrtop"},{"Lema","Inteligencia para Vitoria e Saber para Prever."},{"Saudacao","Saudacoes, senhores Agentes."},{"Saudacao","Saudacoes, senhores Fantasmas."}}},
+    {N="REC MEC",C=_RGB(220,180,60),F={{"REC MEC","Regimento de Cavalaria Mecanizado"},{"Comandante","terro_2433."},{"Subcomandante","Contanum5bl"},{"Lema","Havera sempre uma Cavalaria! Aco na mente, motor no peito e honra na missao!"},{"Saudacao","Saudacoes, senhores Cavaleiros."},{"Saudacao","Saudacoes, senhor Cavaleiro."},{"Comando","ATENCAO TURNO, PREPARAR PARA MARCHAR!"},{"Comando","ATENCAO TURNO, MARCHEM!"}}},
+    {N="BPE",C=_RGB(60,180,120),F={{"BPE","Batalhao de Policia do Exercito"},{"Comandante","zCostasz."},{"Subcomandante","Matheuslindo587."},{"Lema","Orientar o Responsavel, Corrigir o Irresponsavel, Prender o Incorrigivel."},{"Saudacao","Saudacoes, senhores Policiais."},{"Saudacao","Saudacoes, senhor Policial."}}},
+    {N="BFE",C=_RGB(200,70,70),F={{"BFE","Batalhao de Forcas Especiais"},{"Criador","NATANHMELLO4."},{"Criado","1983"},{"Comandante","RenanFoxiy."},{"Subcomandante","TILAPIA_PROFISSIONAL."},{"Lema","Qualquer missao, em qualquer lugar, a qualquer hora, de qualquer maneira."},{"Saudacao","Saudacoes, senhores Fantasmas."},{"Saudacao","Saudacoes, senhor Fantasma."}}},
+    {N="CYBER",C=_RGB(150,100,200),F={{"CYBER","Comando de Defesa Cibernetica"},{"Criador","wAnTee16j5156."},{"Donos","MaxTheJp1 | ItsMeLyrio | Gabriel2444q."},{"Comandante","highanddry98"},{"Lema","Seguranca no ciberespaco, soberania para a Nacao."},{"Saudacao","Saudacoes, senhores Analistas."}}},
+    {N="BAC",C=_RGB(220,100,50),F={{"BAC","Batalhao de Acoes de Comandos"},{"Dono","MateusHgz."},{"Comandante","SasukePro202."},{"Subcomandante","DanielSxS2."},{"Lema","O maximo de confusao, morte e destruicao na retaguarda do inimigo."},{"Saudacao","Saudacoes, senhor Comando."},{"Saudacao","Saudacoes, senhores Comandos."}}},
+    {N="CAAT",C=_RGB(50,150,80),F={{"CAAT","Batalhao de Infantaria de Caatinga"},{"Comandante","Nao tem."},{"Subcomandante","gabrielcm04."},{"Lema","O pai cria, a mae educa e a Caatinga elimina."},{"Saudacao","Saudacoes, senhores Guardioes da Caatinga."}}}
+}
 local function TaffsCard(l,v,o,par)
     local c=New("Frame",{Size=_U2(1,0,0,48),BackgroundColor3=K.Card,BorderSizePixel=0,LayoutOrder=o},par) Cor(c,8) Sk(c,K.Stroke,1)
     New("TextLabel",{BackgroundTransparency=1,Position=_UO(10,5),Size=_U2(1,-82,1,-10),Text=l..": "..v,TextColor3=K.White,TextSize=10,Font=GM,TextWrapped=true,TextXAlignment=XL,TextYAlignment=Enum.TextYAlignment.Center},c)
@@ -352,23 +358,21 @@ local function ShowTaffs()
         local s=New("Frame",{Size=_U2(1,0,0,0),AutomaticSize=Enum.AutomaticSize.Y,BackgroundColor3=K.Card,BorderSizePixel=0,LayoutOrder=i+1},CH) Cor(s,8) Sk(s,div.C,2)
         New("UIListLayout",{HorizontalAlignment=Enum.HorizontalAlignment.Center,SortOrder=Enum.SortOrder.LayoutOrder,Padding=_UD(0,5)},s)
         local hd=New("Frame",{Size=_U2(1,0,0,38),BackgroundColor3=div.C,BackgroundTransparency=.2,BorderSizePixel=0,LayoutOrder=0},s) Cor(hd,8)
-        New("TextLabel",{BackgroundTransparency=1,Position=_UO(12,0),Size=_U2(1,-24,1,0),Text=div.E.."  "..div.N,TextColor3=K.White,TextSize=14,Font=GB,TextXAlignment=XL,TextYAlignment=Enum.TextYAlignment.Center},hd)
+        New("TextLabel",{BackgroundTransparency=1,Position=_UO(12,0),Size=_U2(1,-24,1,0),Text=div.N,TextColor3=K.White,TextSize=14,Font=GB,TextXAlignment=XL,TextYAlignment=Enum.TextYAlignment.Center},hd)
         for j,fl in ipairs(div.F)do TaffsCard(fl[1],fl[2],j,s) end
     end
 end
-local function GetCatColor(c) if c=="Lento"then return K.Success elseif c=="Rápido"then return K.White elseif c=="Mais Rápido"then return K.Orange elseif c=="Sem Burla"then return K.Gray end return K.Gray end
+local function GetCatColor(c) if c=="Lento"then return K.Success elseif c=="Rapido"then return K.White elseif c=="MaisRapido"then return K.Orange elseif c=="SemBurla"then return K.Gray end return K.Gray end
 
--- ============================================
--- EB DELTA — HOTBAR COM POSICIONAMENTO MANUAL
--- ============================================
+-- ============ EB DELTA (HOTBAR estilo HAVAC) ============
 local EBSUB="Parkours"
 local RenderSub
 
 local function ShowEBDelta(keep)
     CurPage="EBDelta" ClearAll(keep)
 
-    -- HOTBAR (Manual, sem UIListLayout)
-    local hb=New("Frame",{Size=_U2(1,0,0,44),BackgroundColor3=K.Card,BorderSizePixel=0,LayoutOrder=0},CH)
+    -- HOTBAR
+    local hb=New("Frame",{Size=_U2(1,0,0,42),BackgroundColor3=K.Card,BorderSizePixel=0,LayoutOrder=0},CH)
     Cor(hb,8) Sk(hb,K.Stroke,1)
 
     local tabs={
@@ -383,25 +387,14 @@ local function ShowEBDelta(keep)
         local btn=New("TextButton",{
             Size=_U2(1/n,0,1,0),
             Position=_U2((i-1)/n,0,0,0),
-            BackgroundTransparency=1,
-            BorderSizePixel=0,
+            BackgroundTransparency=1,BorderSizePixel=0,
             Text=tb.label,
             TextColor3=sl and K.White or K.DGray,
-            TextSize=12,
-            Font=sl and GB or GM,
-            AutoButtonColor=false,
-            ZIndex=3,
+            TextSize=12,Font=sl and GB or GM,
+            AutoButtonColor=false,ZIndex=3,
         },hb)
         if sl then
-            -- Underline roxo
-            New("Frame",{
-                AnchorPoint=_V2(0.5,1),
-                Position=_U2(0.5,0,1,-4),
-                Size=_U2(0.6,0,0,2),
-                BackgroundColor3=K.Purple,
-                BorderSizePixel=0,
-                ZIndex=5,
-            },btn)
+            New("Frame",{AnchorPoint=_V2(0.5,1),Position=_U2(0.5,0,1,-4),Size=_U2(0.7,0,0,2),BackgroundColor3=K.Purple,BorderSizePixel=0,ZIndex=5},btn)
         end
         btn.MouseButton1Click:Connect(function()
             if EBSUB~=tb.key then EBSUB=tb.key ShowEBDelta(false) end
@@ -422,20 +415,20 @@ local function RenderParkours()
         local ec=New("Frame",{Size=_U2(1,0,0,expPk[num] and 149 or 0),BackgroundTransparency=1,ClipsDescendants=true,LayoutOrder=num+20},CH)
         New("UIListLayout",{Padding=_UD(0,5)},ec)
         for _,cat in ipairs(CAT)do
-            local b=New("TextButton",{Size=_U2(1,0,0,32),BackgroundColor3=K.Panel,BorderSizePixel=0,Text="   "..cat,TextColor3=GetCatColor(cat),TextSize=10,Font=GB,TextXAlignment=XL,AutoButtonColor=false},ec) Cor(b,7)
+            local b=New("TextButton",{Size=_U2(1,0,0,32),BackgroundColor3=K.Panel,BorderSizePixel=0,Text="   "..CAT_LABEL[cat],TextColor3=GetCatColor(cat),TextSize=10,Font=GB,TextXAlignment=XL,AutoButtonColor=false},ec) Cor(b,7)
             local s=Sk(b,K.Stroke)
             if selCat[num]==cat then b.BackgroundColor3=K.SelRedD b.TextColor3=K.SelRed s.Color=K.SelRed s.Thickness=1.5 end
             b.MouseButton1Click:Connect(function()
                 local rt=routes[cat] and routes[cat][num]
-                if not rt then Notify("ROTA NAO ENCONTRADA","Parkour "..num.." - "..cat,"Error") return end
-                selCat[num]=cat Notify("ROTA SELECIONADA","Parkour "..num.." - "..cat,"Success") ShowEBDelta(true)
+                if not rt then Notify("ROTA NAO ENCONTRADA","Parkour "..num.." - "..CAT_LABEL[cat],"Error") return end
+                selCat[num]=cat Notify("ROTA SELECIONADA","Parkour "..num.." - "..CAT_LABEL[cat],"Success") ShowEBDelta(true)
             end)
         end
         start.MouseButton1Click:Connect(function()
             if Pb.Running and Pb.Pk==num and not Pb.Tower then Stop("cancelled") ShowEBDelta(true) return end
             local cat=selCat[num] or "Lento" selCat[num]=cat
             local rt=routes[cat] and routes[cat][num]
-            if not rt then Notify("ROTA NAO ENCONTRADA","Parkour "..num.." - "..cat,"Error") return end
+            if not rt then Notify("ROTA NAO ENCONTRADA","Parkour "..num.." - "..CAT_LABEL[cat],"Error") return end
             StartRoute(rt,cat,num) task.wait(.1) ShowEBDelta(true)
         end)
         exp.MouseButton1Click:Connect(function() expPk[num]=not expPk[num] ShowEBDelta(true) end)
@@ -449,8 +442,8 @@ local function RenderTorres()
     local b1=New("TextButton",{AnchorPoint=_V2(1,.5),Position=_U2(1,-8,.5,0),Size=_UO(78,30),BackgroundColor3=run1 and K.Err or K.Success,BorderSizePixel=0,Text=run1 and "PARAR" or "INICIAR",TextColor3=K.White,TextSize=9,Font=GB,AutoButtonColor=false},r1) Cor(b1,7)
     b1.MouseButton1Click:Connect(function()
         if Pb.Running and Pb.Tower=="Torre 1" then Stop("cancelled") ShowEBDelta(true) return end
-        local rt=tRoutes["Torre 1"]["Única"] if not rt then Notify("ROTA NAO CARREGADA","Torre 1","Error") return end
-        StartRoute(rt,nil,nil,"Torre 1","Única") task.wait(.1) ShowEBDelta(true)
+        local rt=tRoutes["Torre 1"]["Unica"] if not rt then Notify("ROTA NAO CARREGADA","Torre 1","Error") return end
+        StartRoute(rt,nil,nil,"Torre 1","Unica") task.wait(.1) ShowEBDelta(true)
     end)
     local r2=New("Frame",{Size=_U2(1,0,0,45),BackgroundColor3=K.Card,BorderSizePixel=0,LayoutOrder=2},CH) Cor(r2,8) Sk(r2,K.Stroke)
     New("TextLabel",{BackgroundTransparency=1,Position=_UO(10,0),Size=_U2(1,-150,1,0),Text="Torre 2",TextColor3=K.White,TextSize=12,Font=GB,TextXAlignment=XL},r2)
@@ -511,7 +504,6 @@ local function JJstart()
                     if clicou then break end
                 end
             end
-            if JJ.metaOn and JJ.feitos==JJ.meta-1 and (tick()-JJ.ultimaBolha>2) then JJ.ativo=false JJset(false) continue end
             if clicou then task.wait(JJ.vel/100) else task.wait(0.02) end
         end
     end)
@@ -561,7 +553,7 @@ end
 local function RenderConfig()
     local c=New("Frame",{Size=_U2(1,0,0,250),BackgroundColor3=K.Card,BorderSizePixel=0,LayoutOrder=1},CH) Cor(c,8) Sk(c,K.SLight,1)
     New("TextLabel",{BackgroundTransparency=1,Position=_UO(12,8),Size=_U2(1,-24,0,22),Text="CONFIGURACAO DE ROTA",TextColor3=K.White,TextSize=14,Font=GB,TextXAlignment=XL},c)
-    New("TextLabel",{BackgroundTransparency=1,Position=_UO(13,32),Size=_U2(1,-26,0,28),Text="Escolha como o personagem se aproxima do inicio da rota. Vale para Parkours E Torres.",TextColor3=K.DGray,TextSize=10,Font=GM,TextWrapped=true,TextXAlignment=XL,TextYAlignment=Enum.TextYAlignment.Top},c)
+    New("TextLabel",{BackgroundTransparency=1,Position=_UO(13,32),Size=_U2(1,-26,0,28),Text="Escolha como o personagem se aproxima do inicio. Vale para Parkours E Torres.",TextColor3=K.DGray,TextSize=10,Font=GM,TextWrapped=true,TextXAlignment=XL,TextYAlignment=Enum.TextYAlignment.Top},c)
     New("TextLabel",{BackgroundTransparency=1,Position=_UO(12,70),Size=_U2(1,-24,0,14),Text="Modo selecionado: "..PK.Modo,TextColor3=K.Primary,TextSize=11,Font=GB,TextXAlignment=XL},c)
     local of=New("Frame",{Position=_UO(12,94),Size=_U2(1,-24,0,70),BackgroundTransparency=1},c)
     New("UIListLayout",{FillDirection=Enum.FillDirection.Horizontal,Padding=_UD(0,8)},of)
@@ -573,11 +565,8 @@ local function RenderConfig()
         New("TextLabel",{BackgroundTransparency=1,Position=_UO(46,26),Size=_U2(1,-50,0,36),Text=t2,TextColor3=K.DGray,TextSize=9,Font=GM,TextWrapped=true,TextXAlignment=XL,TextYAlignment=Enum.TextYAlignment.Top},b)
         b.MouseButton1Click:Connect(function() if PK.Modo~=key then PK.Modo=key Notify("MODO ALTERADO","Modo: "..t1,"Success") ShowEBDelta(true) end end)
     end
-    opt("Dummy","D","DUMMY","Cria um marcador verde. Voce anda ate ele e a rota comeca.")
-    opt("Direto","I","IR DIRETO","O personagem anda ate o inicio sozinho (movimento normal).")
-    local ib=New("Frame",{Position=_UO(12,176),Size=_U2(1,-24,0,60),BackgroundColor3=K.Panel,BorderSizePixel=0},c) Cor(ib,7) Sk(ib,K.Stroke,1)
-    New("TextLabel",{BackgroundTransparency=1,Position=_UO(10,6),Size=_U2(1,-20,0,16),Text="Sobre o modo atual",TextColor3=K.White,TextSize=11,Font=GB,TextXAlignment=XL},ib)
-    New("TextLabel",{BackgroundTransparency=1,Position=_UO(10,24),Size=_U2(1,-20,0,32),Text=PK.Modo=="Dummy" and "Aguarda voce caminhar ate o marcador verde." or "Anda automaticamente com o movimento natural do Roblox.",TextColor3=K.Gray,TextSize=9,Font=GM,TextWrapped=true,TextXAlignment=XL,TextYAlignment=Enum.TextYAlignment.Top},ib)
+    opt("Dummy","D","DUMMY","Cria um marcador verde. Voce anda ate ele e a rota comeca (Parkour e Torres).")
+    opt("Direto","I","IR DIRETO","O personagem anda ate o inicio sozinho (Parkour e Torres).")
 end
 
 RenderSub=function()
@@ -587,13 +576,13 @@ RenderSub=function()
     elseif EBSUB=="Configuracao" then RenderConfig() end
 end
 
--- VOLVERS
+-- ============ VOLVERS ============
 local function ShowVolvers()
     CurPage="Volvers" ClearAll()
     local h=New("Frame",{Size=_U2(1,0,0,58),BackgroundColor3=K.Card,BorderSizePixel=0,LayoutOrder=0},CH) Cor(h,9) Sk(h,K.SLight,1)
     New("TextLabel",{BackgroundTransparency=1,Position=_UO(12,7),Size=_U2(1,-24,0,25),Text="VOLVERS",TextColor3=K.White,TextSize=16,Font=GB,TextXAlignment=XL},h)
     New("TextLabel",{BackgroundTransparency=1,Position=_UO(13,34),Size=_U2(1,-26,0,15),Text="Comandos de formacao",TextColor3=K.DGray,TextSize=9,Font=GM,TextXAlignment=XL},h)
-    local cmds={{"SALVAR POSICAO","Salva somente para onde o personagem esta olhando.",true,SaveDir},{"DIREITA VOLVER!","Gira 90 graus para a direita.",false,function()Turn("DIREITA")end},{"ESQUERDA VOLVER!","Gira 90 graus para a esquerda.",false,function()Turn("ESQUERDA")end},{"RETAGUARDA VOLVER!","Gira 180 graus para tras.",false,function()Turn("RETAGUARDA")end},{"VANGUARDA VOLVER!","Retorna a direcao salva.",false,Vanguarda}}
+    local cmds={{"SALVAR POSICAO","Salva para onde o personagem esta olhando.",true,SaveDir},{"DIREITA VOLVER!","Gira 90 graus para a direita.",false,function()Turn("DIREITA")end},{"ESQUERDA VOLVER!","Gira 90 graus para a esquerda.",false,function()Turn("ESQUERDA")end},{"RETAGUARDA VOLVER!","Gira 180 graus para tras.",false,function()Turn("RETAGUARDA")end},{"VANGUARDA VOLVER!","Retorna a direcao salva.",false,Vanguarda}}
     for i,cmd in ipairs(cmds)do
         local c=New("Frame",{Size=_U2(1,0,0,55),BackgroundColor3=cmd[3] and _RGB(38,38,38) or K.Card,BorderSizePixel=0,LayoutOrder=i+1},CH) Cor(c,8) Sk(c,cmd[3] and K.Primary or K.Stroke,cmd[3] and 1.7 or 1)
         New("TextLabel",{BackgroundTransparency=1,Position=_UO(11,5),Size=_U2(1,-100,0,20),Text=cmd[1],TextColor3=K.White,TextSize=10,Font=Enum.Font.GothamBlack,TextXAlignment=XL},c)
@@ -603,7 +592,7 @@ local function ShowVolvers()
     end
 end
 
--- IA CHAT
+-- ============ IA CHAT ============
 local iaBusy=false
 local function ShowIAChat()
     CurPage="IAChat" ClearAll()
@@ -614,30 +603,29 @@ local function ShowIAChat()
     local bx=New("TextBox",{Position=_UO(10,10),Size=_U2(1,-20,0,56),BackgroundColor3=K.Panel,BorderSizePixel=0,PlaceholderText="Digite sua mensagem...",PlaceholderColor3=K.DGray,Text="",TextColor3=K.White,TextSize=11,Font=GM,TextWrapped=true,TextXAlignment=XL,TextYAlignment=Enum.TextYAlignment.Top,ClearTextOnFocus=false,MultiLine=false},c) Cor(bx,7) Sk(bx,K.Stroke,1) Pad(bx,6,6,8,8)
     local sd=New("TextButton",{Position=_UO(10,74),Size=_U2(1,-20,0,34),BackgroundColor3=K.Success,BorderSizePixel=0,Text="CORRIGIR E ENVIAR",TextColor3=K.White,TextSize=10,Font=GB,AutoButtonColor=false},c) Cor(sd,7)
     local stt=New("TextLabel",{BackgroundTransparency=1,Position=_UO(10,114),Size=_U2(1,-20,0,18),Text="",TextColor3=K.Gray,TextSize=10,Font=GM,TextXAlignment=XL},c)
-    local function setSt(t,cl) stt.Text=t stt.TextColor3=cl end
     sd.MouseButton1Click:Connect(function()
         if iaBusy then return end
         local tx=bx.Text:gsub("^%s+",""):gsub("%s+$","")
-        if tx=="" then setSt("Digite algo primeiro",K.Orange) return end
-        iaBusy=true sd.Text="AGUARDE..." setSt("Pensando...",K.Gray)
+        if tx=="" then stt.Text="Digite algo primeiro" stt.TextColor3=K.Orange return end
+        iaBusy=true sd.Text="AGUARDE..." stt.Text="Pensando..." stt.TextColor3=K.Gray
         task.spawn(function()
             local cor,err=Corrigir(tx)
             if cor then
-                if SendChat(cor)then setSt("Corrigido e enviado!",K.Success) bx.Text="" Notify("IA CHAT","Mensagem enviada.","Success") else setSt("Chat nao encontrado",K.Err) end
-            else setSt("Erro: "..tostring(err),K.Err) end
+                if SendChat(cor)then stt.Text="Corrigido e enviado!" stt.TextColor3=K.Success bx.Text="" Notify("IA CHAT","Enviada.","Success") else stt.Text="Chat nao encontrado" stt.TextColor3=K.Err end
+            else stt.Text="Erro: "..tostring(err) stt.TextColor3=K.Err end
             sd.Text="CORRIGIR E ENVIAR" iaBusy=false
         end)
     end)
 end
 
--- CREDITOS
+-- ============ CREDITOS ============
 local function ShowCreditos()
     CurPage="Creditos" ClearAll()
     local link="https://discord.gg/NY2RfC7Kx"
     local h=New("Frame",{Size=_U2(1,0,0,58),BackgroundColor3=K.Card,BorderSizePixel=0,LayoutOrder=0},CH) Cor(h,9) Sk(h,K.SLight,1)
     New("TextLabel",{BackgroundTransparency=1,Position=_UO(12,7),Size=_U2(1,-24,0,25),Text="CREDITOS",TextColor3=K.White,TextSize=16,Font=GB,TextXAlignment=XL},h)
     local dv=New("Frame",{Size=_U2(1,0,0,70),BackgroundColor3=K.Card,BorderSizePixel=0,LayoutOrder=1},CH) Cor(dv,8) Sk(dv,K.Stroke,1)
-    New("TextLabel",{BackgroundTransparency=1,Position=_UO(11,8),Size=_U2(1,-22,0,54),Text="Esse script foi desenvolvido pelo akira007p no Discord",TextColor3=K.White,TextSize=11,Font=GB,TextWrapped=true,TextXAlignment=XL,TextYAlignment=Enum.TextYAlignment.Center},dv)
+    New("TextLabel",{BackgroundTransparency=1,Position=_UO(11,8),Size=_U2(1,-22,0,54),Text="Script desenvolvido pelo akira007p (Discord)",TextColor3=K.White,TextSize=11,Font=GB,TextWrapped=true,TextXAlignment=XL,TextYAlignment=Enum.TextYAlignment.Center},dv)
     local sv=New("Frame",{Size=_U2(1,0,0,70),BackgroundColor3=K.Card,BorderSizePixel=0,LayoutOrder=2},CH) Cor(sv,8) Sk(sv,K.Orange,1.5)
     New("TextLabel",{BackgroundTransparency=1,Position=_UO(11,9),Size=_U2(1,-100,0,20),Text="Servidor do Discord",TextColor3=K.White,TextSize=10,Font=Enum.Font.GothamBlack,TextXAlignment=XL},sv)
     New("TextLabel",{BackgroundTransparency=1,Position=_UO(11,32),Size=_U2(1,-100,0,28),Text=link,TextColor3=K.Gray,TextSize=8,Font=GM,TextWrapped=true,TextXAlignment=XL,TextYAlignment=Enum.TextYAlignment.Top},sv)
@@ -645,7 +633,7 @@ local function ShowCreditos()
     en.MouseButton1Click:Connect(function() pcall(function()setclipboard(link)end) pcall(function()game:GetService("GuiService"):OpenBrowserWindow(link)end) Notify("DISCORD","Link copiado!","Success") end)
 end
 
--- LOJA
+-- ============ LOJA ============
 local function ShowLoja()
     CurPage="Loja" ClearAll()
     local h=New("Frame",{Size=_U2(1,0,0,58),BackgroundColor3=K.Card,BorderSizePixel=0,LayoutOrder=0},CH) Cor(h,9) Sk(h,K.SLight,1)
@@ -662,9 +650,9 @@ local function ShowLoja()
     end)
 end
 
--- COMBATE
+-- ============ COMBATE (AIMBOT + HITBOX em blocos) ============
 local ShowCombate
-local AB={Ativo=false,MostrarFOV=false,FOV=43,RingTransp=0.3,Cor=_RGB(150,80,255),Thickness=2,OffX=0,OffY=-47,Parte="Cabeça"}
+local AB={Ativo=false,MostrarFOV=false,FOV=43,RingTransp=0.3,Cor=_RGB(150,80,255),Thickness=2,OffX=0,OffY=-47,Parte="Cabeca"}
 local Cam=workspace.CurrentCamera
 local FOVring=nil
 pcall(function()
@@ -676,7 +664,7 @@ end)
 local function ABcentro() return Vector2.new(Cam.ViewportSize.X/2+AB.OffX,Cam.ViewportSize.Y/2+AB.OffY) end
 local function ABparte(ch)
     if not ch then return nil end
-    if AB.Parte=="Cabeça" then return ch:FindFirstChild("Head") or ch:FindFirstChild("HumanoidRootPart")
+    if AB.Parte=="Cabeca" then return ch:FindFirstChild("Head") or ch:FindFirstChild("HumanoidRootPart")
     else return ch:FindFirstChild("Torso") or ch:FindFirstChild("UpperTorso") or ch:FindFirstChild("LowerTorso") or ch:FindFirstChild("Head") end
 end
 local function ABlook(t)
@@ -754,7 +742,6 @@ HBconn=R.Heartbeat:Connect(function()
         for c in pairs(HBorig)do HBrestore(c) end
     end
 end)
-
 local function CBHeader(txt,sub,order)
     local h=New("Frame",{Size=_U2(1,0,0,44),BackgroundColor3=K.Card,BorderSizePixel=0,LayoutOrder=order},CH) Cor(h,9) Sk(h,K.SLight,1)
     New("TextLabel",{BackgroundTransparency=1,Position=_UO(12,5),Size=_U2(1,-24,0,20),Text=txt,TextColor3=K.White,TextSize=13,Font=GB,TextXAlignment=XL},h)
@@ -818,6 +805,7 @@ end
 
 ShowCombate=function()
     CurPage="Combate" ClearAll()
+    -- BLOCO 1: AIMBOT
     CBHeader("AIMBOT","Mira automatica - FOV - Cabeca / Tronco",0)
     local bt=New("TextButton",{Size=_U2(1,0,0,42),BackgroundColor3=AB.Ativo and K.Err or K.Success,Text=AB.Ativo and "PARAR" or "LIGAR",TextColor3=K.White,Font=GB,TextSize=14,BorderSizePixel=0,AutoButtonColor=false,LayoutOrder=1},CH) Cor(bt,8)
     bt.MouseButton1Click:Connect(function() AB.Ativo=not AB.Ativo bt.Text=AB.Ativo and "PARAR" or "LIGAR" bt.BackgroundColor3=AB.Ativo and K.Err or K.Success end)
@@ -825,18 +813,17 @@ ShowCombate=function()
     New("TextLabel",{BackgroundTransparency=1,Position=_UO(10,0),Size=_U2(1,-70,1,0),Text="Mostrar FOV",TextColor3=K.White,TextSize=11,Font=GM,TextXAlignment=XL},cf)
     local tf=New("TextButton",{AnchorPoint=_V2(1,.5),Position=_U2(1,-10,.5,0),Size=_UO(38,20),BackgroundColor3=AB.MostrarFOV and K.Success or K.Panel,Text="",BorderSizePixel=0,AutoButtonColor=false},cf) Cor(tf,10) Sk(tf,K.Stroke,1)
     local bf=New("Frame",{Position=AB.MostrarFOV and _UO(21,3) or _UO(3,3),Size=_UO(14,14),BackgroundColor3=AB.MostrarFOV and Color3.new(1,1,1) or K.DGray,BorderSizePixel=0},tf) Cor(bf,7)
-    local ef=AB.MostrarFOV
     tf.MouseButton1Click:Connect(function()
-        ef=not ef AB.MostrarFOV=ef
-        tf.BackgroundColor3=ef and K.Success or K.Panel
-        bf.Position=ef and _UO(21,3) or _UO(3,3)
-        bf.BackgroundColor3=ef and Color3.new(1,1,1) or K.DGray
+        AB.MostrarFOV=not AB.MostrarFOV
+        tf.BackgroundColor3=AB.MostrarFOV and K.Success or K.Panel
+        bf.Position=AB.MostrarFOV and _UO(21,3) or _UO(3,3)
+        bf.BackgroundColor3=AB.MostrarFOV and Color3.new(1,1,1) or K.DGray
     end)
     local af=New("Frame",{Size=_U2(1,0,0,32),BackgroundTransparency=1,LayoutOrder=3},CH)
     New("UIListLayout",{FillDirection=Enum.FillDirection.Horizontal,Padding=_UD(0,5)},af)
     local opts={}
     local function updA() for _,o in ipairs(opts)do if o.N==AB.Parte then o.B.BackgroundColor3=K.SelRedD o.B.TextColor3=K.SelRed o.S.Color=K.SelRed o.S.Thickness=1.5 else o.B.BackgroundColor3=K.Panel o.B.TextColor3=K.Gray o.S.Color=K.Stroke o.S.Thickness=1 end end end
-    for _,nm in ipairs({"Cabeça","Tronco"})do
+    for _,nm in ipairs({"Cabeca","Tronco"})do
         local b=New("TextButton",{Size=_U2(0.5,-3,1,0),BackgroundColor3=K.Panel,Text=nm,TextColor3=K.Gray,Font=GB,TextSize=11,BorderSizePixel=0,AutoButtonColor=false},af) Cor(b,6)
         local s=Sk(b,K.Stroke,1) table.insert(opts,{B=b,N=nm,S=s})
         b.MouseButton1Click:Connect(function() AB.Parte=nm updA() end)
@@ -851,6 +838,8 @@ ShowCombate=function()
         local b=New("TextButton",{Size=_UO(22,22),Position=_UO((i-1)*28,0),BackgroundColor3=cor,Text="",BorderSizePixel=0,AutoButtonColor=false},cfr) Cor(b,6) Sk(b,K.Stroke,1)
         b.MouseButton1Click:Connect(function() AB.Cor=cor if FOVring then FOVring.Color=cor end end)
     end
+
+    -- BLOCO 2: HITBOX
     CBHeader("HITBOX","Reach - tamanho, cor e transparencia",10)
     HBToggle(11,"Ativar Reach",HB.Ativo,function(v) HB.Ativo=v Notify("HITBOX",v and "Reach ativado." or "Reach desativado.",v and "Success" or "Error") end)
     HBToggle(12,"Mostrar Visual",HB.Visual,function(v) HB.Visual=v end)
@@ -881,7 +870,7 @@ ShowCombate=function()
     end)
 end
 
--- TEXTOS
+-- ============ TEXTOS PRONTOS ============
 local ShowTextos
 do
     local CC={
@@ -944,7 +933,7 @@ do
     end
 end
 
--- SELETOR
+-- ============ SELETOR DE ABAS ============
 local function SelBtn(b)
     if selBtn then selBtn.BackgroundColor3=K.Card selBtn.TextColor3=K.Gray end
     selBtn=b b.BackgroundColor3=K.Sel b.TextColor3=K.White
@@ -958,7 +947,7 @@ btnTextos.MouseButton1Click:Connect(function() SelBtn(btnTextos) ShowTextos() en
 btnLoja.MouseButton1Click:Connect(function() SelBtn(btnLoja) ShowLoja() end)
 btnCreditos.MouseButton1Click:Connect(function() SelBtn(btnCreditos) ShowCreditos() end)
 
--- DRAG / OPEN / CLOSE
+-- ============ DRAG / OPEN / CLOSE ============
 local ldrag=false local lds,lsp
 Logo.InputBegan:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then ldrag=true lds=i.Position lsp=Logo.Position i.Changed:Connect(function() if i.UserInputState==Enum.UserInputState.End then ldrag=false end end) end end)
 U.InputChanged:Connect(function(i) if ldrag and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then local d=i.Position-lds Logo.Position=_U2(lsp.X.Scale,lsp.X.Offset+d.X,lsp.Y.Scale,lsp.Y.Offset+d.Y) end end)
@@ -971,15 +960,14 @@ local function CloseM() if not Opened then return end Opened=false local tw=T:Cr
 Logo.MouseButton1Click:Connect(function() if Opened then CloseM() else OpenM() end end)
 BtnX.MouseButton1Click:Connect(CloseM)
 
--- INIT
+-- ============ INIT ============
 task.defer(function()
     local loaded=0
     for _,c in ipairs(CAT)do if LoadCat(c)then loaded=loaded+1 end end
-    local lt1=LoadTR("Torre 1","Única") local lt2=0
+    local lt1=LoadTR("Torre 1","Unica") local lt2=0
     for _,r in ipairs(T2RO)do if LoadTR("Torre 2",r)then lt2=lt2+1 end end
     for i=1,4 do selCat[i]="Lento" end
     ShowEBDelta()
-    Notify("ZKY PARKOUR EB","v3.4 - "..loaded.."/4 - T1:"..(lt1 and "OK" or "X").." - T2:"..lt2.."/4", loaded==4 and lt1 and lt2==4 and "Success" or "Error")
+    Notify("ZKY PARKOUR EB","v3.5 - "..loaded.."/4 - T1:"..(lt1 and "OK" or "X").." - T2:"..lt2.."/4", loaded==4 and lt1 and lt2==4 and "Success" or "Error")
 end)
-
-print("[ZKY PARKOUR EB V3.4] Carregado!")
+print("[ZKY PARKOUR EB V3.5] Carregado!")
