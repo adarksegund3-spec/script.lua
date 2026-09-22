@@ -211,11 +211,20 @@ local function CriarDummy(pos,rot)
     RemoverDummy()
     local alvo=rot and(CFrame.new(pos)*(rot-rot.Position))or CFrame.new(pos) local ok=false
     if RefreshCharacter()then
+        -- Alguns avatares vêm com partes/acessórios não-arquiváveis, o que faz Clone() falhar silenciosamente.
+        -- Forçamos Archivable=true só durante o clone e devolvemos o valor original logo em seguida, sem afetar o boneco real.
+        local salvos={}
+        for _,d in ipairs(character:GetDescendants())do salvos[d]=d.Archivable pcall(function()d.Archivable=true end)end
         local cok,clone=pcall(function()return character:Clone()end)
+        for inst,valor in pairs(salvos)do pcall(function()inst.Archivable=valor end)end
         if cok and clone then
             for _,d in ipairs(clone:GetDescendants())do
                 if d:IsA("Script")or d:IsA("LocalScript")then pcall(function()d:Destroy()end)
-                elseif d:IsA("BasePart")then d.CanCollide=false d.CanQuery=false d.CanTouch=false d.Massless=true end
+                elseif d:IsA("Shirt")or d:IsA("Pants")or d:IsA("ShirtGraphic")or d:IsA("Decal")then pcall(function()d:Destroy()end)
+                elseif d:IsA("BasePart")then
+                    d.CanCollide=false d.CanQuery=false d.CanTouch=false d.Massless=true
+                    d.Material=Enum.Material.ForceField d.Color=_RGB(0,255,140) d.Transparency=.35
+                end
             end
             local hum=clone:FindFirstChildOfClass("Humanoid")
             if hum then pcall(function()hum.WalkSpeed=0 hum.JumpPower=0 hum.PlatformStand=true end)end
@@ -225,8 +234,8 @@ local function CriarDummy(pos,rot)
                 local pok=pcall(function()clone:PivotTo(alvo)end)
                 if pok then
                     for _,d in ipairs(clone:GetDescendants())do if d:IsA("BasePart")then d.Anchored=true end end
-                    local hl=_I("Highlight") hl.FillColor=_RGB(0,255,130) hl.OutlineColor=_RGB(0,255,130)
-                    hl.FillTransparency=.35 hl.OutlineTransparency=0 hl.DepthMode=Enum.HighlightDepthMode.AlwaysOnTop hl.Parent=clone
+                    local hl=_I("Highlight") hl.FillColor=_RGB(0,255,140) hl.OutlineColor=_RGB(150,255,195)
+                    hl.FillTransparency=.55 hl.OutlineTransparency=0 hl.DepthMode=Enum.HighlightDepthMode.AlwaysOnTop hl.Parent=clone
                     clone.Name="ZKY_Dummy" DummyObj=clone ok=true
                 else clone:Destroy()end
             else clone:Destroy()end
@@ -244,12 +253,12 @@ local function StopPlayback(reason)
 if Playback.Connection then Playback.Connection:Disconnect();Playback.Connection=nil end
 if Playback.WalkConnection then Playback.WalkConnection:Disconnect();Playback.WalkConnection=nil end RemoverDummy() Playback.Running=false Playback.Route=nil Playback.CurrentIndex=1
 Playback.LastJump=-math.huge Playback.Category=nil Playback.Parkour=nil Playback.Tower=nil Playback.TowerRoute=nil Playback.WalkingToStart=false
-if RefreshCharacter()then humanoid:Move(Vector3.zero,false);humanoid.Jump=false end ClearLines()
+if RefreshCharacter()then humanoid:Move(Vector3.zero,false);humanoid.Jump=false pcall(function()humanoid.AutoRotate=true end)end ClearLines()
 if reason=="completed" then Notify("CONCLUÍDO","Rota finalizada!","Success") elseif reason=="cancelled" then Notify("PARADO","Reprodução interrompida.","Error")
 elseif reason=="error" then Notify("ERRO","Não foi possível continuar.","Error")end end
 local function IniciarExecucao(name)
     if not Playback.Running then return end
-    Playback.WalkingToStart=false if RefreshCharacter()then humanoid:Move(Vector3.zero,false)end
+    Playback.WalkingToStart=false if RefreshCharacter()then humanoid:Move(Vector3.zero,false) pcall(function()humanoid.AutoRotate=false end)end
     Playback.StartClock=os.clock() Playback.CurrentIndex=1 Playback.LastJump=-math.huge Notify("EXECUTANDO",name,"Success")
     task.spawn(function()
         while Playback.Running and not Playback.WalkingToStart do if not RefreshCharacter()then StopPlayback("error");break end local frames=Playback.Route
