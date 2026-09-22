@@ -96,7 +96,6 @@ repeat task.wait() until _G.ZKY_OK
 
 local _I,_U2,_UO,_UD,_RGB,_V2,_GB,_GM,_XL,_XC=Instance.new,UDim2.new,UDim2.fromOffset,UDim.new,Color3.fromRGB,Vector2.new,Enum.Font.GothamBold,Enum.Font.GothamMedium,Enum.TextXAlignment.Left,Enum.TextXAlignment.Center
 local P=game:GetService("Players") local T=game:GetService("TweenService") local U=game:GetService("UserInputService") local R=game:GetService("RunService")
-local PFS=game:GetService("PathfindingService")
 local HS=game:GetService("HttpService") local TCS=game:GetService("TextChatService") local RS=game:GetService("ReplicatedStorage") local Pl=P.LocalPlayer
 local PG=Pl:WaitForChild("PlayerGui") local character,humanoid,rootPart local CONFIG={ LineThickness=.15, LineTransparency=.2, LineColor=_RGB(255,145,45),
 JumpCooldown=.28, PlaybackSpeed=1, WalkToSpeed=16, GroundOffset=1.66 } local ParkourConfig={ Modo="Dummy" } -- "Dummy" ou "Direto"
@@ -163,47 +162,18 @@ if elapsed<=frames[1].t then Playback.CurrentIndex=1;return frames[1],frames[2],
 local i=math.clamp(Playback.CurrentIndex,1,count-1) while i<count-1 and elapsed>frames[i+1].t do i+=1 end while i>1 and elapsed<frames[i].t do i-=1 end
 Playback.CurrentIndex=i local a,b=frames[i],frames[i+1] local d=b.t-a.t local alpha=d>0 and math.clamp((elapsed-a.t)/d,0,1)or 0 return a,b,alpha end
 local function HandleJump(f,e) if not f or not f.j or e-Playback.LastJump<CONFIG.JumpCooldown or not RefreshCharacter()then return end Playback.LastJump=e
-humanoid.Jump=true pcall(function()humanoid:ChangeState(Enum.HumanoidStateType.Jumping)end) end -- ===== Caminhada humanizada até o início da rota (pathfinding + variação natural) =====
-local function ComputarCaminho(origem,destino)
-    local ok,resultado=pcall(function()
-        local caminho=PFS:CreatePath({ AgentRadius=2.2, AgentHeight=5, AgentCanJump=true, AgentCanClimb=true, WaypointSpacing=4 })
-        caminho:ComputeAsync(origem,destino)
-        return caminho
-    end)
-    if ok and resultado and resultado.Status==Enum.PathStatus.Success then
-        return resultado:GetWaypoints()
-    end
-    return nil
-end
+humanoid.Jump=true pcall(function()humanoid:ChangeState(Enum.HumanoidStateType.Jumping)end) end -- ===== Caminhada até o início da rota (igual ao original) =====
 local function AndarAte(destino,estaCancelado,aoTerminar)
     if not RefreshCharacter()then aoTerminar(false) return end
-    humanoid.WalkSpeed=CONFIG.WalkToSpeed*(0.92+math.random()*0.16)
-    local waypoints=ComputarCaminho(rootPart.Position,destino) local sucesso=true
-    if waypoints and #waypoints>1 then
-        for i=2,#waypoints do
-            if estaCancelado()then sucesso=false break end
-            if not RefreshCharacter()then sucesso=false break end
-            local wp=waypoints[i]
-            if wp.Action==Enum.PathWaypointAction.Jump then humanoid.Jump=true pcall(function()humanoid:ChangeState(Enum.HumanoidStateType.Jumping)end) end
-            humanoid:MoveTo(wp.Position) local chegou=false local conn
-            conn=humanoid.MoveToFinished:Connect(function()chegou=true end) local t0=os.clock()
-            while not chegou and not estaCancelado() and os.clock()-t0<3 do task.wait() end
-            if conn then conn:Disconnect() end
-            if estaCancelado()then sucesso=false break end
-            if i<#waypoints and math.random()<0.18 then task.wait(math.random(5,16)/100) end
-        end
-    else
-        humanoid:MoveTo(destino) local t0=os.clock()
-        while not estaCancelado() and os.clock()-t0<15 do
-            if not RefreshCharacter()then sucesso=false break end
-            if(rootPart.Position-destino).Magnitude<=4 then break end
-            task.wait()
-        end
-        if os.clock()-t0>=15 then sucesso=false end
+    humanoid.WalkSpeed=CONFIG.WalkToSpeed humanoid:MoveTo(destino) local started=os.clock() local sucesso=false
+    while not estaCancelado() do
+        if not RefreshCharacter()then break end
+        if(rootPart.Position-destino).Magnitude<=4 then sucesso=true break end
+        if os.clock()-started>60 then break end
+        task.wait()
     end
-    if estaCancelado()then sucesso=false end
     if RefreshCharacter()then humanoid:Move(Vector3.zero,false)end
-    aoTerminar(sucesso)
+    aoTerminar(sucesso and not estaCancelado())
 end
 -- ===== Marcador/dummy fantasma (modo "Dummy") =====
 local DummyObj local RemoverDummy
