@@ -112,7 +112,7 @@ SystemPrompt="Você é um corretor gramatical extremamente rigoroso de portuguê
 }
 
 -- ============================================
--- IA: Gerador de Textos (IGUAL ao seu script funcional)
+-- IA: Gerador de Textos — código EXATO do script funcional
 -- ============================================
 local IA_TEXTOS_CONFIG = {
     ApiKey = "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",
@@ -412,11 +412,9 @@ local function StartPlayback(data,cat,num,tower,towerRoute)
     Playback.Route=data Playback.Category=cat Playback.Parkour=num Playback.Tower=tower Playback.TowerRoute=towerRoute
     Playback.CurrentIndex=1
     ShowRouteLines(data)
-
     local name
     if tower then name = (tower=="Torre 1") and "Torre 1" or ("Torre 2 • "..towerRoute)
     else name = "Parkour "..num.." • "..cat end
-
     local usarDummy = (ParkourConfig.Modo == "Dummy")
     if usarDummy then
         Notify("MARCADOR CRIADO","Ande até o marcador verde para iniciar: "..name,"Orange")
@@ -426,8 +424,7 @@ local function StartPlayback(data,cat,num,tower,towerRoute)
             if not RefreshCharacter()then StopPlayback("error");return end
             if(rootPart.Position-target).Magnitude<=5 then
                 if Playback.WalkConnection then Playback.WalkConnection:Disconnect();Playback.WalkConnection=nil end
-                RemoverDummy()
-                IniciarExecucao(name)
+                RemoverDummy() IniciarExecucao(name)
             end
         end)
     else
@@ -529,11 +526,10 @@ local function CorrigirTexto(texto)
 end
 
 -- ============================================
--- IA: Gerar texto — IGUAL ao script funcional
+-- IA: Gerar texto — EXATO do script funcional
 -- ============================================
 local function GerarTexto(tema)
     if not httpRequest then return nil, "Executor sem suporte a HTTP" end
-
     local corpo = HS:JSONEncode({
         model = IA_TEXTOS_CONFIG.Modelo,
         messages = {
@@ -543,7 +539,6 @@ local function GerarTexto(tema)
         temperature = 0.8,
         max_tokens = 120
     })
-
     local resposta, terminou = nil, false
     task.spawn(function()
         local ok, res = pcall(function()
@@ -560,23 +555,17 @@ local function GerarTexto(tema)
         if ok then resposta = res end
         terminou = true
     end)
-
     local inicio = tick()
     while not terminou and (tick() - inicio) < IA_TEXTOS_CONFIG.Timeout do task.wait(0.1) end
-
     if not terminou then return nil, "Tempo esgotado" end
     if not resposta then return nil, "Falha na requisição" end
     if resposta.StatusCode ~= 200 then return nil, "HTTP " .. tostring(resposta.StatusCode) end
-
     local okJson, dados = pcall(function() return HS:JSONDecode(resposta.Body) end)
     if not okJson or not dados.choices or not dados.choices[1] then return nil, "Resposta inválida" end
-
     local txt = dados.choices[1].message and dados.choices[1].message.content
     if not txt or txt == "" then return nil, "Resposta vazia" end
-
     txt = txt:gsub("^%s+", ""):gsub("%s+$", "")
     txt = txt:gsub('^["\']+', ""):gsub('["\']+$', "")
-
     return txt
 end
 
@@ -619,7 +608,6 @@ local iaButton=SideButton("🤖 IA CHAT",false)
 local combateButton=SideButton("⚔ COMBATE",false)
 local textosButton=SideButton("📚 TEXTOS PRONTOS",false)
 local lojaButton=SideButton("🔫 LOJA",false)
--- 🔧 HITBOX removido da sidebar (agora vive dentro de Combate)
 local selectedButton=ebDeltaButton
 
 local Content=_I("ScrollingFrame") Content.Size=_U2(1,-134,1,-78) Content.Position=_U2(0,126,0,70) Content.BackgroundColor3=_K.Panel Content.BorderSizePixel=0
@@ -687,8 +675,6 @@ local function ShowTAFFS()
     CurrentPage="TAFFS" ClearContent()
     local warningCard=_I("Frame") warningCard.Size=_U2(1,0,0,70) warningCard.BackgroundColor3=_RGB(45,35,20) warningCard.BorderSizePixel=0
     warningCard.LayoutOrder=0 warningCard.Parent=_CH Corner(warningCard,8) Stroke(warningCard,_K.Orange,1.5)
-    local warnIcon=_I("TextLabel") warnIcon.BackgroundTransparency=1 warnIcon.Position=_UO(12,8) warnIcon.Size=_UO(30,30) warnIcon.Text="⚠️"
-    warnIcon.TextSize=20 warnIcon.TextColor3=_K.White warnIcon.Font=_GB warnIcon.TextXAlignment=_XC warnIcon.TextYAlignment=Enum.TextYAlignment.Center warnIcon.Parent=warningCard
     local warnText=_I("TextLabel") warnText.BackgroundTransparency=1 warnText.Position=_UO(48,8) warnText.Size=_U2(1,-130,0,35)
     warnText.Text="Deseja adicionar as informações TAFFS em um menu secundário?" warnText.TextColor3=_K.White warnText.TextSize=10 warnText.Font=_GB
     warnText.TextWrapped=true warnText.TextXAlignment=_XL warnText.TextYAlignment=Enum.TextYAlignment.Top warnText.Parent=warningCard
@@ -729,12 +715,11 @@ local function GetCategoryColor(c)
 end
 
 -- ============================================
--- 🏃 EB DELTA — HOTBAR estilo imagem (abas com underline)
+-- 🏃 EB DELTA — HOTBAR estilo HAVAC (com underline roxo)
 -- ============================================
 local EB_SUB = "Parkours"
 local RenderEBSub
 
--- Abas da hotbar (nomes iguais à imagem)
 local EB_TABS = {
     { key="Parkours",      label="Parkours" },
     { key="Torres",        label="Torres" },
@@ -746,27 +731,20 @@ local function ShowEBDelta(preserveScroll)
     CurrentPage = "EBDelta"
     ClearContent(preserveScroll)
 
-    -- ===== HOTBAR estilo HAVAC: texto + underline =====
     local hotbar = _I("Frame")
     hotbar.Size=_U2(1,0,0,42) hotbar.BackgroundColor3=_K.Card hotbar.BorderSizePixel=0
     hotbar.LayoutOrder=0 hotbar.Parent=_CH
     Corner(hotbar,8) Stroke(hotbar,_K.Stroke,1)
 
-    -- Separador inferior fino
-    local sep=_I("Frame")
-    sep.Size=_U2(1,-16,0,1) sep.Position=_U2(0,8,1,-1) sep.BackgroundColor3=_K.Stroke
-    sep.BorderSizePixel=0 sep.Parent=hotbar
-
-    -- Layout horizontal
     local hbLayout = _I("UIListLayout")
     hbLayout.FillDirection=Enum.FillDirection.Horizontal
     hbLayout.HorizontalAlignment=Enum.HorizontalAlignment.Left
     hbLayout.VerticalAlignment=Enum.VerticalAlignment.Center
-    hbLayout.Padding=_UD(0,4)
+    hbLayout.Padding=_UD(0,10)
     hbLayout.Parent=hotbar
     local hbPad = _I("UIPadding")
-    hbPad.PaddingLeft=_UD(0,16) hbPad.PaddingRight=_UD(0,16)
-    hbPad.PaddingTop=_UD(0,6) hbPad.PaddingBottom=_UD(0,6)
+    hbPad.PaddingLeft=_UD(0,14) hbPad.PaddingRight=_UD(0,14)
+    hbPad.PaddingTop=_UD(0,4) hbPad.PaddingBottom=_UD(0,4)
     hbPad.Parent=hotbar
 
     for _,tab in ipairs(EB_TABS) do
@@ -777,11 +755,10 @@ local function ShowEBDelta(preserveScroll)
         btn.TextColor3 = sel and _K.White or _K.DarkGray
         btn.TextSize=12 btn.Font=sel and _GB or _GM
         btn.AutoButtonColor=false
-        btn.Size=UDim2.fromOffset(0, 30) -- largura automática
+        btn.Size=UDim2.fromOffset(0, 34)
         btn.AutomaticSize=Enum.AutomaticSize.X
         btn.Parent=hotbar
 
-        -- Underline do ativo
         if sel then
             local ul = _I("Frame")
             ul.AnchorPoint=_V2(0,1)
@@ -901,8 +878,8 @@ local function RenderEB_Torres()
     ex.MouseButton1Click:Connect(function() expandedTower2=not expandedTower2 ShowEBDelta(true) end)
 end
 
--- ===== Sub-view: AUTOMAÇÕES (JJs) =====
-local JJ_AC = {Fundo=_RGB(10,10,14),Card=_RGB(20,20,28),Borda=_RGB(0,220,255),Texto=_RGB(240,240,250),Verde=_RGB(0,190,110),Vermelho=_RGB(220,50,70),Amarelo=_RGB(255,200,0),Cinza=_RGB(80,80,95)}
+-- ===== Sub-view: AUTOMAÇÕES =====
+local JJ_AC = {Verde=_RGB(0,190,110),Vermelho=_RGB(220,50,70),Amarelo=_RGB(255,200,0),Cinza=_RGB(80,80,95)}
 local JJ_ativo,JJ_VELOCIDADE,JJ_MAX_CLIQUES,JJ_META,JJ_META_ATIVA=false,29,2,40,true
 local JJ_feitos,JJ_bolhasVistas,JJ_cliquesTotal,JJ_ultimaBolhaVista=0,{},0,0
 local JJ_btnToggleRef,JJ_infoLbl,JJ_slFill,JJ_velValor
@@ -1233,7 +1210,7 @@ end
 -- ============================================
 local ShowLoja
 do
-    local AC={Fundo=_RGB(10,10,14),Card=_RGB(20,20,28),Borda=_RGB(0,220,255),Texto=_RGB(240,240,250),Verde=_RGB(0,190,110),Vermelho=_RGB(220,50,70),Amarelo=_RGB(255,200,0),Cinza=_RGB(80,80,95)}
+    local AC={Fundo=_RGB(10,10,14),Card=_RGB(20,20,28),Borda=_RGB(0,220,255),Texto=_RGB(240,240,250),Verde=_RGB(0,190,110)}
     local tok=os.clock() PG:SetAttribute("ZKYArm",tok)
     local function vivo()return PG:GetAttribute("ZKYArm")==tok end
     local function N(c,p,par) local o=_I(c) for k,v in pairs(p)do o[k]=v end o.Parent=par return o end
@@ -1255,15 +1232,12 @@ do
         elseif obj:IsA("ScrollingFrame")then
             obj.BorderSizePixel=0 obj.ScrollBarImageColor3=AC.Borda
             if ehVerde(obj.BackgroundColor3)then obj.BackgroundColor3=AC.Fundo end
-        elseif obj:IsA("TextLabel")then
-            if ehVerde(obj.TextColor3)then obj.TextColor3=AC.Texto end
+        elseif obj:IsA("TextLabel")then if ehVerde(obj.TextColor3)then obj.TextColor3=AC.Texto end
         elseif obj:IsA("TextButton")then
             if ehVerde(obj.BackgroundColor3)then obj.BackgroundColor3=AC.Verde end
             if ehVerde(obj.TextColor3)then obj.TextColor3=Color3.new(1,1,1)end
             if not obj:FindFirstChildOfClass("UICorner")then _I("UICorner",obj).CornerRadius=_UD(0,6) end
-        elseif obj:IsA("ImageLabel")or obj:IsA("ImageButton")then
-            if ehVerde(obj.BackgroundColor3)then obj.BackgroundColor3=AC.Card end
-        end
+        elseif obj:IsA("ImageLabel")or obj:IsA("ImageButton")then if ehVerde(obj.BackgroundColor3)then obj.BackgroundColor3=AC.Card end end
     end
     local function aplicarTema(gui)
         if not gui or not gui.Parent then return end
@@ -1307,7 +1281,7 @@ do
 end
 
 -- ============================================
--- ⚔ COMBATE (AIMBOT + HITBOX, blocos separados)
+-- ⚔ COMBATE (AIMBOT + HITBOX em blocos separados)
 -- ============================================
 local ShowCombate
 
@@ -1436,7 +1410,7 @@ HB_Conn=R.Heartbeat:Connect(function()
     end
 end)
 
--- ---- UI helpers ----
+-- ---- UI helper do Combate ----
 local function CB_Header(text, sub, order)
     local h=_I("Frame") h.Size=_U2(1,0,0,44) h.BackgroundColor3=_K.Card h.BorderSizePixel=0 h.LayoutOrder=order h.Parent=_CH
     Corner(h,9) Stroke(h,_K.StrokeLight,1)
@@ -1449,9 +1423,9 @@ end
 ShowCombate = function()
     CurrentPage="Combate" ClearContent()
 
-    -- ==========================================
-    -- 🔥 BLOCO 1: AIMBOT
-    -- ==========================================
+    -- ==========================
+    -- BLOCO 1: AIMBOT
+    -- ==========================
     CB_Header("🎯 AIMBOT", "Mira automática • FOV • Cabeça / Tronco", 0)
 
     local btnToggle=_I("TextButton") btnToggle.Size=_U2(1,0,0,42)
@@ -1505,7 +1479,7 @@ ShowCombate = function()
     end
     atualizarAlvos()
 
-    -- Slider FOV
+    -- Slider genérico
     local function CB_Slider(order, titulo, valor, min, max, isDecimal, callback)
         local card=_I("Frame") card.Size=_U2(1,0,0,44) card.BackgroundColor3=_K.Card card.BorderSizePixel=0
         card.LayoutOrder=order card.Parent=_CH Corner(card,8) Stroke(card,_K.Stroke,1)
@@ -1543,7 +1517,7 @@ ShowCombate = function()
     CB_Slider(4,"Tamanho FOV",AB_CONFIG.FOV,20,200,false,function(v) AB_CONFIG.FOV=v end)
     CB_Slider(5,"Transparência",AB_CONFIG.RingTransparency,0,1,true,function(v) AB_CONFIG.RingTransparency=v end)
 
-    -- Cores
+    -- Cores do FOV
     local corCard=_I("Frame") corCard.Size=_U2(1,0,0,50) corCard.BackgroundColor3=_K.Card corCard.BorderSizePixel=0
     corCard.LayoutOrder=6 corCard.Parent=_CH Corner(corCard,8) Stroke(corCard,_K.Stroke,1)
     local corLbl=_I("TextLabel") corLbl.BackgroundTransparency=1 corLbl.Position=_UO(10,6) corLbl.Size=_U2(1,-20,0,14)
@@ -1558,12 +1532,11 @@ ShowCombate = function()
         end)
     end
 
-    -- ==========================================
-    -- 🔥 BLOCO 2: HITBOX
-    -- ==========================================
+    -- ==========================
+    -- BLOCO 2: HITBOX
+    -- ==========================
     CB_Header("🎯 HITBOX", "Reach • tamanho, cor e transparência", 10)
 
-    -- Toggle ativar
     local function HB_ToggleCard(order, texto, inicial, callback)
         local card=_I("Frame") card.Size=_U2(1,0,0,42) card.BackgroundColor3=_K.Card card.BorderSizePixel=0
         card.LayoutOrder=order card.Parent=_CH Corner(card,8) Stroke(card,_K.Stroke,1)
@@ -1589,10 +1562,427 @@ ShowCombate = function()
     end)
     HB_ToggleCard(12,"Mostrar Visual",HB_CONFIG.Visual,function(v) HB_CONFIG.Visual=v end)
 
-    -- Slider tamanho
+    -- Sliders da Hitbox
     local function HB_Slider(order, titulo, valor, min, max, callback)
         local card=_I("Frame") card.Size=_U2(1,0,0,50) card.BackgroundColor3=_K.Card card.BorderSizePixel=0
         card.LayoutOrder=order card.Parent=_CH Corner(card,8) Stroke(card,_K.Stroke,1)
         local lbl=_I("TextLabel") lbl.BackgroundTransparency=1 lbl.Position=_UO(10,7) lbl.Size=_U2(1,-70,0,16)
         lbl.Text=titulo lbl.TextColor3=_K.White lbl.TextSize=12 lbl.Font=_GB lbl.TextXAlignment=_XL lbl.Parent=card
-        local val=
+        local val=_I("TextLabel") val.BackgroundTransparency=1 val.AnchorPoint=_V2(1,0) val.Position=_U2(1,-10,0,7)
+        val.Size=_UO(50,16) val.Text=tostring(valor) val.TextColor3=_K.Orange val.TextSize=12 val.Font=_GB
+        val.TextXAlignment=Enum.TextXAlignment.Right val.Parent=card
+        local barBg=_I("Frame") barBg.Position=_UO(10,38) barBg.Size=_U2(1,-20,0,8) barBg.BackgroundColor3=_K.Panel
+        barBg.BorderSizePixel=0 barBg.Parent=card Corner(barBg,4)
+        local pct0=(valor-min)/(max-min)
+        local fill=_I("Frame") fill.Size=_U2(pct0,0,1,0) fill.BackgroundColor3=_K.Success fill.BorderSizePixel=0 fill.Parent=barBg Corner(fill,4)
+        local knob=_I("Frame") knob.AnchorPoint=_V2(.5,.5) knob.Position=_U2(pct0,0,.5,0) knob.Size=_UO(14,14)
+        knob.BackgroundColor3=Color3.new(1,1,1) knob.BorderSizePixel=0 knob.ZIndex=2 knob.Parent=barBg Corner(knob,7)
+        local hit=_I("TextButton") hit.Position=_UO(10,28) hit.Size=_U2(1,-20,0,28) hit.BackgroundTransparency=1
+        hit.Text="" hit.AutoButtonColor=false hit.ZIndex=3 hit.Parent=card
+        local function atualizar(x)
+            local pct=math.clamp((x-barBg.AbsolutePosition.X)/math.max(barBg.AbsoluteSize.X,1),0,1)
+            local v=math.floor(min+(max-min)*pct+.5)
+            local p=(v-min)/(max-min)
+            val.Text=tostring(v) fill.Size=_U2(p,0,1,0) knob.Position=_U2(p,0,.5,0)
+            callback(v)
+        end
+        hit.InputBegan:Connect(function(i)
+            if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
+                Content.ScrollingEnabled=false
+                atualizar(i.Position.X)
+                local mov,fim
+                mov=U.InputChanged:Connect(function(m)
+                    if m==i or m.UserInputType==Enum.UserInputType.MouseMovement then atualizar(m.Position.X) end
+                end)
+                fim=i.Changed:Connect(function()
+                    if i.UserInputState==Enum.UserInputState.End then
+                        mov:Disconnect() fim:Disconnect() Content.ScrollingEnabled=true
+                    end
+                end)
+            end
+        end)
+    end
+    HB_Slider(13,"Tamanho (Reach)",HB_CONFIG.Tamanho,1,50,function(v) HB_CONFIG.Tamanho=v end)
+    HB_Slider(14,"Transparência",math.floor(HB_CONFIG.Transparencia*10+.5),0,10,function(v) HB_CONFIG.Transparencia=v/10 end)
+
+    -- Cores da Hitbox
+    local corCard2=_I("Frame") corCard2.Size=_U2(1,0,0,98) corCard2.BackgroundColor3=_K.Card corCard2.BorderSizePixel=0
+    corCard2.LayoutOrder=15 corCard2.Parent=_CH Corner(corCard2,8) Stroke(corCard2,_K.Stroke,1)
+    local corLbl2=_I("TextLabel") corLbl2.BackgroundTransparency=1 corLbl2.Position=_UO(10,7) corLbl2.Size=_U2(1,-20,0,16)
+    corLbl2.Text="Cor da Hitbox" corLbl2.TextColor3=_K.White corLbl2.TextSize=12 corLbl2.Font=_GB corLbl2.TextXAlignment=_XL corLbl2.Parent=corCard2
+    local fila=_I("Frame") fila.Position=_UO(10,30) fila.Size=_U2(1,-20,0,26) fila.BackgroundTransparency=1 fila.Parent=corCard2
+    _I("UIListLayout",fila).FillDirection=Enum.FillDirection.Horizontal
+    fila:FindFirstChildOfClass("UIListLayout").Padding=_UD(0,5)
+    local amostras={}
+    local function marcar() for _,a in ipairs(amostras)do a.stroke.Enabled=(a.cor==HB_CONFIG.Cor) end end
+    for _,cor in ipairs(HB_Presets)do
+        local b=_I("TextButton") b.Size=_UO(26,26) b.BackgroundColor3=cor b.Text="" b.BorderSizePixel=0
+        b.AutoButtonColor=false b.Parent=fila Corner(b,6)
+        local s=Stroke(b,_K.White,1.5) s.Enabled=(cor==HB_CONFIG.Cor)
+        table.insert(amostras,{stroke=s,cor=cor})
+        b.MouseButton1Click:Connect(function() HB_CONFIG.Cor=cor marcar() end)
+    end
+    local rgbFrame=_I("Frame") rgbFrame.Position=_UO(10,64) rgbFrame.Size=_U2(1,-20,0,26) rgbFrame.BackgroundColor3=_K.Panel
+    rgbFrame.BorderSizePixel=0 rgbFrame.Parent=corCard2 Corner(rgbFrame,6) Stroke(rgbFrame,_K.Stroke,1)
+    local function txtCor(c) return string.format("%d,%d,%d",math.floor(c.R*255+.5),math.floor(c.G*255+.5),math.floor(c.B*255+.5)) end
+    local rgbBox=_I("TextBox") rgbBox.Position=_UO(6,0) rgbBox.Size=_U2(1,-12,1,0) rgbBox.BackgroundTransparency=1
+    rgbBox.Text=txtCor(HB_CONFIG.Cor) rgbBox.PlaceholderText="R,G,B" rgbBox.PlaceholderColor3=_K.DarkGray
+    rgbBox.TextColor3=_K.White rgbBox.Font=Enum.Font.Code rgbBox.TextSize=11 rgbBox.TextXAlignment=_XL
+    rgbBox.ClearTextOnFocus=false rgbBox.Parent=rgbFrame
+    rgbBox.FocusLost:Connect(function()
+        local r,g,b=rgbBox.Text:match("(%d+)%s*,%s*(%d+)%s*,%s*(%d+)")
+        if r and g and b then
+            r,g,b=tonumber(r),tonumber(g),tonumber(b)
+            if r and g and b and r<=255 and g<=255 and b<=255 then HB_CONFIG.Cor=_RGB(r,g,b) marcar() end
+        end
+        rgbBox.Text=txtCor(HB_CONFIG.Cor)
+    end)
+end
+
+-- ============================================
+-- 📚 TEXTOS PRONTOS (cards + IA - código exato do script funcional)
+-- ============================================
+local ShowTextos
+do
+    local CARD_COLORS = {
+        { Header = _RGB(59,130,246), Body = _RGB(30,30,35) },
+        { Header = _RGB(239,68,68),  Body = _RGB(38,28,28) },
+        { Header = _RGB(16,185,129), Body = _RGB(28,36,32) },
+        { Header = _RGB(245,158,11), Body = _RGB(38,34,28) },
+        { Header = _RGB(139,92,246), Body = _RGB(32,28,40) },
+    }
+    local C = {
+        Fundo=_RGB(22,22,26), Painel=_RGB(32,32,38), Borda=_RGB(50,50,58),
+        Texto=_RGB(240,240,245), TextoDim=_RGB(155,155,165),
+        Verde=_RGB(16,185,129), VerdeHover=_RGB(52,211,153),
+        Roxo=_RGB(139,92,246), RoxoHover=_RGB(167,139,250),
+        Amarelo=_RGB(245,158,11), Vermelho=_RGB(239,68,68),
+    }
+
+    local TEXTOS = {
+        { Titulo="POR QUE O EB É IMPORTANTE PRA SOCIEDADE?", Texto="O EB não é apenas farda e arma: é o braço forte que guarda a pátria, socorre em tragédias, forma cidadãos de honra e defende a soberania. Sem ele, não há paz social nem futuro seguro pra ninguém." },
+        { Titulo="POR QUE VOCÊ QUER SUBIR DE PATENTE?", Texto="Quero subir de patente pra ajudar mais a tropa, aprender a liderar direito e fazer por merecer a confiança dos meus superiores. Não é por status, é por vontade de servir melhor." },
+        { Titulo="POR QUE SERVIR AO EXÉRCITO BRASILEIRO?", Texto="Sirvo ao Exército porque acredito no Brasil e quero fazer parte de algo maior que eu. É onde aprendo disciplina, honra e o valor de proteger quem não pode se proteger sozinho." },
+        { Titulo="COMO VOCÊ VÊ SUA JORNADA COMO MILITAR NO FUTURO?", Texto="Quero subir uma patente de cada vez, aprender com os oficiais mais experientes e um dia poder treinar os novatos. Pretendo ficar até onde conseguir, sempre honrando a farda." },
+    }
+
+    local function criarCard(tema, ordem, cor)
+        local card = _I("Frame", _CH)
+        card.Size = _U2(1, 0, 0, 0)
+        card.AutomaticSize = Enum.AutomaticSize.Y
+        card.BackgroundColor3 = cor.Body
+        card.BorderSizePixel = 0
+        card.LayoutOrder = ordem
+        Corner(card, 8)
+        Stroke(card, cor.Header, 0.8, 0.7)
+        card.ClipsDescendants = true
+
+        local cardLayout = _I("UIListLayout", card)
+        cardLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+        local cardHeader = _I("Frame", card)
+        cardHeader.Size = _U2(1, 0, 0, 0)
+        cardHeader.AutomaticSize = Enum.AutomaticSize.Y
+        cardHeader.BackgroundColor3 = cor.Header
+        cardHeader.BorderSizePixel = 0
+        cardHeader.LayoutOrder = 1
+
+        local padHeader = _I("UIPadding", cardHeader)
+        padHeader.PaddingTop = _UD(0, 8) padHeader.PaddingBottom = _UD(0, 8)
+        padHeader.PaddingLeft = _UD(0, 12) padHeader.PaddingRight = _UD(0, 12)
+
+        local tituloCard = _I("TextLabel", cardHeader)
+        tituloCard.Size = _U2(1, 0, 0, 0)
+        tituloCard.AutomaticSize = Enum.AutomaticSize.Y
+        tituloCard.BackgroundTransparency = 1
+        tituloCard.Text = "🤫 " .. tema.Titulo
+        tituloCard.TextColor3 = C.Texto
+        tituloCard.Font = _GB
+        tituloCard.TextSize = 12
+        tituloCard.TextXAlignment = _XL
+        tituloCard.TextWrapped = true
+
+        local cardBody = _I("Frame", card)
+        cardBody.Size = _U2(1, 0, 0, 0)
+        cardBody.AutomaticSize = Enum.AutomaticSize.Y
+        cardBody.BackgroundColor3 = cor.Body
+        cardBody.BorderSizePixel = 0
+        cardBody.LayoutOrder = 2
+
+        local padBody = _I("UIPadding", cardBody)
+        padBody.PaddingTop = _UD(0, 12) padBody.PaddingBottom = _UD(0, 12)
+        padBody.PaddingLeft = _UD(0, 12) padBody.PaddingRight = _UD(0, 12)
+
+        local bodyLayout = _I("UIListLayout", cardBody)
+        bodyLayout.Padding = _UD(0, 12)
+        bodyLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+        local textoCard = _I("TextLabel", cardBody)
+        textoCard.Size = _U2(1, 0, 0, 0)
+        textoCard.AutomaticSize = Enum.AutomaticSize.Y
+        textoCard.BackgroundTransparency = 1
+        textoCard.Text = tema.Texto
+        textoCard.TextColor3 = C.TextoDim
+        textoCard.Font = _GM
+        textoCard.TextSize = 11
+        textoCard.TextXAlignment = _XL
+        textoCard.TextWrapped = true
+        textoCard.LineHeight = 1.25
+
+        local btnContainer = _I("Frame", cardBody)
+        btnContainer.Size = _U2(1, 0, 0, 28)
+        btnContainer.BackgroundTransparency = 1
+
+        local btnCopiar = _I("TextButton", btnContainer)
+        btnCopiar.Size = _UO(75, 28)
+        btnCopiar.Position = _U2(1, 0, 0, 0)
+        btnCopiar.AnchorPoint = Vector2.new(1, 0)
+        btnCopiar.BackgroundColor3 = C.Verde
+        btnCopiar.Text = "Copiar"
+        btnCopiar.TextColor3 = C.Texto
+        btnCopiar.Font = _GB
+        btnCopiar.TextSize = 11
+        btnCopiar.BorderSizePixel = 0
+        btnCopiar.AutoButtonColor = false
+        Corner(btnCopiar, 6)
+
+        btnCopiar.MouseEnter:Connect(function() btnCopiar.BackgroundColor3 = C.VerdeHover end)
+        btnCopiar.MouseLeave:Connect(function() btnCopiar.BackgroundColor3 = C.Verde end)
+
+        btnCopiar.MouseButton1Click:Connect(function()
+            if setclipboard then
+                pcall(setclipboard, tema.Texto)
+                btnCopiar.Text = "Copiado!"
+                btnCopiar.BackgroundColor3 = C.VerdeHover
+                task.wait(1.5)
+                btnCopiar.Text = "Copiar"
+                btnCopiar.BackgroundColor3 = C.Verde
+            end
+        end)
+    end
+
+    ShowTextos = function()
+        CurrentPage="Textos" ClearContent()
+        for i, tema in ipairs(TEXTOS) do
+            local corIndex = ((i - 1) % #CARD_COLORS) + 1
+            criarCard(tema, i, CARD_COLORS[corIndex])
+        end
+
+        -- ========== CARD IA ==========
+        local aiCard = _I("Frame", _CH)
+        aiCard.Size = _U2(1, 0, 0, 0)
+        aiCard.AutomaticSize = Enum.AutomaticSize.Y
+        aiCard.BackgroundColor3 = _RGB(28, 24, 38)
+        aiCard.BorderSizePixel = 0
+        aiCard.LayoutOrder = 999
+        Corner(aiCard, 8)
+        Stroke(aiCard, C.Roxo, 1, 0.4)
+        aiCard.ClipsDescendants = true
+
+        local aiLayout = _I("UIListLayout", aiCard)
+        aiLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+        local aiHeader = _I("Frame", aiCard)
+        aiHeader.Size = _U2(1, 0, 0, 35)
+        aiHeader.BackgroundColor3 = C.Roxo
+        aiHeader.BorderSizePixel = 0
+        aiHeader.LayoutOrder = 1
+
+        local aiTitle = _I("TextLabel", aiHeader)
+        aiTitle.Size = _U2(1, -20, 1, 0)
+        aiTitle.Position = _UO(12, 0)
+        aiTitle.BackgroundTransparency = 1
+        aiTitle.Text = "🤖 GERADOR DE TEXTO IA"
+        aiTitle.TextColor3 = C.Texto
+        aiTitle.Font = _GB
+        aiTitle.TextSize = 12
+        aiTitle.TextXAlignment = _XL
+
+        local aiBody = _I("Frame", aiCard)
+        aiBody.Size = _U2(1, 0, 0, 0)
+        aiBody.AutomaticSize = Enum.AutomaticSize.Y
+        aiBody.BackgroundColor3 = _RGB(28, 24, 38)
+        aiBody.BorderSizePixel = 0
+        aiBody.LayoutOrder = 2
+
+        local aiPad = _I("UIPadding", aiBody)
+        aiPad.PaddingTop = _UD(0, 10) aiPad.PaddingBottom = _UD(0, 10)
+        aiPad.PaddingLeft = _UD(0, 10) aiPad.PaddingRight = _UD(0, 10)
+
+        local aiBodyLayout = _I("UIListLayout", aiBody)
+        aiBodyLayout.Padding = _UD(0, 10)
+        aiBodyLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+        local inputLabel = _I("TextLabel", aiBody)
+        inputLabel.Size = _U2(1, 0, 0, 14)
+        inputLabel.BackgroundTransparency = 1
+        inputLabel.Text = "Tema (ex: por que servir ao EB?)"
+        inputLabel.TextColor3 = C.TextoDim
+        inputLabel.Font = _GM
+        inputLabel.TextSize = 10
+        inputLabel.TextXAlignment = _XL
+
+        local inputBox = _I("TextBox", aiBody)
+        inputBox.Size = _U2(1, 0, 0, 32)
+        inputBox.BackgroundColor3 = C.Fundo
+        inputBox.PlaceholderText = "Digite o tema aqui..."
+        inputBox.PlaceholderColor3 = C.TextoDim
+        inputBox.Text = ""
+        inputBox.TextColor3 = C.Texto
+        inputBox.Font = _GM
+        inputBox.TextSize = 11
+        inputBox.TextXAlignment = _XL
+        inputBox.BorderSizePixel = 0
+        inputBox.ClearTextOnFocus = false
+        Corner(inputBox, 6)
+        Stroke(inputBox, C.Borda, 1, 0.5)
+
+        local btnGerar = _I("TextButton", aiBody)
+        btnGerar.Size = _U2(1, 0, 0, 34)
+        btnGerar.BackgroundColor3 = C.Roxo
+        btnGerar.Text = "⚡ GERAR TEXTO"
+        btnGerar.TextColor3 = C.Texto
+        btnGerar.Font = _GB
+        btnGerar.TextSize = 12
+        btnGerar.BorderSizePixel = 0
+        btnGerar.AutoButtonColor = false
+        Corner(btnGerar, 8)
+
+        local btnGrad = _I("UIGradient", btnGerar)
+        btnGrad.Color = ColorSequence.new(C.Roxo, _RGB(109, 40, 217))
+        btnGrad.Rotation = 90
+
+        btnGerar.MouseEnter:Connect(function() btnGerar.BackgroundColor3 = C.RoxoHover end)
+        btnGerar.MouseLeave:Connect(function() btnGerar.BackgroundColor3 = C.Roxo end)
+
+        local outputLabel = _I("TextLabel", aiBody)
+        outputLabel.Size = _U2(1, 0, 0, 0)
+        outputLabel.AutomaticSize = Enum.AutomaticSize.Y
+        outputLabel.BackgroundTransparency = 1
+        outputLabel.Text = "O texto gerado aparecerá aqui..."
+        outputLabel.TextColor3 = C.TextoDim
+        outputLabel.Font = _GM
+        outputLabel.TextSize = 11
+        outputLabel.TextXAlignment = _XL
+        outputLabel.TextWrapped = true
+        outputLabel.LineHeight = 1.25
+
+        local btnCopiarIA = _I("TextButton", aiBody)
+        btnCopiarIA.Size = _U2(1, 0, 0, 30)
+        btnCopiarIA.BackgroundColor3 = C.Painel
+        btnCopiarIA.Text = "📋 COPIAR TEXTO GERADO"
+        btnCopiarIA.TextColor3 = C.TextoDim
+        btnCopiarIA.Font = _GB
+        btnCopiarIA.TextSize = 11
+        btnCopiarIA.BorderSizePixel = 0
+        btnCopiarIA.AutoButtonColor = false
+        Corner(btnCopiarIA, 6)
+
+        local ultimoTextoGerado = ""
+
+        btnGerar.MouseButton1Click:Connect(function()
+            local temaDigitado = inputBox.Text
+            if temaDigitado == "" then
+                outputLabel.Text = "⚠️ Digite um tema primeiro."
+                outputLabel.TextColor3 = C.Amarelo
+                return
+            end
+            outputLabel.Text = "⏳ Gerando texto... aguarde."
+            outputLabel.TextColor3 = C.Amarelo
+            btnCopiarIA.BackgroundColor3 = C.Painel
+            btnCopiarIA.TextColor3 = C.TextoDim
+
+            local textoGerado, erro = GerarTexto(temaDigitado)
+            if textoGerado then
+                ultimoTextoGerado = textoGerado
+                outputLabel.Text = textoGerado
+                outputLabel.TextColor3 = C.Texto
+                btnCopiarIA.BackgroundColor3 = C.Verde
+                btnCopiarIA.TextColor3 = C.Texto
+            else
+                ultimoTextoGerado = ""
+                outputLabel.Text = "❌ Erro: " .. tostring(erro)
+                outputLabel.TextColor3 = C.Vermelho
+            end
+        end)
+
+        btnCopiarIA.MouseButton1Click:Connect(function()
+            if ultimoTextoGerado == "" then
+                btnCopiarIA.Text = "⚠️ Gere um texto primeiro"
+                task.wait(1.5)
+                btnCopiarIA.Text = "📋 COPIAR TEXTO GERADO"
+                return
+            end
+            if setclipboard then
+                local ok = pcall(setclipboard, ultimoTextoGerado)
+                if ok then
+                    btnCopiarIA.Text = "✓ COPIADO!"
+                    btnCopiarIA.BackgroundColor3 = C.VerdeHover
+                    task.wait(1.5)
+                    btnCopiarIA.Text = "📋 COPIAR TEXTO GERADO"
+                    btnCopiarIA.BackgroundColor3 = C.Verde
+                else
+                    btnCopiarIA.Text = "❌ SEM CLIPBOARD"
+                    task.wait(1.5)
+                    btnCopiarIA.Text = "📋 COPIAR TEXTO GERADO"
+                end
+            end
+        end)
+    end
+end
+
+-- ============================================
+-- SELETOR DE BOTÕES
+-- ============================================
+local function SelectButton(b) if selectedButton then selectedButton.BackgroundColor3=_K.Card selectedButton.TextColor3=_K.Gray end
+selectedButton=b b.BackgroundColor3=_K.Selected b.TextColor3=_K.White end
+
+ebDeltaButton.MouseButton1Click:Connect(function() SelectButton(ebDeltaButton) ShowEBDelta() end)
+taffsButton.MouseButton1Click:Connect(function() SelectButton(taffsButton) ShowTAFFS() end)
+volversButton.MouseButton1Click:Connect(function() SelectButton(volversButton) ShowVolvers() end)
+iaButton.MouseButton1Click:Connect(function() SelectButton(iaButton) ShowAutoCorrecao() end)
+combateButton.MouseButton1Click:Connect(function() SelectButton(combateButton) ShowCombate() end)
+textosButton.MouseButton1Click:Connect(function() SelectButton(textosButton) ShowTextos() end)
+lojaButton.MouseButton1Click:Connect(function() SelectButton(lojaButton) ShowLoja() end)
+creditosButton.MouseButton1Click:Connect(function() SelectButton(creditosButton) ShowCreditos() end)
+
+-- ============================================
+-- DRAG / OPEN / CLOSE
+-- ============================================
+local LogoDragging=false local LogoDragStart,LogoStartPosition
+Logo.InputBegan:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then LogoDragging=true
+LogoDragStart=i.Position LogoStartPosition=Logo.Position i.Changed:Connect(function() if i.UserInputState==Enum.UserInputState.End then LogoDragging=false end end) end
+end) U.InputChanged:Connect(function(i) if LogoDragging and(i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch)then
+local d=i.Position-LogoDragStart Logo.Position=_U2(LogoStartPosition.X.Scale,LogoStartPosition.X.Offset+d.X,LogoStartPosition.Y.Scale,LogoStartPosition.Y.Offset+d.Y) end
+end)
+local MainDragging=false local MainDragStart,MainStartPosition
+Header.InputBegan:Connect(function(i)
+if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then MainDragging=true MainDragStart=i.Position
+MainStartPosition=Main.Position i.Changed:Connect(function() if i.UserInputState==Enum.UserInputState.End then MainDragging=false end end) end end)
+U.InputChanged:Connect(function(i) if MainDragging and(i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch)then
+local d=i.Position-MainDragStart Main.Position=_U2(MainStartPosition.X.Scale,MainStartPosition.X.Offset+d.X,MainStartPosition.Y.Scale,MainStartPosition.Y.Offset+d.Y) end
+end)
+local Opened=false
+local function OpenMenu() if Opened then return end Opened=true Main.Visible=true Main.Size=UDim2.fromScale(.25,.15) Main.BackgroundTransparency=1
+T:Create(Main,TweenInfo.new(.35,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{Size=UDim2.fromScale(.78,.65),BackgroundTransparency=0}):Play() end
+local function CloseMenu() if not Opened then return end Opened=false
+local tw=T:Create(Main,TweenInfo.new(.25,Enum.EasingStyle.Quart,Enum.EasingDirection.In),{Size=UDim2.fromScale(.25,.15),BackgroundTransparency=1}) tw:Play()
+tw.Completed:Wait() if not Opened then Main.Visible=false end end
+Logo.MouseButton1Click:Connect(function() if Opened then CloseMenu()else OpenMenu()end end)
+Close.MouseButton1Click:Connect(CloseMenu)
+
+-- ============================================
+-- CARREGAMENTO INICIAL
+-- ============================================
+task.defer(function()
+    local loaded=0
+    for _,cat in ipairs(CategoryOrder)do if LoadCategory(cat)then loaded+=1 end end
+    local lt1=LoadTowerRoute("Torre 1","Única") local lt2=0
+    for _,rn in ipairs(Tower2RouteOrder)do if LoadTowerRoute("Torre 2",rn)then lt2+=1 end end
+    for i=1,4 do selectedCategory[i]="Lento" end
+    ShowEBDelta()
+    Notify("ZKY PARKOUR EB","v3.2 • "..loaded.."/4 parkours • T1: "..(lt1 and "OK" or "ERRO").." • T2: "..lt2.."/4",
+        loaded==4 and lt1 and lt2==4 and "Success" or "Error")
+end)
+
+print("🚀 ZKY PARKOUR EB DELTA V3.2 carregado com sucesso!")
