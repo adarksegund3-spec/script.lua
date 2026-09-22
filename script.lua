@@ -98,7 +98,7 @@ local _I,_U2,_UO,_UD,_RGB,_V2,_GB,_GM,_XL,_XC=Instance.new,UDim2.new,UDim2.fromO
 local P=game:GetService("Players") local T=game:GetService("TweenService") local U=game:GetService("UserInputService") local R=game:GetService("RunService")
 local HS=game:GetService("HttpService") local TCS=game:GetService("TextChatService") local RS=game:GetService("ReplicatedStorage") local Pl=P.LocalPlayer
 local PG=Pl:WaitForChild("PlayerGui") local character,humanoid,rootPart local CONFIG={ LineThickness=.15, LineTransparency=.2, LineColor=_RGB(255,145,45),
-JumpCooldown=.28, PlaybackSpeed=1, WalkToSpeed=16, GroundOffset=1.66 } local ParkourConfig={ Modo="Dummy" } -- "Dummy" ou "Direto"
+JumpCooldown=.28, PlaybackSpeed=1, WalkToSpeed=16, GroundOffset=1.66 } local ParkourConfig={ Modo="Dummy" }
 local IA_CONFIG={ ApiKey="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",
 Endpoint="https://api.groq.com/openai/v1/chat/completions", Modelo="openai/gpt-oss-120b", Timeout=10,
 SystemPrompt="Você é um corretor gramatical extremamente rigoroso de português do Brasil. Corrija TODOS os erros da mensagem do usuário, sem deixar passar nenhum, incluindo: letras maiúsculas no início de frases e em nomes próprios; todos os acentos gráficos (agudo, circunflexo, til, crase) e a cedilha; toda a pontuação, como vírgulas, pontos finais, pontos de interrogação e de exclamação; concordância verbal e nominal; ortografia e separação de palavras. Não deixe nenhuma palavra sem acento ou sem maiúscula onde for necessário, nem nenhuma frase sem pontuação final. Não resuma, não reescreva o estilo, não mude o significado, o tom nem o tamanho da mensagem: apenas corrija a gramática, a ortografia e a pontuação, mantendo as mesmas palavras sempre que possível. Responda APENAS com a mensagem corrigida, sem explicações, aspas, comentários extras ou qualquer texto adicional."
@@ -108,7 +108,7 @@ local CategoryOrder={"Lento","Rápido","Mais Rápido","Sem Burla"} local TowerPa
 Frente="https://pastebin.com/raw/Y2arCYHb", ["Atrás"]="https://pastebin.com/raw/rXxZX7CQ", Esquerda="https://pastebin.com/raw/FtpTHhGt",
 Direita="https://pastebin.com/raw/4u5Wjtkg" } } local Tower2RouteOrder={"Frente","Atrás","Esquerda","Direita"}
 local routes={Lento={},["Rápido"]={},["Mais Rápido"]={},["Sem Burla"]={}} local towerRoutes={["Torre 1"]={},["Torre 2"]={Frente={},["Atrás"]={},Esquerda={},Direita={}}}
-local selectedCategory,expandedParkour={},{} local selectedTower2Route="Frente" local expandedTower2=false local CurrentPage="Parkours" local lineFolder
+local selectedCategory,expandedParkour={},{} local selectedTower2Route="Frente" local expandedTower2=false local CurrentPage="EBDelta" local lineFolder
 local linesVisible=true local Playback={ Running=false, Connection=nil, Route=nil, StartClock=0, CurrentIndex=1, LastJump=-math.huge, Category=nil, Parkour=nil,
 Tower=nil, TowerRoute=nil, WalkingToStart=false, WalkConnection=nil } local SavedDirection=nil local Turning=false local Old=PG:FindFirstChild("ZKY_PARKOUR")
 if Old then Old:Destroy()end local _K={ Background=_RGB(18,18,20), Panel=_RGB(24,24,27), Card=_RGB(31,31,35), CardHover=_RGB(39,39,43), Selected=_RGB(55,55,60),
@@ -162,27 +162,34 @@ if elapsed<=frames[1].t then Playback.CurrentIndex=1;return frames[1],frames[2],
 local i=math.clamp(Playback.CurrentIndex,1,count-1) while i<count-1 and elapsed>frames[i+1].t do i+=1 end while i>1 and elapsed<frames[i].t do i-=1 end
 Playback.CurrentIndex=i local a,b=frames[i],frames[i+1] local d=b.t-a.t local alpha=d>0 and math.clamp((elapsed-a.t)/d,0,1)or 0 return a,b,alpha end
 local function HandleJump(f,e) if not f or not f.j or e-Playback.LastJump<CONFIG.JumpCooldown or not RefreshCharacter()then return end Playback.LastJump=e
-humanoid.Jump=true pcall(function()humanoid:ChangeState(Enum.HumanoidStateType.Jumping)end) end -- ===== Caminhada até o início da rota (igual ao original) =====
+humanoid.Jump=true pcall(function()humanoid:ChangeState(Enum.HumanoidStateType.Jumping)end) end
+
+-- ===== Caminhada até o início da rota (movimento NORMAL do Roblox) =====
 local function AndarAte(destino,estaCancelado,aoTerminar)
     if not RefreshCharacter()then aoTerminar(false) return end
-    humanoid.WalkSpeed=CONFIG.WalkToSpeed humanoid:MoveTo(destino) local started=os.clock() local sucesso=false
+    -- Movimento natural do Roblox: usa MoveTo + AutoRotate = true
+    pcall(function() humanoid.AutoRotate = true end)
+    humanoid.WalkSpeed = CONFIG.WalkToSpeed
+    humanoid:MoveTo(destino)
+    local started = os.clock()
+    local sucesso = false
     while not estaCancelado() do
-        if not RefreshCharacter()then break end
-        if(rootPart.Position-destino).Magnitude<=4 then sucesso=true break end
-        if os.clock()-started>60 then break end
+        if not RefreshCharacter() then break end
+        -- Redireciona para o destino a cada frame para manter caminhada fluida
+        humanoid:MoveTo(destino)
+        if (rootPart.Position - destino).Magnitude <= 4 then sucesso = true break end
+        if os.clock() - started > 60 then break end
         task.wait()
     end
-    if RefreshCharacter()then humanoid:Move(Vector3.zero,false)end
+    if RefreshCharacter() then humanoid:Move(Vector3.zero, false) end
     aoTerminar(sucesso and not estaCancelado())
 end
--- ===== Marcador/dummy fantasma (modo "Dummy") =====
+
 local DummyObj local RemoverDummy
 local function CriarDummy(pos,rot)
     RemoverDummy()
     local alvo=rot and(CFrame.new(pos)*(rot-rot.Position))or CFrame.new(pos) local ok=false
     if RefreshCharacter()then
-        -- Alguns avatares vêm com partes/acessórios não-arquiváveis, o que faz Clone() falhar silenciosamente.
-        -- Forçamos Archivable=true só durante o clone e devolvemos o valor original logo em seguida, sem afetar o boneco real.
         local salvos={}
         for _,d in ipairs(character:GetDescendants())do salvos[d]=d.Archivable pcall(function()d.Archivable=true end)end
         local cok,clone=pcall(function()return character:Clone()end)
@@ -292,17 +299,73 @@ if not resposta then return nil,"Falha na requisição" end if resposta.StatusCo
 local okJson,dados=pcall(function()return HS:JSONDecode(resposta.Body)end)
 if not okJson or not dados.choices or not dados.choices[1]then return nil,"Resposta inválida" end local txt=dados.choices[1].message and dados.choices[1].message.content
 if not txt or txt=="" then return nil,"Resposta vazia" end txt=txt:gsub("^%s+",""):gsub("%s+$","") txt=txt:gsub('^[""]+',""):gsub('[""]+$',"") return txt end
+
+-- ===== Função: Gerar Texto IA (para Textos Prontos) =====
+local IA_TEXTOS_CONFIG = {
+    ApiKey = "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",
+    Endpoint = "https://api.groq.com/openai/v1/chat/completions",
+    Modelo = "openai/gpt-oss-120b",
+    Timeout = 15,
+    SystemPrompt = "Você é um militar do Exército Brasileiro (EB) em um jogo de Roblox (Roleplay). Gere um texto CURTO, gramatical, humanizado, ético e patriótico sobre o tema fornecido. O texto deve ter entre 150 e 250 caracteres (2 a 3 frases). REGRA OBRIGATÓRIA: envolva a resposta final EXATAMENTE entre os marcadores <<< e >>>, assim: <<<seu texto aqui>>>. Você pode pensar o quanto quiser antes, mas o texto final DEVE estar APENAS entre <<< e >>>, sem aspas, sem saudações, sem nada fora dos marcadores."
+}
+local function GerarTextoIA(tema)
+    if not httpRequest then return nil, "Executor sem suporte a HTTP" end
+    local corpo = HS:JSONEncode({
+        model = IA_TEXTOS_CONFIG.Modelo,
+        messages = {
+            { role = "system", content = IA_TEXTOS_CONFIG.SystemPrompt },
+            { role = "user", content = "Escreva um texto sobre: " .. tema }
+        },
+        temperature = 0.7, max_tokens = 800
+    })
+    local resposta, terminou = nil, false
+    task.spawn(function()
+        local ok, res = pcall(function()
+            return httpRequest({
+                Url = IA_TEXTOS_CONFIG.Endpoint, Method = "POST",
+                Headers = { ["Content-Type"] = "application/json", ["Authorization"] = "Bearer " .. IA_TEXTOS_CONFIG.ApiKey },
+                Body = corpo
+            })
+        end)
+        if ok then resposta = res end
+        terminou = true
+    end)
+    local inicio = tick()
+    while not terminou and (tick() - inicio) < IA_TEXTOS_CONFIG.Timeout do task.wait(0.1) end
+    if not terminou then return nil, "Tempo esgotado" end
+    if not resposta then return nil, "Falha na requisição" end
+    if resposta.StatusCode ~= 200 then return nil, "HTTP " .. tostring(resposta.StatusCode) end
+    local okJson, dados = pcall(function() return HS:JSONDecode(resposta.Body) end)
+    if not okJson or not dados.choices or not dados.choices[1] then return nil, "Resposta inválida" end
+    local msg = dados.choices[1].message
+    if not msg then return nil, "Resposta vazia" end
+    local txt = msg.content or ""
+    if txt == "" and msg.reasoning then txt = msg.reasoning end
+    if txt == "" then return nil, "Resposta vazia" end
+    local extraido = txt:match("<<<(.-)>>>")
+    if extraido and extraido ~= "" then txt = extraido end
+    txt = txt:gsub("^%s+", ""):gsub("%s+$", "")
+    txt = txt:gsub('^["\']+', ""):gsub('["\']+$', "")
+    if #txt > 500 or txt:match("^The user") or txt:match("^Let me") or txt:match("^I ") then
+        return nil, "IA não formatou corretamente. Tente novamente."
+    end
+    return txt
+end
+
+-- ============================================
+-- GUI PRINCIPAL
+-- ============================================
 local Gui=_I("ScreenGui") Gui.Name="ZKY_PARKOUR" Gui.ResetOnSpawn=false Gui.IgnoreGuiInset=true Gui.ZIndexBehavior=Enum.ZIndexBehavior.Sibling Gui.Parent=PG
 local Logo=_I("TextButton") Logo.Name="ZKY_Logo" Logo.Size=_UO(58,58) Logo.Position=_UO(12,65) Logo.BackgroundColor3=_RGB(10,10,10) Logo.BorderSizePixel=0 Logo.Text="🚀"
 Logo.TextColor3=_K.White Logo.TextSize=26 Logo.Font=_GB Logo.AutoButtonColor=false Logo.Parent=Gui Corner(Logo,29) Stroke(Logo,_K.StrokeLight) local Main=_I("Frame")
 Main.Name="Main" Main.AnchorPoint=_V2(.5,.5) Main.Position=UDim2.fromScale(.5,.5) Main.Size=UDim2.fromScale(.78,.65) Main.BackgroundColor3=_K.Background
 Main.BorderSizePixel=0 Main.Visible=false Main.ClipsDescendants=true Main.ZIndex=10 Main.Parent=Gui Corner(Main,14) Stroke(Main,_K.Stroke) local Header=_I("Frame")
 Header.Size=_U2(1,-16,0,54) Header.Position=_UO(8,8) Header.BackgroundColor3=_K.Panel Header.BorderSizePixel=0 Header.ZIndex=20 Header.Parent=Main Corner(Header,10)
-Stroke(Header,_K.Stroke) local Title=_I("TextLabel") Title.BackgroundTransparency=1 Title.Position=_UO(13,7) Title.Size=_U2(.55,0,0,23) Title.Text="🚀 ZKY PARKOUR"
+Stroke(Header,_K.Stroke) local Title=_I("TextLabel") Title.BackgroundTransparency=1 Title.Position=_UO(13,7) Title.Size=_U2(.55,0,0,23) Title.Text="🚀 ZKY PARKOUR EB"
 Title.TextColor3=_K.White Title.TextSize=17 Title.Font=_GB Title.TextXAlignment=_XL Title.ZIndex=22 Title.Parent=Header local Subtitle=_I("TextLabel")
-Subtitle.BackgroundTransparency=1 Subtitle.Position=_UO(14,31) Subtitle.Size=_U2(.65,0,0,15) Subtitle.Text="Auto Parkour • V2.2" Subtitle.TextColor3=_K.DarkGray
+Subtitle.BackgroundTransparency=1 Subtitle.Position=_UO(14,31) Subtitle.Size=_U2(.65,0,0,15) Subtitle.Text="Auto Parkour • V3.0" Subtitle.TextColor3=_K.DarkGray
 Subtitle.TextSize=9 Subtitle.Font=_GM Subtitle.TextXAlignment=_XL Subtitle.ZIndex=22 Subtitle.Parent=Header local Version=_I("TextLabel") Version.BackgroundColor3=_K.Card
-Version.AnchorPoint=_V2(.5,.5) Version.Position=_U2(.5,0,.5,0) Version.Size=_UO(55,25) Version.Text="V2.2" Version.TextColor3=_K.Gray Version.TextSize=10 Version.Font=_GB
+Version.AnchorPoint=_V2(.5,.5) Version.Position=_U2(.5,0,.5,0) Version.Size=_UO(55,25) Version.Text="V3.0" Version.TextColor3=_K.Gray Version.TextSize=10 Version.Font=_GB
 Version.ZIndex=22 Version.Parent=Header Corner(Version,8) Stroke(Version,_K.Stroke) local Close=_I("TextButton") Close.Size=_UO(34,34) Close.Position=_U2(1,-42,.5,-17)
 Close.BackgroundColor3=_K.Card Close.BorderSizePixel=0 Close.Text="×" Close.TextColor3=_K.Gray Close.TextSize=22 Close.Font=_GM Close.AutoButtonColor=false
 Close.ZIndex=25 Close.Parent=Header Corner(Close,10) Stroke(Close,_K.Stroke) local Sidebar=_I("ScrollingFrame") Sidebar.Size=_U2(0,118,1,-78) Sidebar.Position=_UO(8,70)
@@ -311,13 +374,27 @@ Sidebar.AutomaticCanvasSize=Enum.AutomaticSize.Y Sidebar.ZIndex=20 Sidebar.Paren
 local SideLayout=_I("UIListLayout") SideLayout.Padding=_UD(0,5) SideLayout.HorizontalAlignment=Enum.HorizontalAlignment.Center SideLayout.Parent=Sidebar
 local function SideButton(text,selected) local b=_I("TextButton") b.Size=_U2(1,0,0,39) b.BackgroundColor3=selected and _K.Selected or _K.Card b.BorderSizePixel=0
 b.Text=text b.TextColor3=selected and _K.White or _K.Gray b.TextSize=9 b.Font=_GB b.TextXAlignment=_XL b.AutoButtonColor=false b.Parent=Sidebar Corner(b,7)
-Padding(b,0,0,8,2) Stroke(b,_K.Stroke) return b end local creditosButton=SideButton("👑 CRÉDITOS",false) local parkourButton=SideButton("🏃 PARKOURS",true) local towerButton=SideButton("🏰 TORRES")
-local taffsButton=SideButton("📝 TAFFS") local volversButton=SideButton("↪ VOLVERS",false) local iaButton=SideButton("🤖 IA CHAT",false) local selectedButton=parkourButton
+Padding(b,0,0,8,2) Stroke(b,_K.Stroke) return b end
+
+-- ===== Sidebar reestruturada =====
+local creditosButton=SideButton("👑 CRÉDITOS",false)
+local ebDeltaButton=SideButton("🏃 EB DELTA",true)   -- antigo PARKOURS
+local taffsButton=SideButton("📝 TAFFS")
+local volversButton=SideButton("↪ VOLVERS",false)
+local iaButton=SideButton("🤖 IA CHAT",false)
+local combateButton=SideButton("⚔ COMBATE",false)     -- NOVO
+local textosButton=SideButton("📚 TEXTOS PRONTOS",false) -- NOVO
+local lojaButton=SideButton("🔫 LOJA",false)
+local hitboxButton=SideButton("🎯 HITBOX",false)
+local selectedButton=ebDeltaButton
+
 local Content=_I("ScrollingFrame") Content.Size=_U2(1,-134,1,-78) Content.Position=_U2(0,126,0,70) Content.BackgroundColor3=_K.Panel Content.BorderSizePixel=0
 Content.ScrollBarThickness=3 Content.ScrollBarImageColor3=_K.StrokeLight Content.AutomaticCanvasSize=Enum.AutomaticSize.Y Content.ZIndex=20 Content.Parent=Main
 Corner(Content,10) Stroke(Content,_K.Stroke) local _CH=_I("Frame") _CH.Size=_U2(1,0,0,0) _CH.AutomaticSize=Enum.AutomaticSize.Y _CH.BackgroundTransparency=1
 _CH.Parent=Content Padding(_CH,9,9,9,9) local ContentLayout=_I("UIListLayout") ContentLayout.Padding=_UD(0,7) ContentLayout.Parent=_CH local function ClearContent()
-for _,c in ipairs(_CH:GetChildren())do if c:IsA("GuiObject")then c:Destroy()end end end local TAFFS_DATA={ { Name="CIE", Emoji="🕵️‍♂️", Color=_RGB(70,130,180), Fields={
+for _,c in ipairs(_CH:GetChildren())do if c:IsA("GuiObject")then c:Destroy()end end end
+
+local TAFFS_DATA={ { Name="CIE", Emoji="🕵️‍♂️", Color=_RGB(70,130,180), Fields={
 {"🕵️‍♂️ CIE","Centro de Inteligência do Exército"}, {"👤 Criador","vicofjgfhf"}, {"👤 Sub criador","RIP_dabfj8w"}, {"👤 Comandante","eriqurrr."},
 {"👤 Subcomandante","nohanrtop"}, {"📜 Lema","Inteligência para Vitória & Saber para Prever."}, {"💬 Saudação","Saudações, senhores Agentes."},
 {"💬 Saudação","Saudações, senhores Fantasmas."}, {"💬 Saudação","Saudações, senhor Agente."}, {"💬 Saudação","Saudações, senhor Fantasma."} } }, { Name="REC MEC",
@@ -371,69 +448,378 @@ sectionLayout.Parent=section local headerDiv=_I("Frame") headerDiv.Size=_U2(1,0,
 headerDiv.BorderSizePixel=0 headerDiv.LayoutOrder=0 headerDiv.Parent=section Corner(headerDiv,8) local titleDiv=_I("TextLabel") titleDiv.BackgroundTransparency=1
 titleDiv.Position=_UO(12,0) titleDiv.Size=_U2(1,-24,1,0) titleDiv.Text=div.Emoji.."  "..div.Name titleDiv.TextColor3=_K.White titleDiv.TextSize=14 titleDiv.Font=_GB
 titleDiv.TextXAlignment=_XL titleDiv.TextYAlignment=Enum.TextYAlignment.Center titleDiv.Parent=headerDiv for i,field in ipairs(div.Fields)do
-CreateTAFFSCard(field[1],field[2],i,section,div.Color) end end Content.CanvasPosition=_V2() end local function GetCategoryColor(c) if c=="Lento"then return _K.Success
+CreateTAFFSCard(field[1],field[2],i,section,div.Color) end end Content.CanvasPosition=_V2() end
+
+local function GetCategoryColor(c) if c=="Lento"then return _K.Success
 elseif c=="Rápido"then return _K.White elseif c=="Mais Rápido"then return _K.Orange elseif c=="Sem Burla"then return _K.Gray end return _K.Gray end
-local function ShowParkours() CurrentPage="Parkours" ClearContent() local tf=_I("Frame") tf.Size=_U2(1,0,0,48) tf.BackgroundColor3=_K.Card tf.BorderSizePixel=0
-tf.LayoutOrder=0 tf.Parent=_CH Corner(tf,9) Stroke(tf,_K.StrokeLight) local title=_I("TextLabel") title.BackgroundTransparency=1 title.Position=_UO(12,6)
-title.Size=_U2(1,-24,0,22) title.Text="🏃 PARKOURS DISPONÍVEIS" title.TextColor3=_K.White title.TextSize=15 title.Font=_GB title.TextXAlignment=_XL title.Parent=tf
-local info=_I("TextLabel") info.BackgroundTransparency=1 info.Position=_UO(13,28) info.Size=_U2(1,-26,0,14) info.Text="Clique na seta para expandir as opções"
-info.TextColor3=_K.DarkGray info.TextSize=9 info.Font=_GM info.TextXAlignment=_XL info.Parent=tf
-local hotbar=_I("Frame") hotbar.Size=_U2(1,0,0,44) hotbar.BackgroundColor3=_K.Card hotbar.BorderSizePixel=0 hotbar.LayoutOrder=1 hotbar.Parent=_CH Corner(hotbar,8) Stroke(hotbar,_K.Stroke)
-local hbLabel=_I("TextLabel") hbLabel.BackgroundTransparency=1 hbLabel.Position=_UO(10,0) hbLabel.Size=_UO(90,44) hbLabel.Text="Início da rota:" hbLabel.TextColor3=_K.DarkGray
-hbLabel.TextSize=10 hbLabel.Font=_GM hbLabel.TextXAlignment=_XL hbLabel.Parent=hotbar
-local optFrame=_I("Frame") optFrame.AnchorPoint=_V2(1,.5) optFrame.Position=_U2(1,-8,.5,0) optFrame.Size=_UO(168,30) optFrame.BackgroundColor3=_K.Panel optFrame.BorderSizePixel=0 optFrame.Parent=hotbar
-Corner(optFrame,8) Stroke(optFrame,_K.Stroke) local optLayout=_I("UIListLayout") optLayout.FillDirection=Enum.FillDirection.Horizontal optLayout.Parent=optFrame
-local function hotbarOpt(texto,modo)
-local b=_I("TextButton") b.Size=_U2(.5,0,1,0) b.BackgroundColor3=(ParkourConfig.Modo==modo)and _K.Success or _K.Panel b.BorderSizePixel=0
-b.Text=texto b.TextColor3=(ParkourConfig.Modo==modo)and _K.White or _K.Gray b.TextSize=9 b.Font=_GB b.AutoButtonColor=false b.Parent=optFrame Corner(b,7)
-b.MouseButton1Click:Connect(function() if ParkourConfig.Modo~=modo then ParkourConfig.Modo=modo ShowParkours() end end) end
-hotbarOpt("🧍 DUMMY","Dummy") hotbarOpt("➡ DIRETO","Direto")
-for num=1,4 do local row=_I("Frame") row.Size=_U2(1,0,0,45)
-row.BackgroundColor3=_K.Card row.BorderSizePixel=0 row.LayoutOrder=num+2 row.Parent=_CH Corner(row,8) Stroke(row,_K.Stroke) local label=_I("TextLabel")
-label.BackgroundTransparency=1 label.Position=_UO(10,0) label.Size=_U2(1,-105,1,0) label.Text="🏃 Parkour "..num label.TextColor3=_K.White label.TextSize=12 label.Font=_GB
-label.TextXAlignment=_XL label.Parent=row local running=Playback.Running and Playback.Parkour==num and not Playback.Tower local start=_I("TextButton")
-start.AnchorPoint=_V2(1,.5) start.Position=_U2(1,-42,.5,0) start.Size=_UO(78,30) start.BackgroundColor3=running and _K.Error or _K.Success start.BorderSizePixel=0
-start.Text=running and "■ PARAR" or "▶ INICIAR" start.TextColor3=_K.White start.TextSize=9 start.Font=_GB start.AutoButtonColor=false start.ZIndex=5 start.Parent=row
-Corner(start,7) local expand=_I("TextButton") expand.AnchorPoint=_V2(1,.5) expand.Position=_U2(1,-7,.5,0) expand.Size=_UO(27,31) expand.BackgroundTransparency=1
-expand.BorderSizePixel=0 expand.Text=expandedParkour[num]and "▲" or "▼" expand.TextColor3=_K.Gray expand.TextSize=12 expand.Font=_GB expand.AutoButtonColor=false
-expand.ZIndex=6 expand.Parent=row local ec=_I("Frame") ec.Size=_U2(1,0,0,expandedParkour[num]and 149 or 0) ec.BackgroundTransparency=1 ec.ClipsDescendants=true
-ec.LayoutOrder=num+10 ec.Parent=_CH local el=_I("UIListLayout") el.Padding=_UD(0,5) el.Parent=ec for _,cat in ipairs(CategoryOrder)do local b=_I("TextButton")
-b.Size=_U2(1,0,0,32) b.BackgroundColor3=_K.Panel b.BorderSizePixel=0 b.Text="   "..cat b.TextColor3=GetCategoryColor(cat) b.TextSize=10 b.Font=_GB b.TextXAlignment=_XL
-b.AutoButtonColor=false b.Parent=ec Corner(b,7) local s=Stroke(b,_K.Stroke) if selectedCategory[num]==cat then b.BackgroundColor3=_K.SelectionRedDark
-b.TextColor3=_K.SelectionRed s.Color=_K.SelectionRed s.Thickness=1.5 end b.MouseButton1Click:Connect(function() local rs=routes[cat] local route=rs and rs[num]
-if not route then Notify("ROTA NÃO ENCONTRADA","Parkour "..num.." não existe em "..cat..".","Error") return end selectedCategory[num]=cat
-Notify("ROTA SELECIONADA","Parkour "..num.." • "..cat,"Success") ShowParkours() end) end start.MouseButton1Click:Connect(function()
-if Playback.Running and Playback.Parkour==num and not Playback.Tower then StopPlayback("cancelled") ShowParkours() return end local cat=selectedCategory[num]or "Lento"
-selectedCategory[num]=cat local rs=routes[cat] local route=rs and rs[num] if not route then Notify("ROTA NÃO ENCONTRADA","Parkour "..num.." • "..cat,"Error") return end
-StartPlayback(route,cat,num) task.wait(.1) ShowParkours() end) expand.MouseButton1Click:Connect(function() expandedParkour[num]=not expandedParkour[num] ShowParkours()
-end) end Content.CanvasPosition=_V2() end local function ShowTowers() CurrentPage="Towers" ClearContent() local tf=_I("Frame") tf.Size=_U2(1,0,0,48)
-tf.BackgroundColor3=_K.Card tf.BorderSizePixel=0 tf.LayoutOrder=0 tf.Parent=_CH Corner(tf,9) Stroke(tf,_K.StrokeLight) local title=_I("TextLabel")
-title.BackgroundTransparency=1 title.Position=_UO(12,6) title.Size=_U2(1,-24,0,22) title.Text="🏰 TORRES DISPONÍVEIS" title.TextColor3=_K.White title.TextSize=15
-title.Font=_GB title.TextXAlignment=_XL title.Parent=tf local info=_I("TextLabel") info.BackgroundTransparency=1 info.Position=_UO(13,28) info.Size=_U2(1,-26,0,14)
-info.Text="Torre 1 direta • Torre 2 com quatro rotas" info.TextColor3=_K.DarkGray info.TextSize=9 info.Font=_GM info.TextXAlignment=_XL info.Parent=tf
-local r1=_I("Frame") r1.Size=_U2(1,0,0,45) r1.BackgroundColor3=_K.Card r1.BorderSizePixel=0 r1.LayoutOrder=2 r1.Parent=_CH Corner(r1,8) Stroke(r1,_K.Stroke)
-local l1=_I("TextLabel") l1.BackgroundTransparency=1 l1.Position=_UO(10,0) l1.Size=_U2(1,-105,1,0) l1.Text="🏰 Torre 1" l1.TextColor3=_K.White l1.TextSize=12 l1.Font=_GB
-l1.TextXAlignment=_XL l1.Parent=r1 local run1=Playback.Running and Playback.Tower=="Torre 1" local b1=_I("TextButton") b1.AnchorPoint=_V2(1,.5) b1.Position=_U2(1,-8,.5,0)
-b1.Size=_UO(78,30) b1.BackgroundColor3=run1 and _K.Error or _K.Success b1.BorderSizePixel=0 b1.Text=run1 and "■ PARAR" or "▶ INICIAR" b1.TextColor3=_K.White b1.TextSize=9
-b1.Font=_GB b1.AutoButtonColor=false b1.Parent=r1 Corner(b1,7) b1.MouseButton1Click:Connect(function() if Playback.Running and Playback.Tower=="Torre 1" then
-StopPlayback("cancelled") ShowTowers() return end local route=towerRoutes["Torre 1"]["Única"] if not route then
-Notify("ROTA NÃO CARREGADA","A rota da Torre 1 não foi encontrada.","Error") return end StartPlayback(route,nil,nil,"Torre 1","Única") task.wait(.1) ShowTowers() end)
-local r2=_I("Frame") r2.Size=_U2(1,0,0,45) r2.BackgroundColor3=_K.Card r2.BorderSizePixel=0 r2.LayoutOrder=3 r2.Parent=_CH Corner(r2,8) Stroke(r2,_K.Stroke)
-local l2=_I("TextLabel") l2.BackgroundTransparency=1 l2.Position=_UO(10,0) l2.Size=_U2(1,-150,1,0) l2.Text="🏰 Torre 2" l2.TextColor3=_K.White l2.TextSize=12 l2.Font=_GB
-l2.TextXAlignment=_XL l2.Parent=r2 local run2=Playback.Running and Playback.Tower=="Torre 2" local b2=_I("TextButton") b2.AnchorPoint=_V2(1,.5)
-b2.Position=_U2(1,-42,.5,0) b2.Size=_UO(78,30) b2.BackgroundColor3=run2 and _K.Error or _K.Success b2.BorderSizePixel=0 b2.Text=run2 and "■ PARAR" or "▶ INICIAR"
-b2.TextColor3=_K.White b2.TextSize=9 b2.Font=_GB b2.AutoButtonColor=false b2.Parent=r2 Corner(b2,7) local ex=_I("TextButton") ex.AnchorPoint=_V2(1,.5)
-ex.Position=_U2(1,-7,.5,0) ex.Size=_UO(27,31) ex.BackgroundTransparency=1 ex.BorderSizePixel=0 ex.Text=expandedTower2 and "▲" or "▼" ex.TextColor3=_K.Gray ex.TextSize=12
-ex.Font=_GB ex.AutoButtonColor=false ex.Parent=r2 local tc=_I("Frame") tc.Size=_U2(1,0,0,expandedTower2 and 149 or 0) tc.BackgroundTransparency=1 tc.ClipsDescendants=true
-tc.LayoutOrder=4 tc.Parent=_CH local tl=_I("UIListLayout") tl.Padding=_UD(0,5) tl.Parent=tc for _,rn in ipairs(Tower2RouteOrder)do local b=_I("TextButton")
-b.Size=_U2(1,0,0,32) b.BackgroundColor3=_K.Panel b.BorderSizePixel=0 b.Text="   "..rn b.TextColor3=_K.Gray b.TextSize=10 b.Font=_GB b.TextXAlignment=_XL
-b.AutoButtonColor=false b.Parent=tc Corner(b,7) local s=Stroke(b,_K.Stroke) if selectedTower2Route==rn then b.BackgroundColor3=_K.SelectionRedDark
-b.TextColor3=_K.SelectionRed s.Color=_K.SelectionRed s.Thickness=1.5 end b.MouseButton1Click:Connect(function() local route=towerRoutes["Torre 2"][rn] if not route then
-Notify("ROTA NÃO CARREGADA","Torre 2 • "..rn,"Error") return end selectedTower2Route=rn Notify("ROTA SELECIONADA","Torre 2 • "..rn,"Success") ShowTowers() end) end
-b2.MouseButton1Click:Connect(function() if Playback.Running and Playback.Tower=="Torre 2" then StopPlayback("cancelled") ShowTowers() return end
-local rn=selectedTower2Route local route=towerRoutes["Torre 2"][rn] if not route then Notify("ROTA NÃO CARREGADA","Torre 2 • "..rn,"Error") return end
-StartPlayback(route,nil,nil,"Torre 2",rn) task.wait(.1) ShowTowers() end) ex.MouseButton1Click:Connect(function() expandedTower2=not expandedTower2 ShowTowers() end)
-Content.CanvasPosition=_V2() end local function ShowVolvers() CurrentPage="Volvers" ClearContent() local header=_I("Frame") header.Size=_U2(1,0,0,58)
+
+-- ============================================
+-- 🏃 EB DELTA - Hotbar + Sub-páginas
+-- ============================================
+local EB_SUB = "Parkour" -- "Parkour", "Torres", "Automacao", "Configuracao"
+
+local RenderEBSub
+
+local function ShowEBDelta()
+    CurrentPage = "EBDelta"
+    ClearContent()
+
+    -- Header do EB DELTA
+    local hdr = _I("Frame") hdr.Size=_U2(1,0,0,52) hdr.BackgroundColor3=_K.Card hdr.BorderSizePixel=0 hdr.LayoutOrder=0 hdr.Parent=_CH
+    Corner(hdr,9) Stroke(hdr,_K.StrokeLight,1)
+    local t=_I("TextLabel") t.BackgroundTransparency=1 t.Position=_UO(12,6) t.Size=_U2(1,-24,0,22) t.Text="🏃 EB DELTA"
+    t.TextColor3=_K.White t.TextSize=15 t.Font=_GB t.TextXAlignment=_XL t.Parent=hdr
+    local s=_I("TextLabel") s.BackgroundTransparency=1 s.Position=_UO(13,28) s.Size=_U2(1,-26,0,14)
+    s.Text="Parkour • Torres • Automação • Configuração" s.TextColor3=_K.DarkGray s.TextSize=9 s.Font=_GM s.TextXAlignment=_XL s.Parent=hdr
+
+    -- Hotbar superior
+    local hotbar = _I("Frame") hotbar.Size=_U2(1,0,0,40) hotbar.BackgroundColor3=_K.Card hotbar.BorderSizePixel=0 hotbar.LayoutOrder=1 hotbar.Parent=_CH
+    Corner(hotbar,8) Stroke(hotbar,_K.Stroke)
+    Padding(hotbar,4,4,4,4)
+    local hLayout = _I("UIListLayout") hLayout.FillDirection=Enum.FillDirection.Horizontal hLayout.Padding=_UD(0,5)
+    hLayout.HorizontalAlignment=Enum.HorizontalAlignment.Center hLayout.VerticalAlignment=Enum.VerticalAlignment.Center hLayout.Parent=hotbar
+
+    local opcoes = {
+        {key="Parkour",     label="🏃 PARKOUR"},
+        {key="Torres",      label="🏰 TORRES"},
+        {key="Automacao",   label="🤸 AUTOMAÇÃO"},
+        {key="Configuracao",label="⚙ CONFIG"},
+    }
+    for _,opt in ipairs(opcoes) do
+        local sel = (EB_SUB == opt.key)
+        local b = _I("TextButton")
+        b.Size = _U2(0.24,0,1,0)
+        b.BackgroundColor3 = sel and _K.Selected or _K.Panel
+        b.BorderSizePixel=0
+        b.Text = opt.label
+        b.TextColor3 = sel and _K.White or _K.Gray
+        b.TextSize=9 b.Font=_GB b.AutoButtonColor=false
+        b.Parent=hotbar
+        Corner(b,6)
+        local st = Stroke(b, sel and _K.Primary or _K.Stroke, sel and 1.5 or 1)
+        b.MouseButton1Click:Connect(function()
+            if EB_SUB ~= opt.key then
+                EB_SUB = opt.key
+                ShowEBDelta()
+            end
+        end)
+    end
+
+    -- Renderiza conteúdo do sub-view
+    if RenderEBSub then
+        RenderEBSub()
+    end
+
+    Content.CanvasPosition = _V2()
+end
+
+-- ===== Sub-view: PARKOUR =====
+local function RenderEB_Parkour()
+    local tf=_I("Frame") tf.Size=_U2(1,0,0,48) tf.BackgroundColor3=_K.Card tf.BorderSizePixel=0
+    tf.LayoutOrder=2 tf.Parent=_CH Corner(tf,9) Stroke(tf,_K.StrokeLight)
+    local title=_I("TextLabel") title.BackgroundTransparency=1 title.Position=_UO(12,6)
+    title.Size=_U2(1,-24,0,22) title.Text="🏃 PARKOURS DISPONÍVEIS" title.TextColor3=_K.White title.TextSize=14 title.Font=_GB title.TextXAlignment=_XL title.Parent=tf
+    local info=_I("TextLabel") info.BackgroundTransparency=1 info.Position=_UO(13,28) info.Size=_U2(1,-26,0,14) info.Text="Clique na seta para expandir as opções"
+    info.TextColor3=_K.DarkGray info.TextSize=9 info.Font=_GM info.TextXAlignment=_XL info.Parent=tf
+
+    for num=1,4 do
+        local row=_I("Frame") row.Size=_U2(1,0,0,45)
+        row.BackgroundColor3=_K.Card row.BorderSizePixel=0 row.LayoutOrder=num+10 row.Parent=_CH Corner(row,8) Stroke(row,_K.Stroke)
+        local label=_I("TextLabel")
+        label.BackgroundTransparency=1 label.Position=_UO(10,0) label.Size=_U2(1,-105,1,0) label.Text="🏃 Parkour "..num label.TextColor3=_K.White label.TextSize=12 label.Font=_GB
+        label.TextXAlignment=_XL label.Parent=row
+        local running=Playback.Running and Playback.Parkour==num and not Playback.Tower
+        local start=_I("TextButton")
+        start.AnchorPoint=_V2(1,.5) start.Position=_U2(1,-42,.5,0) start.Size=_UO(78,30) start.BackgroundColor3=running and _K.Error or _K.Success start.BorderSizePixel=0
+        start.Text=running and "■ PARAR" or "▶ INICIAR" start.TextColor3=_K.White start.TextSize=9 start.Font=_GB start.AutoButtonColor=false start.ZIndex=5 start.Parent=row
+        Corner(start,7)
+        local expand=_I("TextButton") expand.AnchorPoint=_V2(1,.5) expand.Position=_U2(1,-7,.5,0) expand.Size=_UO(27,31) expand.BackgroundTransparency=1
+        expand.BorderSizePixel=0 expand.Text=expandedParkour[num]and "▲" or "▼" expand.TextColor3=_K.Gray expand.TextSize=12 expand.Font=_GB expand.AutoButtonColor=false
+        expand.ZIndex=6 expand.Parent=row
+        local ec=_I("Frame") ec.Size=_U2(1,0,0,expandedParkour[num]and 149 or 0) ec.BackgroundTransparency=1 ec.ClipsDescendants=true
+        ec.LayoutOrder=num+20 ec.Parent=_CH
+        local el=_I("UIListLayout") el.Padding=_UD(0,5) el.Parent=ec
+        for _,cat in ipairs(CategoryOrder)do
+            local b=_I("TextButton")
+            b.Size=_U2(1,0,0,32) b.BackgroundColor3=_K.Panel b.BorderSizePixel=0 b.Text="   "..cat b.TextColor3=GetCategoryColor(cat) b.TextSize=10 b.Font=_GB b.TextXAlignment=_XL
+            b.AutoButtonColor=false b.Parent=ec Corner(b,7)
+            local s=Stroke(b,_K.Stroke)
+            if selectedCategory[num]==cat then b.BackgroundColor3=_K.SelectionRedDark
+                b.TextColor3=_K.SelectionRed s.Color=_K.SelectionRed s.Thickness=1.5 end
+            b.MouseButton1Click:Connect(function()
+                local rs=routes[cat] local route=rs and rs[num]
+                if not route then Notify("ROTA NÃO ENCONTRADA","Parkour "..num.." não existe em "..cat..".","Error") return end
+                selectedCategory[num]=cat
+                Notify("ROTA SELECIONADA","Parkour "..num.." • "..cat,"Success")
+                ShowEBDelta()
+            end)
+        end
+        start.MouseButton1Click:Connect(function()
+            if Playback.Running and Playback.Parkour==num and not Playback.Tower then StopPlayback("cancelled") ShowEBDelta() return end
+            local cat=selectedCategory[num]or "Lento"
+            selectedCategory[num]=cat local rs=routes[cat] local route=rs and rs[num]
+            if not route then Notify("ROTA NÃO ENCONTRADA","Parkour "..num.." • "..cat,"Error") return end
+            StartPlayback(route,cat,num) task.wait(.1) ShowEBDelta()
+        end)
+        expand.MouseButton1Click:Connect(function() expandedParkour[num]=not expandedParkour[num] ShowEBDelta() end)
+    end
+end
+
+-- ===== Sub-view: TORRES =====
+local function RenderEB_Torres()
+    local tf=_I("Frame") tf.Size=_U2(1,0,0,48)
+    tf.BackgroundColor3=_K.Card tf.BorderSizePixel=0 tf.LayoutOrder=2 tf.Parent=_CH Corner(tf,9) Stroke(tf,_K.StrokeLight)
+    local title=_I("TextLabel")
+    title.BackgroundTransparency=1 title.Position=_UO(12,6) title.Size=_U2(1,-24,0,22) title.Text="🏰 TORRES DISPONÍVEIS" title.TextColor3=_K.White title.TextSize=14
+    title.Font=_GB title.TextXAlignment=_XL title.Parent=tf
+    local info=_I("TextLabel") info.BackgroundTransparency=1 info.Position=_UO(13,28) info.Size=_U2(1,-26,0,14)
+    info.Text="Torre 1 direta • Torre 2 com quatro rotas" info.TextColor3=_K.DarkGray info.TextSize=9 info.Font=_GM info.TextXAlignment=_XL info.Parent=tf
+
+    local r1=_I("Frame") r1.Size=_U2(1,0,0,45) r1.BackgroundColor3=_K.Card r1.BorderSizePixel=0 r1.LayoutOrder=3 r1.Parent=_CH Corner(r1,8) Stroke(r1,_K.Stroke)
+    local l1=_I("TextLabel") l1.BackgroundTransparency=1 l1.Position=_UO(10,0) l1.Size=_U2(1,-105,1,0) l1.Text="🏰 Torre 1" l1.TextColor3=_K.White l1.TextSize=12 l1.Font=_GB
+    l1.TextXAlignment=_XL l1.Parent=r1
+    local run1=Playback.Running and Playback.Tower=="Torre 1"
+    local b1=_I("TextButton") b1.AnchorPoint=_V2(1,.5) b1.Position=_U2(1,-8,.5,0)
+    b1.Size=_UO(78,30) b1.BackgroundColor3=run1 and _K.Error or _K.Success b1.BorderSizePixel=0 b1.Text=run1 and "■ PARAR" or "▶ INICIAR" b1.TextColor3=_K.White b1.TextSize=9
+    b1.Font=_GB b1.AutoButtonColor=false b1.Parent=r1 Corner(b1,7)
+    b1.MouseButton1Click:Connect(function()
+        if Playback.Running and Playback.Tower=="Torre 1" then StopPlayback("cancelled") ShowEBDelta() return end
+        local route=towerRoutes["Torre 1"]["Única"]
+        if not route then Notify("ROTA NÃO CARREGADA","A rota da Torre 1 não foi encontrada.","Error") return end
+        StartPlayback(route,nil,nil,"Torre 1","Única") task.wait(.1) ShowEBDelta()
+    end)
+
+    local r2=_I("Frame") r2.Size=_U2(1,0,0,45) r2.BackgroundColor3=_K.Card r2.BorderSizePixel=0 r2.LayoutOrder=4 r2.Parent=_CH Corner(r2,8) Stroke(r2,_K.Stroke)
+    local l2=_I("TextLabel") l2.BackgroundTransparency=1 l2.Position=_UO(10,0) l2.Size=_U2(1,-150,1,0) l2.Text="🏰 Torre 2" l2.TextColor3=_K.White l2.TextSize=12 l2.Font=_GB
+    l2.TextXAlignment=_XL l2.Parent=r2
+    local run2=Playback.Running and Playback.Tower=="Torre 2"
+    local b2=_I("TextButton") b2.AnchorPoint=_V2(1,.5)
+    b2.Position=_U2(1,-42,.5,0) b2.Size=_UO(78,30) b2.BackgroundColor3=run2 and _K.Error or _K.Success b2.BorderSizePixel=0 b2.Text=run2 and "■ PARAR" or "▶ INICIAR"
+    b2.TextColor3=_K.White b2.TextSize=9 b2.Font=_GB b2.AutoButtonColor=false b2.Parent=r2 Corner(b2,7)
+    local ex=_I("TextButton") ex.AnchorPoint=_V2(1,.5)
+    ex.Position=_U2(1,-7,.5,0) ex.Size=_UO(27,31) ex.BackgroundTransparency=1 ex.BorderSizePixel=0 ex.Text=expandedTower2 and "▲" or "▼" ex.TextColor3=_K.Gray ex.TextSize=12
+    ex.Font=_GB ex.AutoButtonColor=false ex.Parent=r2
+    local tc=_I("Frame") tc.Size=_U2(1,0,0,expandedTower2 and 149 or 0) tc.BackgroundTransparency=1 tc.ClipsDescendants=true
+    tc.LayoutOrder=5 tc.Parent=_CH
+    local tl=_I("UIListLayout") tl.Padding=_UD(0,5) tl.Parent=tc
+    for _,rn in ipairs(Tower2RouteOrder)do
+        local b=_I("TextButton")
+        b.Size=_U2(1,0,0,32) b.BackgroundColor3=_K.Panel b.BorderSizePixel=0 b.Text="   "..rn b.TextColor3=_K.Gray b.TextSize=10 b.Font=_GB b.TextXAlignment=_XL
+        b.AutoButtonColor=false b.Parent=tc Corner(b,7)
+        local s=Stroke(b,_K.Stroke)
+        if selectedTower2Route==rn then b.BackgroundColor3=_K.SelectionRedDark
+            b.TextColor3=_K.SelectionRed s.Color=_K.SelectionRed s.Thickness=1.5 end
+        b.MouseButton1Click:Connect(function()
+            local route=towerRoutes["Torre 2"][rn]
+            if not route then Notify("ROTA NÃO CARREGADA","Torre 2 • "..rn,"Error") return end
+            selectedTower2Route=rn Notify("ROTA SELECIONADA","Torre 2 • "..rn,"Success") ShowEBDelta()
+        end)
+    end
+    b2.MouseButton1Click:Connect(function()
+        if Playback.Running and Playback.Tower=="Torre 2" then StopPlayback("cancelled") ShowEBDelta() return end
+        local rn=selectedTower2Route local route=towerRoutes["Torre 2"][rn]
+        if not route then Notify("ROTA NÃO CARREGADA","Torre 2 • "..rn,"Error") return end
+        StartPlayback(route,nil,nil,"Torre 2",rn) task.wait(.1) ShowEBDelta()
+    end)
+    ex.MouseButton1Click:Connect(function() expandedTower2=not expandedTower2 ShowEBDelta() end)
+end
+
+-- ===== Sub-view: AUTOMAÇÃO (JJs) =====
+local JJ_AC = {Fundo=_RGB(10,10,14),Card=_RGB(20,20,28),Borda=_RGB(0,220,255),Texto=_RGB(240,240,250),Verde=_RGB(0,190,110),Vermelho=_RGB(220,50,70),Amarelo=_RGB(255,200,0),Cinza=_RGB(80,80,95)}
+local JJ_ativo,JJ_VELOCIDADE,JJ_MAX_CLIQUES,JJ_META,JJ_META_ATIVA=false,29,2,40,true
+local JJ_feitos,JJ_bolhasVistas,JJ_cliquesTotal,JJ_ultimaBolhaVista=0,{},0,0
+local JJ_btnToggleRef,JJ_infoLbl,JJ_slFill,JJ_velValor
+
+local function JJ_setBtnEstado(ligado)
+    if not JJ_btnToggleRef or not JJ_btnToggleRef.Parent then return end
+    if ligado then JJ_btnToggleRef.Text="PARAR" JJ_btnToggleRef.BackgroundColor3=JJ_AC.Vermelho
+    else JJ_btnToggleRef.Text="LIGAR" JJ_btnToggleRef.BackgroundColor3=JJ_AC.Verde end
+end
+local function JJ_clicarFiresignal(obj)
+    if firesignal then pcall(function()
+        firesignal(obj.MouseButton1Down) firesignal(obj.MouseButton1Up) firesignal(obj.MouseButton1Click)
+    end) return end
+    pcall(function() obj.MouseButton1Down:Fire() obj.MouseButton1Up:Fire() obj.MouseButton1Click:Fire() end)
+end
+local function JJ_ehBolha(obj)
+    if obj.ClassName~="ImageButton" then return false end
+    if obj.Name~="InputTemplate" then return false end
+    if not obj.Visible then return false end
+    local s=obj.AbsoluteSize
+    if s.X<20 or s.Y<20 or s.X>200 or s.Y>200 then return false end
+    local p=obj.AbsolutePosition if p.X<=0 or p.Y<=0 then return false end
+    return true
+end
+local function JJ_gerarID(obj)
+    local pos=obj.AbsolutePosition local size=obj.AbsoluteSize
+    local cx=pos.X+size.X/2 local cy=pos.Y+size.Y/2
+    return math.floor(cx/40).."_"..math.floor(cy/40)
+end
+task.spawn(function()
+    while true do
+        task.wait(0.1)
+        if not JJ_ativo then continue end
+        if JJ_META_ATIVA and JJ_feitos>=JJ_META then JJ_ativo=false JJ_setBtnEstado(false) continue end
+        local delayAtual=JJ_VELOCIDADE/100
+        local agora=tick()
+        for id,dados in pairs(JJ_bolhasVistas)do if agora-dados.t>2.5 then JJ_bolhasVistas[id]=nil end end
+        local clicou=false
+        for _,gui in ipairs(PG:GetChildren())do
+            if gui:IsA("ScreenGui") and gui~=Gui then
+                for _,obj in ipairs(gui:GetDescendants())do
+                    if JJ_ehBolha(obj)then
+                        JJ_ultimaBolhaVista=tick()
+                        local id=JJ_gerarID(obj)
+                        local dados=JJ_bolhasVistas[id]
+                        if not dados then JJ_bolhasVistas[id]={count=0,t=tick()} dados=JJ_bolhasVistas[id] end
+                        dados.t=tick()
+                        if dados.count<JJ_MAX_CLIQUES then
+                            JJ_clicarFiresignal(obj) dados.count=dados.count+1 JJ_cliquesTotal=JJ_cliquesTotal+1 clicou=true
+                            if dados.count==1 then JJ_feitos=JJ_feitos+1 end
+                            break
+                        end
+                    end
+                end
+                if clicou then break end
+            end
+        end
+        if JJ_META_ATIVA and JJ_feitos==JJ_META-1 and(tick()-JJ_ultimaBolhaVista>2)then
+            JJ_ativo=false JJ_setBtnEstado(false) continue
+        end
+        if clicou then task.wait(delayAtual) else task.wait(0.02) end
+    end
+end)
+task.spawn(function()
+    while true do task.wait(0.3)
+        if JJ_infoLbl and JJ_infoLbl.Parent then
+            JJ_infoLbl.Text=string.format("JJs: %d/%d",JJ_feitos,JJ_META)
+            JJ_infoLbl.TextColor3=(JJ_feitos>=JJ_META and JJ_META_ATIVA)and JJ_AC.Verde or JJ_AC.Amarelo
+        end
+    end
+end)
+
+local function RenderEB_Automacao()
+    local card=_I("Frame") card.Size=_U2(1,0,0,260) card.BackgroundColor3=_K.Card card.BorderSizePixel=0 card.LayoutOrder=2 card.Parent=_CH
+    Corner(card,8) Stroke(card,_K.Stroke,1)
+    local titleH=_I("TextLabel") titleH.BackgroundTransparency=1 titleH.Position=_UO(10,6) titleH.Size=_U2(1,-20,0,18) titleH.Text="🤸 AUTO JJs"
+    titleH.TextColor3=_K.White titleH.TextSize=13 titleH.Font=_GB titleH.TextXAlignment=_XL titleH.Parent=card
+
+    JJ_infoLbl=_I("TextLabel") JJ_infoLbl.BackgroundTransparency=1 JJ_infoLbl.Position=_UO(10,28) JJ_infoLbl.Size=_U2(1,-20,0,26)
+    JJ_infoLbl.Text=string.format("JJs: %d/%d",JJ_feitos,JJ_META) JJ_infoLbl.TextColor3=JJ_AC.Amarelo JJ_infoLbl.TextSize=12 JJ_infoLbl.Font=_GB JJ_infoLbl.TextXAlignment=_XL JJ_infoLbl.Parent=card
+
+    local lblM=_I("TextLabel") lblM.BackgroundTransparency=1 lblM.Position=_UO(10,60) lblM.Size=_U2(0.5,0,0,16) lblM.Text="META:" lblM.TextColor3=_K.White lblM.TextSize=10 lblM.Font=_GB lblM.TextXAlignment=_XL lblM.Parent=card
+    local metaBox=_I("TextBox") metaBox.Size=_U2(0.3,0,0,22) metaBox.Position=_U2(0.65,0,0,58) metaBox.BackgroundColor3=_K.Panel metaBox.Text=tostring(JJ_META)
+    metaBox.TextColor3=_K.White metaBox.Font=_GB metaBox.TextSize=11 metaBox.BorderSizePixel=0 metaBox.ClearTextOnFocus=false metaBox.Parent=card Corner(metaBox,5)
+    metaBox.FocusLost:Connect(function() local v=tonumber(metaBox.Text) if v and v>0 then JJ_META=v else metaBox.Text=tostring(JJ_META)end end)
+
+    local metaBtn=_I("TextButton") metaBtn.Position=_UO(10,86) metaBtn.Size=_U2(1,-20,0,22)
+    metaBtn.BackgroundColor3=JJ_META_ATIVA and JJ_AC.Verde or JJ_AC.Cinza metaBtn.Text=JJ_META_ATIVA and "META: ON" or "META: OFF"
+    metaBtn.TextColor3=Color3.new(1,1,1) metaBtn.Font=_GB metaBtn.TextSize=10 metaBtn.BorderSizePixel=0 metaBtn.AutoButtonColor=false metaBtn.Parent=card Corner(metaBtn,5)
+    metaBtn.MouseButton1Click:Connect(function()
+        JJ_META_ATIVA=not JJ_META_ATIVA metaBtn.Text=JJ_META_ATIVA and "META: ON" or "META: OFF"
+        metaBtn.BackgroundColor3=JJ_META_ATIVA and JJ_AC.Verde or JJ_AC.Cinza
+    end)
+
+    local lblV=_I("TextLabel") lblV.BackgroundTransparency=1 lblV.Position=_UO(10,114) lblV.Size=_U2(1,-20,0,14) lblV.Text="VELOCIDADE" lblV.TextColor3=_K.White lblV.TextSize=10 lblV.Font=_GB lblV.TextXAlignment=_XL lblV.Parent=card
+    local sliderBg=_I("Frame") sliderBg.Size=_U2(1,-20,0,6) sliderBg.Position=_UO(10,132) sliderBg.BackgroundColor3=_K.Panel sliderBg.BorderSizePixel=0 sliderBg.Parent=card Corner(sliderBg,3)
+    JJ_slFill=_I("Frame") JJ_slFill.Size=_U2((JJ_VELOCIDADE-1)/39,0,1,0) JJ_slFill.BackgroundColor3=JJ_AC.Verde JJ_slFill.BorderSizePixel=0 JJ_slFill.Parent=sliderBg Corner(JJ_slFill,3)
+    local r1=_I("TextLabel") r1.BackgroundTransparency=1 r1.Position=_UO(10,140) r1.Size=_U2(0.35,0,0,12) r1.Text="RÁPIDO" r1.TextColor3=_K.DarkGray r1.TextSize=8 r1.Font=_GM r1.TextXAlignment=_XL r1.Parent=card
+    local r2=_I("TextLabel") r2.BackgroundTransparency=1 r2.Position=_U2(0.65,0,0,140) r2.Size=_U2(0.35,0,0,12) r2.Text="LENTO" r2.TextColor3=_K.DarkGray r2.TextSize=8 r2.Font=_GM r2.TextXAlignment=Enum.TextXAlignment.Right r2.Parent=card
+    JJ_velValor=_I("TextLabel") JJ_velValor.BackgroundTransparency=1 JJ_velValor.Position=_U2(0.35,0,0,139) JJ_velValor.Size=_U2(0.3,0,0,14) JJ_velValor.Text=tostring(JJ_VELOCIDADE)
+    JJ_velValor.TextColor3=_K.White JJ_velValor.TextSize=12 JJ_velValor.Font=_GB JJ_velValor.TextXAlignment=_XC JJ_velValor.Parent=card
+
+    local btnMenos=_I("TextButton") btnMenos.Position=_UO(10,158) btnMenos.Size=_U2(0.15,0,0,26) btnMenos.BackgroundColor3=_K.Panel btnMenos.Text="−" btnMenos.TextColor3=_K.White btnMenos.TextSize=18 btnMenos.Font=_GB btnMenos.BorderSizePixel=0 btnMenos.AutoButtonColor=false btnMenos.Parent=card Corner(btnMenos,5)
+    local btnMais=_I("TextButton") btnMais.Position=_U2(0.85,0,0,158) btnMais.Size=_U2(0.15,0,0,26) btnMais.BackgroundColor3=_K.Panel btnMais.Text="+" btnMais.TextColor3=_K.White btnMais.TextSize=18 btnMais.Font=_GB btnMais.BorderSizePixel=0 btnMais.AutoButtonColor=false btnMais.Parent=card Corner(btnMais,5)
+    local function setVel(v)
+        JJ_VELOCIDADE=math.clamp(v,1,40)
+        if JJ_velValor and JJ_velValor.Parent then JJ_velValor.Text=tostring(JJ_VELOCIDADE) end
+        if JJ_slFill and JJ_slFill.Parent then JJ_slFill.Size=_U2((JJ_VELOCIDADE-1)/39,0,1,0) end
+    end
+    btnMenos.MouseButton1Click:Connect(function()setVel(JJ_VELOCIDADE-1)end)
+    btnMais.MouseButton1Click:Connect(function()setVel(JJ_VELOCIDADE+1)end)
+
+    local lblRec=_I("TextLabel") lblRec.BackgroundTransparency=1 lblRec.Position=_UO(10,186) lblRec.Size=_U2(1,-20,0,12) lblRec.Text="Recomendação: 29" lblRec.TextColor3=JJ_AC.Amarelo lblRec.TextSize=9 lblRec.Font=_GM lblRec.TextXAlignment=_XL lblRec.Parent=card
+
+    local btnToggle=_I("TextButton") btnToggle.Position=_UO(10,202) btnToggle.Size=_U2(1,-20,0,36) btnToggle.BackgroundColor3=JJ_AC.Verde
+    btnToggle.Text="LIGAR" btnToggle.TextColor3=Color3.new(1,1,1) btnToggle.TextSize=14 btnToggle.Font=_GB btnToggle.BorderSizePixel=0 btnToggle.AutoButtonColor=false btnToggle.Parent=card Corner(btnToggle,6)
+    JJ_btnToggleRef=btnToggle JJ_setBtnEstado(JJ_ativo)
+    btnToggle.MouseButton1Click:Connect(function()
+        if not JJ_ativo and JJ_META_ATIVA and JJ_feitos>=JJ_META then JJ_feitos=0 JJ_cliquesTotal=0 JJ_bolhasVistas={} end
+        JJ_ativo=not JJ_ativo JJ_setBtnEstado(JJ_ativo)
+        if JJ_ativo then JJ_ultimaBolhaVista=tick() end
+    end)
+    local btnReset=_I("TextButton") btnReset.Position=_UO(10,242) btnReset.Size=_U2(1,-20,0,16) btnReset.BackgroundColor3=_K.Panel
+    btnReset.Text="RESETAR CONTADOR" btnReset.TextColor3=_K.DarkGray btnReset.TextSize=9 btnReset.Font=_GB btnReset.BorderSizePixel=0 btnReset.AutoButtonColor=false btnReset.Parent=card Corner(btnReset,4)
+    btnReset.MouseButton1Click:Connect(function() JJ_feitos=0 JJ_cliquesTotal=0 JJ_bolhasVistas={} end)
+end
+
+-- ===== Sub-view: CONFIGURAÇÃO (Dummy / Direto) =====
+local function RenderEB_Configuracao()
+    local card=_I("Frame") card.Size=_U2(1,0,0,240) card.BackgroundColor3=_K.Card card.BorderSizePixel=0 card.LayoutOrder=2 card.Parent=_CH
+    Corner(card,8) Stroke(card,_K.StrokeLight,1)
+
+    local title=_I("TextLabel") title.BackgroundTransparency=1 title.Position=_UO(12,8) title.Size=_U2(1,-24,0,22)
+    title.Text="⚙ CONFIGURAÇÃO DE ROTA" title.TextColor3=_K.White title.TextSize=14 title.Font=_GB title.TextXAlignment=_XL title.Parent=card
+    local desc=_I("TextLabel") desc.BackgroundTransparency=1 desc.Position=_UO(13,32) desc.Size=_U2(1,-26,0,28)
+    desc.Text="Escolha como o personagem se aproxima do início da rota. Essa opção vale para Torres e Parkours."
+    desc.TextColor3=_K.DarkGray desc.TextSize=10 desc.Font=_GM desc.TextWrapped=true desc.TextXAlignment=_XL desc.TextYAlignment=Enum.TextYAlignment.Top desc.Parent=card
+
+    local selLabel=_I("TextLabel") selLabel.BackgroundTransparency=1 selLabel.Position=_UO(12,70) selLabel.Size=_U2(1,-24,0,14)
+    selLabel.Text="Modo selecionado: "..ParkourConfig.Modo selLabel.TextColor3=_K.Primary selLabel.TextSize=11 selLabel.Font=_GB selLabel.TextXAlignment=_XL selLabel.Parent=card
+
+    local optFrame=_I("Frame") optFrame.Position=_UO(12,94) optFrame.Size=_U2(1,-24,0,60) optFrame.BackgroundTransparency=1 optFrame.Parent=card
+    local optLayout=_I("UIListLayout") optLayout.FillDirection=Enum.FillDirection.Horizontal optLayout.Padding=_UD(0,8) optLayout.Parent=optFrame
+
+    local function makeOpt(key, emoji, t1, t2)
+        local sel = ParkourConfig.Modo==key
+        local b=_I("TextButton") b.Size=_U2(0.5,-4,1,0) b.BackgroundColor3=sel and _K.SelectionRedDark or _K.Panel b.BorderSizePixel=0
+        b.AutoButtonColor=false b.Parent=optFrame Corner(b,8)
+        local s=Stroke(b, sel and _K.SelectionRed or _K.Stroke, sel and 1.5 or 1)
+        local em=_I("TextLabel") em.BackgroundTransparency=1 em.Position=_UO(10,6) em.Size=_UO(30,30) em.Text=emoji em.TextSize=20 em.Font=_GB em.TextXAlignment=_XL em.Parent=b
+        local tL=_I("TextLabel") tL.BackgroundTransparency=1 tL.Position=_UO(46,6) tL.Size=_U2(1,-50,0,20) tL.Text=t1
+        tL.TextColor3=sel and _K.White or _K.Gray tL.TextSize=12 tL.Font=_GB tL.TextXAlignment=_XL tL.Parent=b
+        local subL=_I("TextLabel") subL.BackgroundTransparency=1 subL.Position=_UO(46,26) subL.Size=_U2(1,-50,0,26) subL.Text=t2
+        subL.TextColor3=_K.DarkGray subL.TextSize=9 subL.Font=_GM subL.TextWrapped=true subL.TextXAlignment=_XL subL.TextYAlignment=Enum.TextYAlignment.Top subL.Parent=b
+        b.MouseButton1Click:Connect(function()
+            if ParkourConfig.Modo~=key then
+                ParkourConfig.Modo=key
+                Notify("MODO ALTERADO","Modo: "..t1,"Success")
+                ShowEBDelta()
+            end
+        end)
+    end
+    makeOpt("Dummy","🧍","DUMMY","Cria um marcador verde. Você anda até ele e a rota começa.")
+    makeOpt("Direto","➡","IR DIRETO","O personagem anda até o início sozinho (movimento normal do Roblox).")
+
+    local infoBox=_I("Frame") infoBox.Position=_UO(12,166) infoBox.Size=_U2(1,-24,0,58) infoBox.BackgroundColor3=_K.Panel infoBox.BorderSizePixel=0 infoBox.Parent=card
+    Corner(infoBox,7) Stroke(infoBox,_K.Stroke,1)
+    local iT=_I("TextLabel") iT.BackgroundTransparency=1 iT.Position=_UO(10,6) iT.Size=_U2(1,-20,0,16)
+    iT.Text="💡 Sobre o modo atual" iT.TextColor3=_K.White iT.TextSize=11 iT.Font=_GB iT.TextXAlignment=_XL iT.Parent=infoBox
+    local iD=_I("TextLabel") iD.BackgroundTransparency=1 iD.Position=_UO(10,24) iD.Size=_U2(1,-20,0,30)
+    if ParkourConfig.Modo=="Dummy" then
+        iD.Text="O personagem aguarda você caminhar até o marcador para iniciar a rota."
+    else
+        iD.Text="O personagem anda automaticamente com o movimento natural do Roblox até o início."
+    end
+    iD.TextColor3=_K.Gray iD.TextSize=9 iD.Font=_GM iD.TextWrapped=true iD.TextXAlignment=_XL iD.TextYAlignment=Enum.TextYAlignment.Top iD.Parent=infoBox
+end
+
+RenderEBSub = function()
+    if EB_SUB=="Parkour" then
+        RenderEB_Parkour()
+    elseif EB_SUB=="Torres" then
+        RenderEB_Torres()
+    elseif EB_SUB=="Automacao" then
+        RenderEB_Automacao()
+    elseif EB_SUB=="Configuracao" then
+        RenderEB_Configuracao()
+    end
+end
+
+-- ============================================
+-- VOLVERS
+-- ============================================
+local function ShowVolvers() CurrentPage="Volvers" ClearContent() local header=_I("Frame") header.Size=_U2(1,0,0,58)
 header.BackgroundColor3=_K.Card header.BorderSizePixel=0 header.LayoutOrder=0 header.Parent=_CH Corner(header,9) Stroke(header,_K.StrokeLight,1)
 local title=_I("TextLabel") title.BackgroundTransparency=1 title.Position=_UO(12,7) title.Size=_U2(1,-24,0,25) title.Text="↪ VOLVERS" title.TextColor3=_K.White
 title.TextSize=16 title.Font=_GB title.TextXAlignment=_XL title.Parent=header local sub=_I("TextLabel") sub.BackgroundTransparency=1 sub.Position=_UO(13,34)
@@ -462,7 +848,12 @@ execBtn.AnchorPoint=_V2(1,.5) execBtn.Position=_U2(1,-8,.5,0) execBtn.Size=_UO(6
 execBtn.BorderSizePixel=0 execBtn.Text="▶ EXECUTAR" execBtn.TextColor3=_K.White execBtn.TextSize=8 execBtn.Font=_GB execBtn.AutoButtonColor=false execBtn.Parent=card
 Corner(execBtn,7) execBtn.MouseButton1Click:Connect(function() cmd.action() end) card.MouseEnter:Connect(function() T:Create(card,TweenInfo.new(.12),{
 BackgroundColor3=cmd.highlight and _RGB(48,48,48)or _K.CardHover }):Play() end) card.MouseLeave:Connect(function() T:Create(card,TweenInfo.new(.12),{
-BackgroundColor3=cmd.highlight and _RGB(38,38,38)or _K.Card }):Play() end) end Content.CanvasPosition=_V2() end local iaOcupado=false local function ShowAutoCorrecao()
+BackgroundColor3=cmd.highlight and _RGB(38,38,38)or _K.Card }):Play() end) end Content.CanvasPosition=_V2() end
+
+-- ============================================
+-- IA CHAT
+-- ============================================
+local iaOcupado=false local function ShowAutoCorrecao()
 CurrentPage="AutoCorrecao" ClearContent() local header=_I("Frame") header.Size=_U2(1,0,0,58) header.BackgroundColor3=_K.Card header.BorderSizePixel=0 header.LayoutOrder=0
 header.Parent=_CH Corner(header,9) Stroke(header,_K.StrokeLight,1) local title=_I("TextLabel") title.BackgroundTransparency=1 title.Position=_UO(12,7)
 title.Size=_U2(1,-24,0,25) title.Text="🤖 IA CHAT" title.TextColor3=_K.White title.TextSize=16 title.Font=_GB title.TextXAlignment=_XL title.Parent=header
@@ -490,7 +881,12 @@ if iaOcupado then return end local texto=box.Text:gsub("^%s+",""):gsub("%s+$",""
 iaOcupado=true send.Text="⏳ AGUARDE..." setStatus("🧠 Pensando...",_K.Gray) task.spawn(function() local corrigido,erro=CorrigirTexto(texto) if corrigido then
 if EnviarNoChat(corrigido)then setStatus("✅ Corrigido e enviado!",_K.Success) box.Text="" Notify("IA CHAT","Mensagem enviada.","Success") else
 setStatus("❌ Chat não encontrado",_K.Error) end else setStatus("❌ "..tostring(erro),_K.Error) end send.Text="✨ CORRIGIR E ENVIAR" iaOcupado=false end) end)
-Content.CanvasPosition=_V2() end local function ShowCreditos() CurrentPage="Creditos" ClearContent() local link="https://discord.gg/NY2RfC7Kx"
+Content.CanvasPosition=_V2() end
+
+-- ============================================
+-- CRÉDITOS
+-- ============================================
+local function ShowCreditos() CurrentPage="Creditos" ClearContent() local link="https://discord.gg/NY2RfC7Kx"
 local header=_I("Frame") header.Size=_U2(1,0,0,58) header.BackgroundColor3=_K.Card header.BorderSizePixel=0 header.LayoutOrder=0 header.Parent=_CH Corner(header,9)
 Stroke(header,_K.StrokeLight,1) local title=_I("TextLabel") title.BackgroundTransparency=1 title.Position=_UO(12,7) title.Size=_U2(1,-24,0,25) title.Text="👑 CRÉDITOS"
 title.TextColor3=_K.White title.TextSize=16 title.Font=_GB title.TextXAlignment=_XL title.Parent=header local sub=_I("TextLabel") sub.BackgroundTransparency=1
@@ -507,33 +903,18 @@ enter.AnchorPoint=_V2(1,.5) enter.Position=_U2(1,-8,.5,0) enter.Size=_UO(70,32) 
 enter.TextColor3=_K.White enter.TextSize=9 enter.Font=_GB enter.AutoButtonColor=false enter.Parent=srv Corner(enter,8) enter.MouseButton1Click:Connect(function()
 pcall(function() setclipboard(link) end) pcall(function() game:GetService("GuiService"):OpenBrowserWindow(link) end)
 Notify("DISCORD","Link copiado! Cole no navegador se não abrir.","Success") end) Content.CanvasPosition=_V2() end
-local function SelectButton(b) if selectedButton then selectedButton.BackgroundColor3=_K.Card selectedButton.TextColor3=_K.Gray end
-selectedButton=b b.BackgroundColor3=_K.Selected b.TextColor3=_K.White end parkourButton.MouseButton1Click:Connect(function() SelectButton(parkourButton) ShowParkours()
-end) towerButton.MouseButton1Click:Connect(function() SelectButton(towerButton) ShowTowers() end) taffsButton.MouseButton1Click:Connect(function()
-SelectButton(taffsButton) ShowTAFFS() end) volversButton.MouseButton1Click:Connect(function() SelectButton(volversButton) ShowVolvers() end)
-iaButton.MouseButton1Click:Connect(function() SelectButton(iaButton) ShowAutoCorrecao() end) creditosButton.MouseButton1Click:Connect(function() SelectButton(creditosButton) ShowCreditos() end) local LogoDragging=false local LogoDragStart,LogoStartPosition
-Logo.InputBegan:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then LogoDragging=true
-LogoDragStart=i.Position LogoStartPosition=Logo.Position i.Changed:Connect(function() if i.UserInputState==Enum.UserInputState.End then LogoDragging=false end end) end
-end) U.InputChanged:Connect(function(i) if LogoDragging and(i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch)then
-local d=i.Position-LogoDragStart Logo.Position=_U2(LogoStartPosition.X.Scale,LogoStartPosition.X.Offset+d.X,LogoStartPosition.Y.Scale,LogoStartPosition.Y.Offset+d.Y) end
-end) local MainDragging=false local MainDragStart,MainStartPosition Header.InputBegan:Connect(function(i)
-if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then MainDragging=true MainDragStart=i.Position
-MainStartPosition=Main.Position i.Changed:Connect(function() if i.UserInputState==Enum.UserInputState.End then MainDragging=false end end) end end)
-U.InputChanged:Connect(function(i) if MainDragging and(i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch)then
-local d=i.Position-MainDragStart Main.Position=_U2(MainStartPosition.X.Scale,MainStartPosition.X.Offset+d.X,MainStartPosition.Y.Scale,MainStartPosition.Y.Offset+d.Y) end
-end) local Opened=false local function OpenMenu() if Opened then return end Opened=true Main.Visible=true Main.Size=UDim2.fromScale(.25,.15) Main.BackgroundTransparency=1
-T:Create(Main,TweenInfo.new(.35,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{Size=UDim2.fromScale(.78,.65),BackgroundTransparency=0}):Play() end
-local function CloseMenu() if not Opened then return end Opened=false
-local tw=T:Create(Main,TweenInfo.new(.25,Enum.EasingStyle.Quart,Enum.EasingDirection.In),{Size=UDim2.fromScale(.25,.15),BackgroundTransparency=1}) tw:Play()
-tw.Completed:Wait() if not Opened then Main.Visible=false end end Logo.MouseButton1Click:Connect(function() if Opened then CloseMenu()else OpenMenu()end end)
-Close.MouseButton1Click:Connect(CloseMenu) local ShowLoja,ShowJJs do
+
+-- ============================================
+-- LOJA + AIMBOT AUX
+-- ============================================
+local ShowLoja do
 local AC={Fundo=_RGB(10,10,14),Card=_RGB(20,20,28),Borda=_RGB(0,220,255),Texto=_RGB(240,240,250),Verde=_RGB(0,190,110),Vermelho=_RGB(220,50,70),Amarelo=_RGB(255,200,0),Cinza=_RGB(80,80,95)}
-local tok=os.clock() PG:SetAttribute("ZKYArm",tok) local function vivo()return PG:GetAttribute("ZKYArm")==tok end local function N(c,p,par) local o=_I(c)
-for k,v in pairs(p)do o[k]=v end o.Parent=par return o end local function rotulo(par,pos,size,txt,cor,ts,fonte,al)
-return N("TextLabel",{BackgroundTransparency=1,Position=pos,Size=size,Text=txt,TextColor3=cor,TextSize=ts,Font=fonte,TextXAlignment=al or _XL},par) end
-local function cabecalho(titulo,sub) local h=N("Frame",{Size=_U2(1,0,0,58),BackgroundColor3=_K.Card,BorderSizePixel=0,LayoutOrder=0},_CH) Corner(h,9)
-Stroke(h,_K.StrokeLight,1) rotulo(h,_UO(12,7),_U2(1,-24,0,25),titulo,_K.White,16,_GB) rotulo(h,_UO(13,34),_U2(1,-26,0,15),sub,_K.DarkGray,9,_GM) end
-local function ehVerde(c) if not c then return false end return c.G>0.2 and c.G>c.R*1.1 and c.G>c.B*1.1 end local function limpar(obj)
+local tok=os.clock() PG:SetAttribute("ZKYArm",tok)
+local function vivo()return PG:GetAttribute("ZKYArm")==tok end
+local function N(c,p,par) local o=_I(c) for k,v in pairs(p)do o[k]=v end o.Parent=par return o end
+local function rotulo(par,pos,size,txt,cor,ts,fonte,al) return N("TextLabel",{BackgroundTransparency=1,Position=pos,Size=size,Text=txt,TextColor3=cor,TextSize=ts,Font=fonte,TextXAlignment=al or _XL},par) end
+local function ehVerde(c) if not c then return false end return c.G>0.2 and c.G>c.R*1.1 and c.G>c.B*1.1 end
+local function limpar(obj)
 if not obj or not obj.Parent then return end if obj:IsA("Frame")then local area=obj.AbsoluteSize.X*obj.AbsoluteSize.Y
 if ehVerde(obj.BackgroundColor3)or obj.BackgroundColor3==_RGB(0,0,0)then obj.BackgroundColor3=area>30000 and AC.Fundo or AC.Card end if area>5000 then
 if not obj:FindFirstChildOfClass("UICorner")then _I("UICorner",obj).CornerRadius=_UD(0,10) end local s=obj:FindFirstChildOfClass("UIStroke")
@@ -542,72 +923,371 @@ elseif obj:IsA("ScrollingFrame")then obj.BorderSizePixel=0 obj.ScrollBarImageCol
 elseif obj:IsA("TextLabel")then if ehVerde(obj.TextColor3)then obj.TextColor3=AC.Texto end elseif obj:IsA("TextButton")then
 if ehVerde(obj.BackgroundColor3)then obj.BackgroundColor3=AC.Verde end if ehVerde(obj.TextColor3)then obj.TextColor3=Color3.new(1,1,1)end
 if not obj:FindFirstChildOfClass("UICorner")then _I("UICorner",obj).CornerRadius=_UD(0,6) end elseif obj:IsA("ImageLabel")or obj:IsA("ImageButton")then
-if ehVerde(obj.BackgroundColor3)then obj.BackgroundColor3=AC.Card end end end local function aplicarTema(gui) if not gui or not gui.Parent then return end
+if ehVerde(obj.BackgroundColor3)then obj.BackgroundColor3=AC.Card end end end
+local function aplicarTema(gui) if not gui or not gui.Parent then return end
 for _,obj in ipairs(gui:GetDescendants())do pcall(limpar,obj)end if not gui:FindFirstChild("AkiraMark")then
 N("TextLabel",{Name="AkiraMark",Size=_U2(1,-20,0,16),Position=_U2(0,10,1,-18),BackgroundTransparency=1,Text="⚡ by Akira",TextColor3=AC.Borda,Font=_GB,TextSize=11,ZIndex=200},gui)
 end end local function acharGui(nome) for _,g in ipairs(PG:GetChildren())do if g:IsA("ScreenGui")and g.Name==nome then return g end end
-for _,g in ipairs(PG:GetDescendants())do if g:IsA("ScreenGui")and g.Name==nome then return g end end end local monitoradas={} local function obter(nome)
-local g=monitoradas[nome] if g and g.Parent then return g end return acharGui(nome) end task.spawn(function() while vivo()do task.wait(0.5) local g=obter("GunShopGui")
+for _,g in ipairs(PG:GetDescendants())do if g:IsA("ScreenGui")and g.Name==nome then return g end end end local monitoradas={}
+local function obter(nome) local g=monitoradas[nome] if g and g.Parent then return g end return acharGui(nome) end
+task.spawn(function() while vivo()do task.wait(0.5) local g=obter("GunShopGui")
 if g and g~=monitoradas.GunShopGui then monitoradas.GunShopGui=g g:GetPropertyChangedSignal("Enabled"):Connect(function() if g.Enabled then task.wait(0.15) aplicarTema(g)
 end end) end end end) task.spawn(function() while vivo()do task.wait(0.8) local g=obter("GunShopGui") if g and g.Enabled then pcall(aplicarTema,g)end end end)
 local function abrirLoja() local g=obter("GunShopGui") if not g then Notify("ERRO","Loja de armas não encontrada no jogo.","Error") return end g.Enabled=true
-task.wait(0.15) aplicarTema(g) CloseMenu() end ShowLoja=function() CurrentPage="Loja" ClearContent() cabecalho("🔫 LOJA DE ARMAS","Abre a loja de armas com visual dark")
+task.wait(0.15) aplicarTema(g) CloseMenu() end
+ShowLoja=function() CurrentPage="Loja" ClearContent()
+local h=_I("Frame") h.Size=_U2(1,0,0,58) h.BackgroundColor3=_K.Card h.BorderSizePixel=0 h.LayoutOrder=0 h.Parent=_CH Corner(h,9) Stroke(h,_K.StrokeLight,1)
+rotulo(h,_UO(12,7),_U2(1,-24,0,25),"🔫 LOJA DE ARMAS",_K.White,16,_GB) rotulo(h,_UO(13,34),_U2(1,-26,0,15),"Abre a loja de armas com visual dark",_K.DarkGray,9,_GM)
 local card=N("Frame",{Size=_U2(1,0,0,55),BackgroundColor3=_K.Card,BorderSizePixel=0,LayoutOrder=1},_CH) Corner(card,8) Stroke(card,AC.Borda,1.5)
 rotulo(card,_UO(11,5),_U2(1,-100,0,20),"🔫 LOJA DE ARMAS",_K.White,10,Enum.Font.GothamBlack)
 rotulo(card,_UO(11,26),_U2(1,-100,0,17),"Abre a loja de armas do jogo.",_K.Gray,7,_GM)
 local btn=N("TextButton",{AnchorPoint=_V2(1,.5),Position=_U2(1,-8,.5,0),Size=_UO(68,30),BackgroundColor3=_K.Success,BorderSizePixel=0,Text="▶ ABRIR",TextColor3=_K.White,TextSize=8,Font=_GB,AutoButtonColor=false},card)
-Corner(btn,7) btn.MouseButton1Click:Connect(abrirLoja) Content.CanvasPosition=_V2() end local ativo,VELOCIDADE,MAX_CLIQUES,META,META_ATIVA=false,29,2,40,true
-local jjsFeitos,bolhasVistas,cliquesTotal,ultimaBolhaVista=0,{},0,0 local btnToggleRef,infoLbl,slFill,velValor local function setBtnEstado(ligado)
-if not btnToggleRef or not btnToggleRef.Parent then return end if ligado then btnToggleRef.Text="PARAR" btnToggleRef.BackgroundColor3=AC.Vermelho else
-btnToggleRef.Text="LIGAR" btnToggleRef.BackgroundColor3=AC.Verde end end local function clicarFiresignal(obj) if firesignal then pcall(function()
-firesignal(obj.MouseButton1Down) firesignal(obj.MouseButton1Up) firesignal(obj.MouseButton1Click) end) return end pcall(function() obj.MouseButton1Down:Fire()
-obj.MouseButton1Up:Fire() obj.MouseButton1Click:Fire() end) end local function ehBolha(obj) if obj.ClassName~="ImageButton" then return false end
-if obj.Name~="InputTemplate" then return false end if not obj.Visible then return false end local s=obj.AbsoluteSize
-if s.X<20 or s.Y<20 or s.X>200 or s.Y>200 then return false end local p=obj.AbsolutePosition if p.X<=0 or p.Y<=0 then return false end return true end
-local function gerarID(obj) local pos=obj.AbsolutePosition local size=obj.AbsoluteSize local cx=pos.X+size.X/2 local cy=pos.Y+size.Y/2
-return math.floor(cx/40).."_"..math.floor(cy/40) end task.spawn(function() while vivo()do if not ativo then task.wait(0.1) continue end
-if META_ATIVA and jjsFeitos>=META then ativo=false setBtnEstado(false) task.wait(0.1) continue end local delayAtual=VELOCIDADE/100 local agora=tick()
-for id,dados in pairs(bolhasVistas)do if agora-dados.t>2.5 then bolhasVistas[id]=nil end end local clicou=false for _,gui in ipairs(PG:GetChildren())do
-if gui:IsA("ScreenGui")and gui~=Gui then for _,obj in ipairs(gui:GetDescendants())do if ehBolha(obj)then ultimaBolhaVista=tick() local id=gerarID(obj)
-local dados=bolhasVistas[id] if not dados then bolhasVistas[id]={count=0,t=tick()} dados=bolhasVistas[id] end dados.t=tick() if dados.count<MAX_CLIQUES then
-clicarFiresignal(obj) dados.count=dados.count+1 cliquesTotal=cliquesTotal+1 clicou=true if dados.count==1 then jjsFeitos=jjsFeitos+1 end break end end end end
-if clicou then break end end if META_ATIVA and jjsFeitos==META-1 and(tick()-ultimaBolhaVista>2)then ativo=false setBtnEstado(false) task.wait(0.1) continue end
-if clicou then task.wait(delayAtual)else task.wait(0.02)end end end) task.spawn(function() while vivo()do task.wait(0.3) if infoLbl and infoLbl.Parent then
-infoLbl.Text=string.format("JJs: %d/%d",jjsFeitos,META) infoLbl.TextColor3=(jjsFeitos>=META and META_ATIVA)and AC.Verde or AC.Amarelo end end end)
-local function atualizarVelocidade() if velValor and velValor.Parent then velValor.Text=tostring(VELOCIDADE)end
-if slFill and slFill.Parent then slFill.Size=_U2((VELOCIDADE-1)/39,0,1,0)end end local function setVelocidade(v) VELOCIDADE=math.clamp(v,1,40) atualizarVelocidade() end
-local function botao(par,pos,size,txt,bg,cor,ts,r)
-local b=N("TextButton",{Position=pos,Size=size,BackgroundColor3=bg,Text=txt,TextColor3=cor,Font=_GB,TextSize=ts,BorderSizePixel=0,AutoButtonColor=false},par) Corner(b,r)
-return b end ShowJJs=function() CurrentPage="JJs" ClearContent() cabecalho("🤸 AUTO JJs","Clica sozinho nas bolhas dos JJs")
-local card=N("Frame",{Size=_U2(1,0,0,260),BackgroundColor3=_K.Card,BorderSizePixel=0,LayoutOrder=1},_CH) Corner(card,8) Stroke(card,_K.Stroke,1)
-local GB,GM,CT=_GB,_GM,_XC infoLbl=rotulo(card,_UO(10,8),_U2(1,-20,0,26),string.format("JJs: %d/%d",jjsFeitos,META),AC.Amarelo,12,GB)
-rotulo(card,_UO(10,40),_U2(0.5,0,0,16),"META:",_K.White,10,GB)
-local metaBox=N("TextBox",{Size=_U2(0.3,0,0,22),Position=_U2(0.65,0,0,38),BackgroundColor3=_K.Panel,Text=tostring(META),TextColor3=_K.White,Font=GB,TextSize=11,BorderSizePixel=0,ClearTextOnFocus=false},card)
-Corner(metaBox,5) metaBox.FocusLost:Connect(function() local v=tonumber(metaBox.Text) if v and v>0 then META=v else metaBox.Text=tostring(META)end end)
-local metaBtn=botao(card,_UO(10,66),_U2(1,-20,0,22),META_ATIVA and "META: ON" or "META: OFF",META_ATIVA and AC.Verde or AC.Cinza,Color3.new(1,1,1),10,5)
-metaBtn.MouseButton1Click:Connect(function() META_ATIVA=not META_ATIVA metaBtn.Text=META_ATIVA and "META: ON" or "META: OFF"
-metaBtn.BackgroundColor3=META_ATIVA and AC.Verde or AC.Cinza end) rotulo(card,_UO(10,94),_U2(1,-20,0,14),"VELOCIDADE",_K.White,10,GB)
-local sliderBg=N("Frame",{Size=_U2(1,-20,0,6),Position=_UO(10,112),BackgroundColor3=_K.Panel,BorderSizePixel=0},card) Corner(sliderBg,3)
-slFill=N("Frame",{Size=_U2((VELOCIDADE-1)/39,0,1,0),BackgroundColor3=AC.Verde,BorderSizePixel=0},sliderBg) Corner(slFill,3)
-rotulo(card,_UO(10,120),_U2(0.35,0,0,12),"RÁPIDO",_K.DarkGray,8,GM) rotulo(card,_U2(0.65,0,0,120),_U2(0.35,0,0,12),"LENTO",_K.DarkGray,8,GM,Enum.TextXAlignment.Right)
-velValor=rotulo(card,_U2(0.35,0,0,119),_U2(0.3,0,0,14),tostring(VELOCIDADE),_K.White,12,GB,CT)
-local btnMenos=botao(card,_UO(10,138),_U2(0.15,0,0,26),"−",_K.Panel,_K.White,18,5) rotulo(card,_U2(0.15,0,0,138),_U2(0.15,0,0,26),"-1",_K.DarkGray,10,GM,CT)
-local btnMais=botao(card,_U2(0.85,0,0,138),_U2(0.15,0,0,26),"+",_K.Panel,_K.White,18,5) rotulo(card,_U2(0.7,0,0,138),_U2(0.15,0,0,26),"+1",_K.DarkGray,10,GM,CT)
-btnMenos.MouseButton1Click:Connect(function()setVelocidade(VELOCIDADE-1)end) btnMais.MouseButton1Click:Connect(function()setVelocidade(VELOCIDADE+1)end)
-rotulo(card,_UO(10,166),_U2(1,-20,0,12),"Recomendação: 29",AC.Amarelo,9,GM)
-local btnToggle=botao(card,_UO(10,182),_U2(1,-20,0,36),"LIGAR",AC.Verde,Color3.new(1,1,1),14,6) btnToggleRef=btnToggle setBtnEstado(ativo)
-btnToggle.MouseButton1Click:Connect(function() if not ativo and META_ATIVA and jjsFeitos>=META then jjsFeitos=0 cliquesTotal=0 bolhasVistas={} end ativo=not ativo
-setBtnEstado(ativo) if ativo then ultimaBolhaVista=tick()end end) local btnReset=botao(card,_UO(10,222),_U2(1,-20,0,16),"RESETAR CONTADOR",_K.Panel,_K.DarkGray,9,4)
-btnReset.MouseButton1Click:Connect(function() jjsFeitos=0 cliquesTotal=0 bolhasVistas={} end)
-rotulo(card,_UO(10,242),_U2(1,-20,0,12),"Desenvolvido por Akira",_K.DarkGray,8,GM,Enum.TextXAlignment.Right) Content.CanvasPosition=_V2() end end
--- ========== ABA HITBOX (Akira Reach) ==========
+Corner(btn,7) btn.MouseButton1Click:Connect(abrirLoja) Content.CanvasPosition=_V2() end
+end
+
+-- ============================================
+-- ⚔ COMBATE - Aimbot integrado
+-- ============================================
+local ShowCombate
+do
+    local AB_CONFIG = {
+        Ativo=false, MostrarFOV=false, FOV=43, RingTransparency=0.3,
+        Cor=_RGB(150,80,255), Thickness=2, OffsetX=0, OffsetY=-47,
+        ParteAlvo="Cabeça"
+    }
+    local RunService = game:GetService("RunService")
+    local Cam = workspace.CurrentCamera
+    local Drawing_new = (typeof(Drawing)~="nil" and Drawing.new) or nil
+    local FOVring = nil
+    if Drawing_new then
+        pcall(function()
+            FOVring = Drawing_new("Circle")
+            FOVring.Visible=false FOVring.Thickness=AB_CONFIG.Thickness FOVring.Color=AB_CONFIG.Cor
+            FOVring.Filled=false FOVring.Radius=AB_CONFIG.FOV FOVring.Position=Cam.ViewportSize/2
+        end)
+    end
+
+    local function lookAtComOffset(target)
+        local camPos=Cam.CFrame.Position
+        local dirAlvo=(target-camPos).Unit
+        local fovRad=math.rad(Cam.FieldOfView)
+        local vx=Cam.ViewportSize.X local vy=Cam.ViewportSize.Y
+        local offXRad=-math.atan((AB_CONFIG.OffsetX/vx)*2*math.tan(fovRad/2))
+        local offYRad=math.atan((AB_CONFIG.OffsetY/vy)*2*math.tan(fovRad/2))
+        local cf=CFrame.new(camPos,camPos+dirAlvo)
+        cf=cf*CFrame.Angles(offYRad,offXRad,0)
+        Cam.CFrame=cf
+    end
+    local function getCentro()
+        return Vector2.new(Cam.ViewportSize.X/2+AB_CONFIG.OffsetX, Cam.ViewportSize.Y/2+AB_CONFIG.OffsetY)
+    end
+    local function pegarTronco(char)
+        if not char then return nil end
+        return char:FindFirstChild("Torso") or char:FindFirstChild("UpperTorso") or char:FindFirstChild("LowerTorso") or char:FindFirstChild("Head")
+    end
+    local function pegarParteAlvo(char)
+        if not char then return nil end
+        if AB_CONFIG.ParteAlvo=="Cabeça" then
+            return char:FindFirstChild("Head") or char:FindFirstChild("HumanoidRootPart")
+        elseif AB_CONFIG.ParteAlvo=="Tronco" then
+            return pegarTronco(char)
+        end
+        return char:FindFirstChild("Head")
+    end
+    local function getClosestPlayer()
+        local nearest,last=nil,math.huge
+        local centro=getCentro()
+        for _,p in ipairs(P:GetPlayers())do
+            if p~=Pl then
+                local part=pegarParteAlvo(p.Character)
+                if part then
+                    local ePos,vis=Cam:WorldToViewportPoint(part.Position)
+                    if vis then
+                        local d=(Vector2.new(ePos.X,ePos.Y)-centro).Magnitude
+                        if d<last and d<=AB_CONFIG.FOV then last=d nearest=p end
+                    end
+                end
+            end
+        end
+        return nearest
+    end
+
+    RunService.RenderStepped:Connect(function()
+        if FOVring then
+            FOVring.Visible=AB_CONFIG.MostrarFOV or AB_CONFIG.Ativo
+            FOVring.Radius=AB_CONFIG.FOV
+            FOVring.Color=AB_CONFIG.Cor
+            FOVring.Thickness=AB_CONFIG.Thickness
+            FOVring.Position=getCentro()
+            FOVring.Transparency=AB_CONFIG.RingTransparency
+        end
+        if not AB_CONFIG.Ativo then return end
+        local closest=getClosestPlayer()
+        if closest then
+            local part=pegarParteAlvo(closest.Character)
+            if part then lookAtComOffset(part.Position) end
+        end
+    end)
+
+    local function slider(parent, layoutOrder, titulo, valor, min, max, isDecimal, callback)
+        local card=_I("Frame") card.Size=_U2(1,0,0,50) card.BackgroundColor3=_K.Card card.BorderSizePixel=0 card.LayoutOrder=layoutOrder card.Parent=parent
+        Corner(card,8) Stroke(card,_K.Stroke,1)
+        local lbl=_I("TextLabel") lbl.BackgroundTransparency=1 lbl.Position=_UO(10,7) lbl.Size=_U2(1,-70,0,16) lbl.Text=titulo
+        lbl.TextColor3=_K.White lbl.TextSize=11 lbl.Font=_GB lbl.TextXAlignment=_XL lbl.Parent=card
+        local valLbl=_I("TextLabel") valLbl.BackgroundTransparency=1 valLbl.Position=_U2(1,-60,0,7) valLbl.Size=_UO(50,16) valLbl.Text=isDecimal and string.format("%.2f",valor) or tostring(valor)
+        valLbl.TextColor3=_K.Orange valLbl.TextSize=12 valLbl.Font=_GB valLbl.TextXAlignment=Enum.TextXAlignment.Right valLbl.Parent=card
+        local barBg=_I("Frame") barBg.Size=_U2(1,-20,0,6) barBg.Position=_UO(10,30) barBg.BackgroundColor3=_K.Panel barBg.BorderSizePixel=0 barBg.Parent=card Corner(barBg,3)
+        local pct0=(valor-min)/(max-min)
+        local fill=_I("Frame") fill.Size=_U2(pct0,0,1,0) fill.BackgroundColor3=AB_CONFIG.Cor fill.BorderSizePixel=0 fill.Parent=barBg Corner(fill,3)
+        local hit=_I("TextButton") hit.Position=_UO(10,22) hit.Size=_U2(1,-20,0,22) hit.BackgroundTransparency=1 hit.Text="" hit.AutoButtonColor=false hit.Parent=card
+        local dragging=false
+        local function atualizar(x)
+            local abs=barBg.AbsolutePosition.X local sz=barBg.AbsoluteSize.X
+            local pct=math.clamp((x-abs)/sz,0,1)
+            local v
+            if isDecimal then v=min+(max-min)*pct valLbl.Text=string.format("%.2f",v)
+            else v=math.floor(min+(max-min)*pct+.5) valLbl.Text=tostring(v) end
+            fill.Size=_U2(pct,0,1,0) callback(v)
+        end
+        hit.InputBegan:Connect(function(i)
+            if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
+                dragging=true atualizar(i.Position.X)
+            end
+        end)
+        U.InputChanged:Connect(function(i)
+            if dragging and (i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch) then
+                atualizar(i.Position.X)
+            end
+        end)
+        U.InputEnded:Connect(function(i)
+            if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then dragging=false end
+        end)
+    end
+
+    ShowCombate = function()
+        CurrentPage="Combate" ClearContent()
+        local h=_I("Frame") h.Size=_U2(1,0,0,58) h.BackgroundColor3=_K.Card h.BorderSizePixel=0 h.LayoutOrder=0 h.Parent=_CH Corner(h,9) Stroke(h,_K.StrokeLight,1)
+        local t=_I("TextLabel") t.BackgroundTransparency=1 t.Position=_UO(12,7) t.Size=_U2(1,-24,0,25) t.Text="⚔ COMBATE - AIMBOT" t.TextColor3=_K.White
+        t.TextSize=16 t.Font=_GB t.TextXAlignment=_XL t.Parent=h
+        local s=_I("TextLabel") s.BackgroundTransparency=1 s.Position=_UO(13,34) s.Size=_U2(1,-26,0,15) s.Text="Aimbot com seletor Cabeça/Tronco"
+        s.TextColor3=_K.DarkGray s.TextSize=9 s.Font=_GM s.TextXAlignment=_XL s.Parent=h
+
+        -- Botão Ligar
+        local btnToggle=_I("TextButton") btnToggle.Size=_U2(1,0,0,42) btnToggle.BackgroundColor3=AB_CONFIG.Ativo and _K.Error or _K.Success
+        btnToggle.Text=AB_CONFIG.Ativo and "PARAR" or "LIGAR" btnToggle.TextColor3=_K.White btnToggle.Font=_GB btnToggle.TextSize=14
+        btnToggle.BorderSizePixel=0 btnToggle.AutoButtonColor=false btnToggle.LayoutOrder=1 btnToggle.Parent=_CH Corner(btnToggle,8)
+        btnToggle.MouseButton1Click:Connect(function()
+            AB_CONFIG.Ativo=not AB_CONFIG.Ativo
+            btnToggle.Text=AB_CONFIG.Ativo and "PARAR" or "LIGAR"
+            btnToggle.BackgroundColor3=AB_CONFIG.Ativo and _K.Error or _K.Success
+        end)
+
+        -- Toggle FOV
+        local cardFOV=_I("Frame") cardFOV.Size=_U2(1,0,0,42) cardFOV.BackgroundColor3=_K.Card cardFOV.BorderSizePixel=0 cardFOV.LayoutOrder=2 cardFOV.Parent=_CH
+        Corner(cardFOV,8) Stroke(cardFOV,_K.Stroke,1)
+        local lblFOV=_I("TextLabel") lblFOV.BackgroundTransparency=1 lblFOV.Position=_UO(10,0) lblFOV.Size=_U2(1,-70,1,0) lblFOV.Text="Mostrar FOV"
+        lblFOV.TextColor3=_K.White lblFOV.TextSize=11 lblFOV.Font=_GM lblFOV.TextXAlignment=_XL lblFOV.Parent=cardFOV
+        local tgFOV=_I("TextButton") tgFOV.AnchorPoint=_V2(1,.5) tgFOV.Position=_U2(1,-10,.5,0) tgFOV.Size=_UO(38,20) tgFOV.BackgroundColor3=_K.Panel
+        tgFOV.Text="" tgFOV.BorderSizePixel=0 tgFOV.AutoButtonColor=false tgFOV.Parent=cardFOV Corner(tgFOV,10) Stroke(tgFOV,_K.Stroke,1)
+        local bolFOV=_I("Frame") bolFOV.Position=_UO(3,3) bolFOV.Size=_UO(14,14) bolFOV.BackgroundColor3=_K.DarkGray bolFOV.BorderSizePixel=0 bolFOV.Parent=tgFOV Corner(bolFOV,7)
+        local estadoFOV=false
+        local function setFOV(v)
+            estadoFOV=v AB_CONFIG.MostrarFOV=v
+            if v then tgFOV.BackgroundColor3=_K.Success bolFOV.Position=_UO(21,3) bolFOV.BackgroundColor3=Color3.new(1,1,1)
+            else tgFOV.BackgroundColor3=_K.Panel bolFOV.Position=_UO(3,3) bolFOV.BackgroundColor3=_K.DarkGray end
+        end
+        setFOV(false)
+        tgFOV.MouseButton1Click:Connect(function() setFOV(not estadoFOV) end)
+
+        -- Seletor Cabeça/Tronco
+        local alvoLbl=_I("TextLabel") alvoLbl.BackgroundTransparency=1 alvoLbl.LayoutOrder=3 alvoLbl.Size=_U2(1,0,0,16)
+        alvoLbl.Text="Parte do Alvo" alvoLbl.TextColor3=_K.DarkGray alvoLbl.Font=_GM alvoLbl.TextSize=10 alvoLbl.TextXAlignment=_XL alvoLbl.Parent=_CH
+        local alvoFrame=_I("Frame") alvoFrame.Size=_U2(1,0,0,32) alvoFrame.BackgroundTransparency=1 alvoFrame.LayoutOrder=4 alvoFrame.Parent=_CH
+        local opts={"Cabeça","Tronco"} local botoesAlvo={}
+        local function atualizarAlvos()
+            for _,item in ipairs(botoesAlvo)do
+                if item.Nome==AB_CONFIG.ParteAlvo then
+                    item.Btn.BackgroundColor3=_K.SelectionRedDark item.Btn.TextColor3=_K.SelectionRed
+                    item.S.Bolor=_K.SelectionRed item.S.Thickness=1.5
+                else
+                    item.Btn.BackgroundColor3=_K.Panel item.Btn.TextColor3=_K.Gray
+                    item.S.Color=_K.Stroke item.S.Thickness=1
+                end
+            end
+        end
+        for i,nome in ipairs(opts)do
+            local b=_I("TextButton") b.Size=_U2(0.5,-4,1,0) b.Position=_U2((i-1)*0.5,0,0,0)
+            b.BackgroundColor3=_K.Panel b.Text=nome b.TextColor3=_K.Gray b.Font=_GB b.TextSize=11 b.BorderSizePixel=0 b.AutoButtonColor=false b.Parent=alvoFrame
+            Corner(b,6) local s=Stroke(b,_K.Stroke,1)
+            table.insert(botoesAlvo,{Btn=b,Nome=nome,S=s})
+            b.MouseButton1Click:Connect(function() AB_CONFIG.ParteAlvo=nome atualizarAlvos() end)
+        end
+        atualizarAlvos()
+
+        -- Sliders
+        slider(_CH,5,"Tamanho FOV",AB_CONFIG.FOV,20,200,false,function(v) AB_CONFIG.FOV=v end)
+        slider(_CH,6,"Transparência",AB_CONFIG.RingTransparency,0,1,true,function(v) AB_CONFIG.RingTransparency=v end)
+
+        -- Cores
+        local coresLista={ _RGB(150,80,255),_RGB(255,0,0),_RGB(0,255,100),_RGB(255,200,0),_RGB(0,200,255),_RGB(255,0,255),_RGB(255,255,255) }
+        local corCard=_I("Frame") corCard.Size=_U2(1,0,0,50) corCard.BackgroundColor3=_K.Card corCard.BorderSizePixel=0 corCard.LayoutOrder=7 corCard.Parent=_CH
+        Corner(corCard,8) Stroke(corCard,_K.Stroke,1)
+        local corLbl=_I("TextLabel") corLbl.BackgroundTransparency=1 corLbl.Position=_UO(10,6) corLbl.Size=_U2(1,-20,0,14)
+        corLbl.Text="Cor do FOV" corLbl.TextColor3=_K.White corLbl.TextSize=11 corLbl.Font=_GB corLbl.TextXAlignment=_XL corLbl.Parent=corCard
+        local corFrame=_I("Frame") corFrame.Position=_UO(10,26) corFrame.Size=_U2(1,-20,0,20) corFrame.BackgroundTransparency=1 corFrame.Parent=corCard
+        for i,cor in ipairs(coresLista)do
+            local b=_I("TextButton") b.Size=_UO(22,22) b.Position=_UO((i-1)*28,0) b.BackgroundColor3=cor
+            b.Text="" b.BorderSizePixel=0 b.AutoButtonColor=false b.Parent=corFrame Corner(b,6) Stroke(b,_K.Stroke,1)
+            b.MouseButton1Click:Connect(function()
+                AB_CONFIG.Cor=cor
+                if FOVring then FOVring.Color=cor end
+            end)
+        end
+    end
+end
+
+-- ============================================
+-- 📚 TEXTOS PRONTOS
+-- ============================================
+local ShowTextos
+do
+    local TEXTOS = {
+        { Titulo = "POR QUE O EB É IMPORTANTE PRA SOCIEDADE?", Texto = "O EB não é apenas farda e arma: é o braço forte que guarda a pátria, socorre em tragédias, forma cidadãos de honra e defende a soberania. Sem ele, não há paz social nem futuro seguro pra ninguém." },
+        { Titulo = "POR QUE VOCÊ QUER SUBIR DE PATENTE?", Texto = "Quero subir de patente pra ajudar mais a tropa, aprender a liderar direito e fazer por merecer a confiança dos meus superiores. Não é por status, é por vontade de servir melhor." },
+        { Titulo = "POR QUE SERVIR AO EXÉRCITO BRASILEIRO?", Texto = "Sirvo ao Exército porque acredito no Brasil e quero fazer parte de algo maior que eu. É onde aprendo disciplina, honra e o valor de proteger quem não pode se proteger sozinho." },
+        { Titulo = "COMO VOCÊ VÊ SUA JORNADA COMO MILITAR NO FUTURO?", Texto = "Quero subir uma patente de cada vez, aprender com os oficiais mais experientes e um dia poder treinar os novatos. Pretendo ficar até onde conseguir, sempre honrando a farda." },
+    }
+    local CARD_COLORS = {
+        { Header = _RGB(59,130,246), Body = _RGB(35,35,35) },
+        { Header = _RGB(239,68,68),  Body = _RGB(45,30,30) },
+        { Header = _RGB(16,185,129), Body = _RGB(30,40,35) },
+        { Header = _RGB(245,158,11), Body = _RGB(45,40,30) },
+        { Header = _RGB(139,92,246), Body = _RGB(35,30,45) },
+    }
+
+    local function criarTextoCard(tema, ordem, cor, parent)
+        local card=_I("Frame") card.Size=_U2(1,0,0,0) card.AutomaticSize=Enum.AutomaticSize.Y
+        card.BackgroundColor3=cor.Body card.BorderSizePixel=0 card.LayoutOrder=ordem card.Parent=parent
+        Corner(card,8) Stroke(card,cor.Header,1,0.7) card.ClipsDescendants=true
+        local cl=_I("UIListLayout") cl.SortOrder=Enum.SortOrder.LayoutOrder cl.Parent=card
+
+        local ch=_I("Frame") ch.Size=_U2(1,0,0,0) ch.AutomaticSize=Enum.AutomaticSize.Y ch.BackgroundColor3=cor.Header ch.BorderSizePixel=0 ch.LayoutOrder=1 ch.Parent=card
+        Padding(ch,8,8,12,12)
+        local ttl=_I("TextLabel") ttl.Size=_U2(1,0,0,0) ttl.AutomaticSize=Enum.AutomaticSize.Y ttl.BackgroundTransparency=1
+        ttl.Text="🤫 "..tema.Titulo ttl.TextColor3=_K.White ttl.Font=_GB ttl.TextSize=12 ttl.TextXAlignment=_XL ttl.TextWrapped=true ttl.Parent=ch
+
+        local cb=_I("Frame") cb.Size=_U2(1,0,0,0) cb.AutomaticSize=Enum.AutomaticSize.Y cb.BackgroundColor3=cor.Body cb.BorderSizePixel=0 cb.LayoutOrder=2 cb.Parent=card
+        Padding(cb,12,12,12,12)
+        local cbl=_I("UIListLayout") cbl.Padding=_UD(0,12) cbl.SortOrder=Enum.SortOrder.LayoutOrder cbl.Parent=cb
+
+        local txt=_I("TextLabel") txt.Size=_U2(1,0,0,0) txt.AutomaticSize=Enum.AutomaticSize.Y txt.BackgroundTransparency=1
+        txt.Text=tema.Texto txt.TextColor3=_K.Gray txt.Font=_GM txt.TextSize=11 txt.TextXAlignment=_XL txt.TextWrapped=true txt.LineHeight=1.2 txt.Parent=cb
+
+        local btnContainer=_I("Frame") btnContainer.Size=_U2(1,0,0,28) btnContainer.BackgroundTransparency=1 btnContainer.Parent=cb
+        local btnCopiar=_I("TextButton") btnCopiar.Size=_UO(75,28) btnCopiar.Position=_U2(1,0,0,0) btnCopiar.AnchorPoint=_V2(1,0)
+        btnCopiar.BackgroundColor3=_K.Success btnCopiar.Text="Copiar" btnCopiar.TextColor3=_K.White btnCopiar.Font=_GB btnCopiar.TextSize=11
+        btnCopiar.BorderSizePixel=0 btnCopiar.AutoButtonColor=false btnCopiar.Parent=btnContainer Corner(btnCopiar,6)
+        btnCopiar.MouseButton1Click:Connect(function()
+            if setclipboard then
+                pcall(setclipboard,tema.Texto)
+                btnCopiar.Text="Copiado!" btnCopiar.BackgroundColor3=_RGB(52,211,153)
+                task.wait(1.5)
+                btnCopiar.Text="Copiar" btnCopiar.BackgroundColor3=_K.Success
+            end
+        end)
+    end
+
+    ShowTextos = function()
+        CurrentPage="Textos" ClearContent()
+        local h=_I("Frame") h.Size=_U2(1,0,0,58) h.BackgroundColor3=_K.Card h.BorderSizePixel=0 h.LayoutOrder=0 h.Parent=_CH Corner(h,9) Stroke(h,_K.StrokeLight,1)
+        local t=_I("TextLabel") t.BackgroundTransparency=1 t.Position=_UO(12,7) t.Size=_U2(1,-24,0,25) t.Text="📚 TEXTOS PRONTOS + IA"
+        t.TextColor3=_K.White t.TextSize=16 t.Font=_GB t.TextXAlignment=_XL t.Parent=h
+        local s=_I("TextLabel") s.BackgroundTransparency=1 s.Position=_UO(13,34) s.Size=_U2(1,-26,0,15)
+        s.Text="Informações militares e gerador de texto inteligente" s.TextColor3=_K.DarkGray s.TextSize=9 s.Font=_GM s.TextXAlignment=_XL s.Parent=h
+
+        for i,tema in ipairs(TEXTOS)do
+            local ci=((i-1)%#CARD_COLORS)+1
+            criarTextoCard(tema, i, CARD_COLORS[ci], _CH)
+        end
+
+        -- Card IA
+        local aiCard=_I("Frame") aiCard.Size=_U2(1,0,0,0) aiCard.AutomaticSize=Enum.AutomaticSize.Y
+        aiCard.BackgroundColor3=_RGB(30,30,40) aiCard.BorderSizePixel=0 aiCard.LayoutOrder=999 aiCard.Parent=_CH
+        Corner(aiCard,8) Stroke(aiCard,_RGB(139,92,246),1,0.5)
+        local aiL=_I("UIListLayout") aiL.SortOrder=Enum.SortOrder.LayoutOrder aiL.Parent=aiCard
+
+        local aiHead=_I("Frame") aiHead.Size=_U2(1,0,0,35) aiHead.BackgroundColor3=_RGB(139,92,246) aiHead.BorderSizePixel=0 aiHead.LayoutOrder=1 aiHead.Parent=aiCard
+        Corner(aiHead,8)
+        local aiT=_I("TextLabel") aiT.BackgroundTransparency=1 aiT.Position=_UO(10,8) aiT.Size=_U2(1,-20,0,20)
+        aiT.Text="🤖 GERADOR DE TEXTO IA (EB)" aiT.TextColor3=_K.White aiT.Font=_GB aiT.TextSize=12 aiT.TextXAlignment=_XL aiT.Parent=aiHead
+
+        local aiBody=_I("Frame") aiBody.Size=_U2(1,0,0,0) aiBody.AutomaticSize=Enum.AutomaticSize.Y aiBody.BackgroundColor3=_RGB(30,30,40) aiBody.BorderSizePixel=0 aiBody.LayoutOrder=2 aiBody.Parent=aiCard
+        Padding(aiBody,10,10,10,10)
+        local aiBL=_I("UIListLayout") aiBL.Padding=_UD(0,10) aiBL.SortOrder=Enum.SortOrder.LayoutOrder aiBL.Parent=aiBody
+
+        local inputBox=_I("TextBox") inputBox.Size=_U2(1,0,0,30) inputBox.BackgroundColor3=_K.Background inputBox.PlaceholderText="Digite o tema (ex: Por que servir ao EB?)"
+        inputBox.PlaceholderColor3=_K.DarkGray inputBox.Text="" inputBox.TextColor3=_K.White inputBox.Font=_GM inputBox.TextSize=11 inputBox.TextXAlignment=_XL inputBox.BorderSizePixel=0 inputBox.Parent=aiBody
+        Corner(inputBox,6)
+
+        local btnGerar=_I("TextButton") btnGerar.Size=_U2(1,0,0,35) btnGerar.BackgroundColor3=_RGB(139,92,246) btnGerar.Text="⚡ GERAR TEXTO"
+        btnGerar.TextColor3=_K.White btnGerar.Font=_GB btnGerar.TextSize=12 btnGerar.BorderSizePixel=0 btnGerar.AutoButtonColor=false btnGerar.Parent=aiBody
+        Corner(btnGerar,8) Stroke(btnGerar,_RGB(167,139,250),1,0.2)
+
+        local outputLabel=_I("TextLabel") outputLabel.Size=_U2(1,0,0,0) outputLabel.AutomaticSize=Enum.AutomaticSize.Y outputLabel.BackgroundTransparency=1
+        outputLabel.Text="A resposta da IA aparecerá aqui..." outputLabel.TextColor3=_K.DarkGray outputLabel.Font=_GM outputLabel.TextSize=11
+        outputLabel.TextXAlignment=_XL outputLabel.TextWrapped=true outputLabel.LineHeight=1.2 outputLabel.Parent=aiBody
+
+        local aiBtnContainer=_I("Frame") aiBtnContainer.Size=_U2(1,0,0,28) aiBtnContainer.BackgroundTransparency=1 aiBtnContainer.LayoutOrder=4 aiBtnContainer.Parent=aiBody
+        local btnCopiarIA=_I("TextButton") btnCopiarIA.Size=_UO(75,28) btnCopiarIA.Position=_U2(1,0,0,0) btnCopiarIA.AnchorPoint=_V2(1,0)
+        btnCopiarIA.BackgroundColor3=_K.Panel btnCopiarIA.Text="Copiar" btnCopiarIA.TextColor3=_K.DarkGray btnCopiarIA.Font=_GB btnCopiarIA.TextSize=11
+        btnCopiarIA.BorderSizePixel=0 btnCopiarIA.AutoButtonColor=false btnCopiarIA.Parent=aiBtnContainer Corner(btnCopiarIA,6)
+
+        btnGerar.MouseButton1Click:Connect(function()
+            local temaDigitado=inputBox.Text
+            if temaDigitado=="" then
+                outputLabel.Text="⚠️ Por favor, digite um tema primeiro."
+                outputLabel.TextColor3=_RGB(245,158,11)
+                return
+            end
+            outputLabel.Text="⏳ Gerando texto... aguarde."
+            outputLabel.TextColor3=_RGB(245,158,11)
+            btnCopiarIA.BackgroundColor3=_K.Panel btnCopiarIA.TextColor3=_K.DarkGray
+
+            local textoGerado,erro=GerarTextoIA(temaDigitado)
+            if textoGerado then
+                outputLabel.Text=textoGerado
+                outputLabel.TextColor3=_K.White
+                btnCopiarIA.BackgroundColor3=_K.Success
+                btnCopiarIA.TextColor3=_K.White
+                -- Recria conexão
+                local conn
+                conn = btnCopiarIA.MouseButton1Click:Connect(function()
+                    if setclipboard then
+                        pcall(setclipboard,textoGerado)
+                        btnCopiarIA.Text="Copiado!"
+                        btnCopiarIA.BackgroundColor3=_RGB(52,211,153)
+                        task.wait(1.5)
+                        btnCopiarIA.Text="Copiar"
+                        btnCopiarIA.BackgroundColor3=_K.Success
+                    end
+                end)
+                task.delay(0.1, function() if conn then conn:Disconnect() end end)
+            else
+                outputLabel.Text="❌ Erro: "..tostring(erro)
+                outputLabel.TextColor3=_K.Error
+            end
+        end)
+    end
+end
+
+-- ============================================
+-- HITBOX
+-- ============================================
 local ShowHitbox do
 local HB_CONFIG={ Ativo=false, Visual=true, Tamanho=5, Transparencia=.7, Cor=_RGB(80,140,230), Material="Neon" }
 local HB_Original={}
 local HB_Tok=os.clock() PG:SetAttribute("ZKYHitbox",HB_Tok)
 local HB_Presets={ _RGB(80,140,230),_RGB(255,0,0),_RGB(0,255,100),_RGB(255,200,0),_RGB(255,0,255),_RGB(255,255,255),_RGB(150,80,255) }
-
--- ----- lógica da hitbox (altera o HRP direto, igual ao Akira Reach) -----
 local function HB_Salvar(char)
     if HB_Original[char] then return end
     local hrp=char:FindFirstChild("HumanoidRootPart")
@@ -622,9 +1302,7 @@ local function HB_Aplicar(char)
     pcall(function()
         hrp.Size=Vector3.new(HB_CONFIG.Tamanho,HB_CONFIG.Tamanho,HB_CONFIG.Tamanho)
         hrp.Transparency=HB_CONFIG.Visual and HB_CONFIG.Transparencia or 1
-        hrp.Color=HB_CONFIG.Cor
-        hrp.Material=Enum.Material.Neon
-        hrp.CanCollide=false
+        hrp.Color=HB_CONFIG.Cor hrp.Material=Enum.Material.Neon hrp.CanCollide=false
     end)
 end
 local function HB_Restaurar(char)
@@ -634,16 +1312,12 @@ local function HB_Restaurar(char)
     local hrp=char:FindFirstChild("HumanoidRootPart")
     if hrp then
         pcall(function()
-            hrp.Size=orig.Size
-            hrp.Transparency=orig.Transparency
-            hrp.Color=orig.Color
-            hrp.Material=orig.Material
-            hrp.CanCollide=orig.CanCollide
+            hrp.Size=orig.Size hrp.Transparency=orig.Transparency hrp.Color=orig.Color
+            hrp.Material=orig.Material hrp.CanCollide=orig.CanCollide
         end)
     end
     HB_Original[char]=nil
 end
-
 local HB_Conn
 HB_Conn=R.Heartbeat:Connect(function()
     if PG:GetAttribute("ZKYHitbox")~=HB_Tok then
@@ -652,25 +1326,16 @@ HB_Conn=R.Heartbeat:Connect(function()
         return
     end
     if HB_CONFIG.Ativo then
-        for _,p in ipairs(P:GetPlayers())do
-            if p~=Pl and p.Character then
-                HB_Aplicar(p.Character)
-            end
-        end
-        for char in pairs(HB_Original)do
-            if not char.Parent then HB_Original[char]=nil end
-        end
+        for _,p in ipairs(P:GetPlayers())do if p~=Pl and p.Character then HB_Aplicar(p.Character) end end
+        for char in pairs(HB_Original)do if not char.Parent then HB_Original[char]=nil end end
     else
         for char in pairs(HB_Original)do HB_Restaurar(char) end
     end
 end)
-
--- ----- helpers de interface (mesmo visual das outras abas) -----
 local function N(c,p,par) local o=_I(c) for k,v in pairs(p)do o[k]=v end o.Parent=par return o end
 local function HB_Card(h,ordem)
     local c=N("Frame",{Size=_U2(1,0,0,h),BackgroundColor3=_K.Card,BorderSizePixel=0,LayoutOrder=ordem},_CH)
-    Corner(c,8) Stroke(c,_K.Stroke,1)
-    return c
+    Corner(c,8) Stroke(c,_K.Stroke,1) return c
 end
 local function HB_Label(par,pos,size,txt,cor,ts,fonte,al)
     return N("TextLabel",{BackgroundTransparency=1,Position=pos,Size=size,Text=txt,TextColor3=cor,TextSize=ts,Font=fonte,TextXAlignment=al or _XL},par)
@@ -701,7 +1366,6 @@ local function HB_Slider(ordem,titulo,valor,min,max,callback)
     local pct0=(valor-min)/(max-min)
     local fill=N("Frame",{Size=_U2(pct0,0,1,0),BackgroundColor3=_K.Success,BorderSizePixel=0},barBg) Corner(fill,4)
     local knob=N("Frame",{AnchorPoint=_V2(.5,.5),Position=_U2(pct0,0,.5,0),Size=_UO(14,14),BackgroundColor3=Color3.new(1,1,1),BorderSizePixel=0,ZIndex=2},barBg) Corner(knob,7)
-    -- área de toque maior que a barra
     local hit=N("TextButton",{Position=_UO(10,28),Size=_U2(1,-20,0,28),BackgroundTransparency=1,Text="",AutoButtonColor=false,ZIndex=3},card)
     local function atualizar(x)
         local pct=math.clamp((x-barBg.AbsolutePosition.X)/math.max(barBg.AbsoluteSize.X,1),0,1)
@@ -736,31 +1400,22 @@ local function HB_Cores(ordem)
     local function txtCor(c) return string.format("%d,%d,%d",math.floor(c.R*255+.5),math.floor(c.G*255+.5),math.floor(c.B*255+.5)) end
     local rgbBox=N("TextBox",{Position=_UO(6,0),Size=_U2(1,-12,1,0),BackgroundTransparency=1,Text=txtCor(HB_CONFIG.Cor),PlaceholderText="R,G,B",PlaceholderColor3=_K.DarkGray,TextColor3=_K.White,Font=Enum.Font.Code,TextSize=11,TextXAlignment=_XL,ClearTextOnFocus=false},rgbFrame)
     local amostras={}
-    local function marcar()
-        for _,a in ipairs(amostras)do a.stroke.Enabled=(a.cor==HB_CONFIG.Cor) end
-    end
+    local function marcar() for _,a in ipairs(amostras)do a.stroke.Enabled=(a.cor==HB_CONFIG.Cor) end end
     for _,cor in ipairs(HB_Presets)do
         local b=N("TextButton",{Size=_UO(26,26),BackgroundColor3=cor,Text="",BorderSizePixel=0,AutoButtonColor=false},fila)
-        Corner(b,6)
-        local s=Stroke(b,_K.White,1.5) s.Enabled=(cor==HB_CONFIG.Cor)
+        Corner(b,6) local s=Stroke(b,_K.White,1.5) s.Enabled=(cor==HB_CONFIG.Cor)
         table.insert(amostras,{stroke=s,cor=cor})
-        b.MouseButton1Click:Connect(function()
-            HB_CONFIG.Cor=cor rgbBox.Text=txtCor(cor) marcar()
-        end)
+        b.MouseButton1Click:Connect(function() HB_CONFIG.Cor=cor rgbBox.Text=txtCor(cor) marcar() end)
     end
     rgbBox.FocusLost:Connect(function()
         local r,g,b=rgbBox.Text:match("(%d+)%s*,%s*(%d+)%s*,%s*(%d+)")
         if r and g and b then
             r,g,b=tonumber(r),tonumber(g),tonumber(b)
-            if r and g and b and r<=255 and g<=255 and b<=255 then
-                HB_CONFIG.Cor=_RGB(r,g,b) marcar()
-            end
+            if r and g and b and r<=255 and g<=255 and b<=255 then HB_CONFIG.Cor=_RGB(r,g,b) marcar() end
         end
         rgbBox.Text=txtCor(HB_CONFIG.Cor)
     end)
 end
-
--- ----- página -----
 ShowHitbox=function()
     CurrentPage="Hitbox" ClearContent() Content.ScrollingEnabled=true
     local h=N("Frame",{Size=_U2(1,0,0,58),BackgroundColor3=_K.Card,BorderSizePixel=0,LayoutOrder=0},_CH) Corner(h,9) Stroke(h,_K.StrokeLight,1)
@@ -779,11 +1434,55 @@ ShowHitbox=function()
     Content.CanvasPosition=_V2()
 end
 end
-local lojaButton=SideButton("🔫 LOJA",false) lojaButton.MouseButton1Click:Connect(function() SelectButton(lojaButton) ShowLoja() end)
-local jjButton=SideButton("🤸 AUTO JJs",false) jjButton.MouseButton1Click:Connect(function() SelectButton(jjButton) ShowJJs() end)
-local hitboxButton=SideButton("🎯 HITBOX",false) hitboxButton.MouseButton1Click:Connect(function() SelectButton(hitboxButton) ShowHitbox() end)
-task.defer(function() local loaded=0
-for _,cat in ipairs(CategoryOrder)do if LoadCategory(cat)then loaded+=1 end end local lt1=LoadTowerRoute("Torre 1","Única") local lt2=0
-for _,rn in ipairs(Tower2RouteOrder)do if LoadTowerRoute("Torre 2",rn)then lt2+=1 end end for i=1,4 do selectedCategory[i]="Lento" end ShowParkours()
-Notify("ZKY PARKOUR",loaded.."/4 parkours • Torre 1: "..(lt1 and "OK" or "ERRO").." • Torre 2: "..lt2.."/4",loaded==4 and lt1 and lt2==4 and "Success" or "Error") end)
-print("ZKY PARKOUR V2.2 carregado com sucesso!")
+
+-- ============================================
+-- SELETOR DE BOTÕES E LIGAÇÕES
+-- ============================================
+local function SelectButton(b) if selectedButton then selectedButton.BackgroundColor3=_K.Card selectedButton.TextColor3=_K.Gray end
+selectedButton=b b.BackgroundColor3=_K.Selected b.TextColor3=_K.White end
+
+ebDeltaButton.MouseButton1Click:Connect(function() SelectButton(ebDeltaButton) ShowEBDelta() end)
+taffsButton.MouseButton1Click:Connect(function() SelectButton(taffsButton) ShowTAFFS() end)
+volversButton.MouseButton1Click:Connect(function() SelectButton(volversButton) ShowVolvers() end)
+iaButton.MouseButton1Click:Connect(function() SelectButton(iaButton) ShowAutoCorrecao() end)
+combateButton.MouseButton1Click:Connect(function() SelectButton(combateButton) ShowCombate() end)
+textosButton.MouseButton1Click:Connect(function() SelectButton(textosButton) ShowTextos() end)
+lojaButton.MouseButton1Click:Connect(function() SelectButton(lojaButton) ShowLoja() end)
+hitboxButton.MouseButton1Click:Connect(function() SelectButton(hitboxButton) ShowHitbox() end)
+creditosButton.MouseButton1Click:Connect(function() SelectButton(creditosButton) ShowCreditos() end)
+
+-- ============================================
+-- DRAG / OPEN / CLOSE
+-- ============================================
+local LogoDragging=false local LogoDragStart,LogoStartPosition
+Logo.InputBegan:Connect(function(i) if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then LogoDragging=true
+LogoDragStart=i.Position LogoStartPosition=Logo.Position i.Changed:Connect(function() if i.UserInputState==Enum.UserInputState.End then LogoDragging=false end end) end
+end) U.InputChanged:Connect(function(i) if LogoDragging and(i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch)then
+local d=i.Position-LogoDragStart Logo.Position=_U2(LogoStartPosition.X.Scale,LogoStartPosition.X.Offset+d.X,LogoStartPosition.Y.Scale,LogoStartPosition.Y.Offset+d.Y) end
+end) local MainDragging=false local MainDragStart,MainStartPosition Header.InputBegan:Connect(function(i)
+if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then MainDragging=true MainDragStart=i.Position
+MainStartPosition=Main.Position i.Changed:Connect(function() if i.UserInputState==Enum.UserInputState.End then MainDragging=false end end) end end)
+U.InputChanged:Connect(function(i) if MainDragging and(i.UserInputType==Enum.UserInputType.MouseMovement or i.UserInputType==Enum.UserInputType.Touch)then
+local d=i.Position-MainDragStart Main.Position=_U2(MainStartPosition.X.Scale,MainStartPosition.X.Offset+d.X,MainStartPosition.Y.Scale,MainStartPosition.Y.Offset+d.Y) end
+end) local Opened=false local function OpenMenu() if Opened then return end Opened=true Main.Visible=true Main.Size=UDim2.fromScale(.25,.15) Main.BackgroundTransparency=1
+T:Create(Main,TweenInfo.new(.35,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{Size=UDim2.fromScale(.78,.65),BackgroundTransparency=0}):Play() end
+local function CloseMenu() if not Opened then return end Opened=false
+local tw=T:Create(Main,TweenInfo.new(.25,Enum.EasingStyle.Quart,Enum.EasingDirection.In),{Size=UDim2.fromScale(.25,.15),BackgroundTransparency=1}) tw:Play()
+tw.Completed:Wait() if not Opened then Main.Visible=false end end Logo.MouseButton1Click:Connect(function() if Opened then CloseMenu()else OpenMenu()end end)
+Close.MouseButton1Click:Connect(CloseMenu)
+
+-- ============================================
+-- CARREGAMENTO INICIAL
+-- ============================================
+task.defer(function()
+    local loaded=0
+    for _,cat in ipairs(CategoryOrder)do if LoadCategory(cat)then loaded+=1 end end
+    local lt1=LoadTowerRoute("Torre 1","Única") local lt2=0
+    for _,rn in ipairs(Tower2RouteOrder)do if LoadTowerRoute("Torre 2",rn)then lt2+=1 end end
+    for i=1,4 do selectedCategory[i]="Lento" end
+    ShowEBDelta()
+    Notify("ZKY PARKOUR EB","v3.0 • "..loaded.."/4 parkours • T1: "..(lt1 and "OK" or "ERRO").." • T2: "..lt2.."/4",
+        loaded==4 and lt1 and lt2==4 and "Success" or "Error")
+end)
+
+print("🚀 ZKY PARKOUR EB DELTA V3.0 carregado com sucesso!")
