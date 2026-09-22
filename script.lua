@@ -1583,4 +1583,16 @@ ShowCombate = function()
             callback(estado)
         end)
     end
-    HB_ToggleCard(11,"Ativar Reach",HB_CONFIG.At
+    HB_ToggleCard(11,"Ativar Reach",HB_CONFIG.Ativo,function(v)
+        HB_CONFIG.Ativo=v
+        Notify("HITBOX",v and "Reach ativado." or "Reach desativado.",v and "Success" or "Error")
+    end)
+    HB_ToggleCard(12,"Mostrar Visual",HB_CONFIG.Visual,function(v) HB_CONFIG.Visual=v end)
+
+    -- Slider tamanho
+    local function HB_Slider(order, titulo, valor, min, max, callback)
+        local card=_I("Frame") card.Size=_U2(1,0,0,50) card.BackgroundColor3=_K.Card card.BorderSizePixel=0
+        card.LayoutOrder=order card.Parent=_CH Corner(card,8) Stroke(card,_K.Stroke,1)
+        local lbl=_I("TextLabel") lbl.BackgroundTransparency=1 lbl.Position=_UO(10,7) lbl.Size=_U2(1,-70,0,16)
+        lbl.Text=titulo lbl.TextColor3=_K.White lbl.TextSize=12 lbl.Font=_GB lbl.TextXAlignment=_XL lbl.Parent=card
+        local val=
