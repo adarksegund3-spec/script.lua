@@ -1,13 +1,1078 @@
--- Lua 5.3+ / Luau compatibility polyfills
-if not math.ldexp then math.ldexp = function(x, n) return x * 2 ^ n end end
-if not math.frexp then math.frexp = function(x)
-    if x == 0 then return 0, 0 end
-    local exp = math.floor(math.log(math.abs(x)) / math.log(2)) + 1
-    local mantissa = x / 2 ^ exp
-    return mantissa, exp
-end end
-if not loadstring and load then loadstring = load end
-if not loadstring then loadstring = function(s) return load(s) end end
+_G.ZKY_OK = false
+do
+    local KEY_CORRETA = "Akira007"
+    local LINK_DISCORD = "https://discord.gg/NY2RfC7Kx"
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "ZKYKey"
+    gui.ResetOnSpawn = false
+    pcall(function() gui.Parent = (gethui and gethui()) or game:GetService("CoreGui") end)
+    if not gui.Parent then
+        gui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+    end
+    local f = Instance.new("Frame", gui)
+    f.Size = UDim2.new(0, 280, 0, 220)
+    f.Position = UDim2.new(0.5, -140, 0.5, -110)
+    f.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
+    Instance.new("UICorner", f).CornerRadius = UDim.new(0, 10)
+    local t = Instance.new("TextLabel", f)
+    t.Size = UDim2.new(1, 0, 0, 36)
+    t.BackgroundTransparency = 1
+    t.Text = "EB DELTA — KEY"
+    t.TextColor3 = Color3.new(1, 1, 1)
+    t.Font = Enum.Font.GothamBold
+    t.TextSize = 16
+    local box = Instance.new("TextBox", f)
+    box.Size = UDim2.new(1, -30, 0, 34)
+    box.Position = UDim2.new(0, 15, 0, 42)
+    box.BackgroundColor3 = Color3.fromRGB(35, 35, 42)
+    box.TextColor3 = Color3.new(1, 1, 1)
+    box.PlaceholderText = "Cole a key aqui"
+    box.Text = ""
+    box.ClearTextOnFocus = false
+    box.Font = Enum.Font.Gotham
+    box.TextSize = 14
+    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 8)
+    local aviso = Instance.new("TextLabel", f)
+    aviso.Size = UDim2.new(1, -30, 0, 40)
+    aviso.Position = UDim2.new(0, 15, 0, 84)
+    aviso.BackgroundTransparency = 1
+    aviso.Text = "Pra pegar a key, entre no Discord"
+    aviso.TextColor3 = Color3.fromRGB(180, 180, 180)
+    aviso.Font = Enum.Font.Gotham
+    aviso.TextSize = 12
+    aviso.TextWrapped = true
+    local bPegar = Instance.new("TextButton", f)
+    bPegar.Size = UDim2.new(1, -30, 0, 34)
+    bPegar.Position = UDim2.new(0, 15, 0, 128)
+    bPegar.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
+    bPegar.Text = "Pegar Key"
+    bPegar.TextColor3 = Color3.new(1, 1, 1)
+    bPegar.Font = Enum.Font.GothamBold
+    bPegar.TextSize = 14
+    Instance.new("UICorner", bPegar).CornerRadius = UDim.new(0, 8)
+    local bChk = Instance.new("TextButton", f)
+    bChk.Size = UDim2.new(1, -30, 0, 34)
+    bChk.Position = UDim2.new(0, 15, 0, 168)
+    bChk.BackgroundColor3 = Color3.fromRGB(50, 170, 90)
+    bChk.Text = "Check Key"
+    bChk.TextColor3 = Color3.new(1, 1, 1)
+    bChk.Font = Enum.Font.GothamBold
+    bChk.TextSize = 14
+    Instance.new("UICorner", bChk).CornerRadius = UDim.new(0, 8)
+    local st = Instance.new("TextLabel", f)
+    st.Size = UDim2.new(1, -20, 0, 18)
+    st.Position = UDim2.new(0, 10, 1, -20)
+    st.BackgroundTransparency = 1
+    st.Text = ""
+    st.TextColor3 = Color3.fromRGB(200, 200, 200)
+    st.Font = Enum.Font.Gotham
+    st.TextSize = 11
+    bPegar.MouseButton1Click:Connect(function()
+        pcall(function() setclipboard(LINK_DISCORD) end)
+        pcall(function() game:GetService("GuiService"):OpenBrowserWindow(LINK_DISCORD) end)
+        st.Text = "Link do Discord copiado!"
+    end)
+    bChk.MouseButton1Click:Connect(function()
+        local digitada = box.Text:gsub("%s", "")
+        if digitada:lower() == KEY_CORRETA:lower() then
+            _G.ZKY_OK = true
+            gui:Destroy()
+        else
+            st.Text = "Key inválida."
+        end
+    end)
+end
+repeat task.wait() until _G.ZKY_OK
 
---[Obfuscated by Hercules v2.0.0 | hercules-obfuscator.xyz/discord | hercules-obfuscator.xyz/source]
-local thing=3735;local thing2=3735;local counter=0;while thing==thing2 and counter<1 do thing=thing+1;counter=counter+1;if thing==thing2 then local str='dummy';str=str..str; else do local rWrFtxkoL,ZQkZuhjgUs,fWiFPtZI,hCCvURmNJAlC,gBIAnPrl,OmIBzVYHSzmL,fikJRJQgQpPy,MZLbhrQtmWBv,SHuCgSpGW,eKeDepktlP,IHKeIPkxoZ,GWyTsHvZDSjb,BrdsCAmKw,OSuQZvHMp,ZkmDSLHLDgEJ,bGtdZQSXi,tsWEwefmrKf,nfRPNEQcD,tnpEYNJmaSSi,AdYdvrvx,UVkCaJsIrqwj,QNYbrFfmo,djZrinavMram;rWrFtxkoL=ipairs;ZQkZuhjgUs=pairs;fWiFPtZI=pcall;hCCvURmNJAlC=print;gBIAnPrl=select;OmIBzVYHSzmL=tonumber;fikJRJQgQpPy=tostring;MZLbhrQtmWBv=math.atan;SHuCgSpGW=math.floor;eKeDepktlP=math.huge;IHKeIPkxoZ=math.max;GWyTsHvZDSjb=math.rad;BrdsCAmKw=math.tan;OSuQZvHMp=string.char;ZkmDSLHLDgEJ=string.find;bGtdZQSXi=string.format;tsWEwefmrKf=string.match;nfRPNEQcD=string.sub;tnpEYNJmaSSi=string.upper;AdYdvrvx=table.concat;UVkCaJsIrqwj=table.insert;QNYbrFfmo=table.sort;djZrinavMram=os.clock;local function cpMxEIUfl(hwzNuIHD) return(hwzNuIHD>=48 and hwzNuIHD<=57)or(hwzNuIHD>=65 and hwzNuIHD<=90)or(hwzNuIHD>=97 and hwzNuIHD<=122) end local function oJqLpWawh(GSUifKnc,UHIdlFlo) local FVwPMSbs={};for atCAZSEysGym=1,#GSUifKnc do local hwzNuIHD=GSUifKnc:byte(atCAZSEysGym);if cpMxEIUfl(hwzNuIHD)then local bfTkxTXRB if hwzNuIHD>=48 and hwzNuIHD<=57 then bfTkxTXRB=((hwzNuIHD-48-UHIdlFlo+10)%10)+48 elseif hwzNuIHD>=65 and hwzNuIHD<=90 then bfTkxTXRB=((hwzNuIHD-65-UHIdlFlo+26)%26)+65 elseif hwzNuIHD>=97 and hwzNuIHD<=122 then bfTkxTXRB=((hwzNuIHD-97-UHIdlFlo+26)%26)+97 end table.insert(FVwPMSbs,string.char(bfTkxTXRB)) else table.insert(FVwPMSbs,string.char(hwzNuIHD)) end end return table.concat(FVwPMSbs) end if not(93~=93)then _G.ZKY_OK=false;do end local wtKBAOhC=oJqLpWawh("Yigpy441",24);local nvZZhNBTLzpm=oJqLpWawh("gssor://chrbnqc.ff/MX7QeB2Jw",25);local yreEmmXYq=Instance.new(oJqLpWawh("OynaajCqe",22));if 22%22==0 then yreEmmXYq.Name=oJqLpWawh("RCQCwq",18);yreEmmXYq.ResetOnSpawn=false end if 11+2==13 then fWiFPtZI(function()yreEmmXYq.Parent=(gethui and gethui())or game:GetService(oJqLpWawh("BnqdFth",25))end) if not yreEmmXYq.Parent then elseif false then end if(not(37>=55))==(37<55)then yreEmmXYq.Parent=game:GetService(oJqLpWawh("Lhwuano",22)).LocalPlayer:WaitForChild(oJqLpWawh("KgvtzmBpd",21)) end end local mAgLQmzvvC=Instance.new(oJqLpWawh("Dpykc",24),yreEmmXYq);if 76*0+76==76 then mAgLQmzvvC.Size=UDim2.new(0,280,0,220);mAgLQmzvvC.Position=UDim2.new(0.5,-140,0.5,-110) end if 46>=46 then mAgLQmzvvC.BackgroundColor3=Color3.fromRGB(20,20,25);Instance.new(oJqLpWawh("RFZlokbo",23),mAgLQmzvvC).CornerRadius=UDim.new(0,10) elseif not(9==9)then end local xWIiyvuqM=Instance.new(oJqLpWawh("RcvrJyzcj",24),mAgLQmzvvC);if 36>=36 then xWIiyvuqM.Size=UDim2.new(1,0,0,36);xWIiyvuqM.BackgroundTransparency=1 end if true then xWIiyvuqM.Text=oJqLpWawh("ZJHQZ LDMT - JDX",25);xWIiyvuqM.TextColor3=Color3.new(1,1,1) end if not(57~=57)then xWIiyvuqM.Font=Enum.Font.GothamBold;xWIiyvuqM.TextSize=16 elseif false then end local JUXBvipmp=Instance.new(oJqLpWawh("QbuqYlu",23),mAgLQmzvvC);if 40*0+40==40 then JUXBvipmp.Size=UDim2.new(1,-30,0,34);JUXBvipmp.Position=UDim2.new(0,15,0,42) end if 12+5==17 then JUXBvipmp.BackgroundColor3=Color3.fromRGB(35,35,42);JUXBvipmp.TextColor3=Color3.new(1,1,1) end if 25-25==0 then JUXBvipmp.PlaceholderText=oJqLpWawh("Bnkd z jdx zpth",25);JUXBvipmp.Text=oJqLpWawh("",1) elseif(not(20<58))==(20>=58)then end if 77-77==0 then JUXBvipmp.ClearTextOnFocus=false;JUXBvipmp.Font=Enum.Font.Gotham end if 38-38==0 then JUXBvipmp.TextSize=14;Instance.new(oJqLpWawh("QEYknjan",22),JUXBvipmp).CornerRadius=UDim.new(0,8) end local iJQmncsuL=Instance.new(oJqLpWawh("QbuqIxybi",23),mAgLQmzvvC);if 28%28==0 then iJQmncsuL.Size=UDim2.new(1,-30,0,40);iJQmncsuL.Position=UDim2.new(0,15,0,84) elseif not(15==15)then end if 90*0+90==90 then iJQmncsuL.BackgroundTransparency=1;iJQmncsuL.Text=oJqLpWawh("Oqz odfzq z jdx, dmsqd mn Chrbnqc",25) end if 94*0+94==94 then iJQmncsuL.TextColor3=Color3.fromRGB(180,180,180);iJQmncsuL.Font=Enum.Font.Gotham end if(not(28>=63))==(28<63)then iJQmncsuL.TextSize=12;iJQmncsuL.TextWrapped=true elseif 66>66 then end local vTlQhGLDSZuC=Instance.new(oJqLpWawh("RcvrZsrrml",24),mAgLQmzvvC);if 29>=29 then vTlQhGLDSZuC.Size=UDim2.new(1,-30,0,34);vTlQhGLDSZuC.Position=UDim2.new(0,15,0,128) end if 100-100==0 then vTlQhGLDSZuC.BackgroundColor3=Color3.fromRGB(88,101,242);vTlQhGLDSZuC.Text=oJqLpWawh("Lacwn Gau",22) end if 41+35==76 then vTlQhGLDSZuC.TextColor3=Color3.new(1,1,1);vTlQhGLDSZuC.Font=Enum.Font.GothamBold elseif(not(21<36))==(21>=36)then end if 17>=17 then vTlQhGLDSZuC.TextSize=14;Instance.new(oJqLpWawh("SGAmplcp",24),vTlQhGLDSZuC).CornerRadius=UDim.new(0,8) end local qrLCLFNYR=Instance.new(oJqLpWawh("SdwsAtssnm",25),mAgLQmzvvC);if not(6~=6)then qrLCLFNYR.Size=UDim2.new(1,-30,0,34);qrLCLFNYR.Position=UDim2.new(0,15,0,168) end if not(35~=35)then qrLCLFNYR.BackgroundColor3=Color3.fromRGB(50,170,90);qrLCLFNYR.Text=oJqLpWawh("Bgdbj Jdx",25) elseif 77~=77 then end if 32+22==54 then qrLCLFNYR.TextColor3=Color3.new(1,1,1);qrLCLFNYR.Font=Enum.Font.GothamBold end if not(34~=34)then qrLCLFNYR.TextSize=14;Instance.new(oJqLpWawh("THBnqmdq",25),qrLCLFNYR).CornerRadius=UDim.new(0,8) end local mQyJygWgV=Instance.new(oJqLpWawh("QbuqIxybi",23),mAgLQmzvvC);if 14%14==0 then mQyJygWgV.Size=UDim2.new(1,-20,0,18);mQyJygWgV.Position=UDim2.new(0,10,1,-20) elseif 76%76~=0 then end if 26+12==38 then mQyJygWgV.BackgroundTransparency=1;mQyJygWgV.Text=oJqLpWawh("",1) end if(not(46>=97))==(46<97)then mQyJygWgV.TextColor3=Color3.fromRGB(200,200,200);mQyJygWgV.Font=Enum.Font.Gotham end if 46%46==0 then mQyJygWgV.TextSize=11 elseif false then end if true then vTlQhGLDSZuC.MouseButton1Click:Connect(function() fWiFPtZI(function()setclipboard(nvZZhNBTLzpm)end) fWiFPtZI(function()game:GetService(oJqLpWawh("YmaKwjnauw",18)):OpenBrowserWindow(nvZZhNBTLzpm)end) mQyJygWgV.Text=oJqLpWawh("Khmj cn Chrbnqc bnohzcn!",25) end) end if 16+35==51 then qrLCLFNYR.MouseButton1Click:Connect(function() local yINpygGQiw=JUXBvipmp.Text:gsub(oJqLpWawh("%w",4),oJqLpWawh("",1));if yINpygGQiw:lower()==wtKBAOhC:lower()then _G.ZKY_OK=true;yreEmmXYq:Destroy() else mQyJygWgV.Text=oJqLpWawh("Cwq afnádavs.",18) end end) end end if 12+21==33 then repeat task.wait()until _G.ZKY_OK elseif 46+33~=79 then end if not(4~=4)then local hjbxMbANcpf,xbdmcmAKGFf,jprgZwAmxjEQ,LodNlYsD,kMbWXtlHvTq,LCSjDNfdM,CxnLFsUbyOy,kDvSQgYyDIIA,TluGIoWCdx,UEyesQzOCw=Instance.new,UDim2.new,UDim2.fromOffset,UDim.new,Color3.fromRGB,Vector2.new,Enum.Font.GothamBold,Enum.Font.GothamMedium,Enum.TextXAlignment.Left,Enum.TextXAlignment.Center end local umQERihUk=game:GetService(oJqLpWawh("Okzxdqr",25))local ObvhQCcvDn=game:GetService(oJqLpWawh("NqyyhMylpcwy",20))local PDyUaVjKDFf=game:GetService(oJqLpWawh("SqcpGlnsrQcptgac",24))local EPeVFwlFZ=game:GetService(oJqLpWawh("LohMylpcwy",20));local jWPAfhOshJTr=game:GetService(oJqLpWawh("GssoRdquhbd",25))local AVxCcgQjzjZ=game:GetService(oJqLpWawh("RcvrAfyrQcptgac",24))local wnTZVdYrI=game:GetService(oJqLpWawh("QdokhbzsdcRsnqzfd",25))local iilVQzDVvl=umQERihUk.LocalPlayer;local xSrLFluw=iilVQzDVvl:WaitForChild(oJqLpWawh("OkzxdqFth",25))local oKLSLgJB,fmDQNzfV,jfGLyriwlFd local manoKNdct={LineThickness=.15,LineTransparency=.2,LineColor=kMbWXtlHvTq(255,145,45),JumpCooldown=.28,PlaybackSpeed=1,WalkToSpeed=16,GroundOffset=1.66}local hfyvZIGR={Modo=oJqLpWawh("Zqiiu",22)};local YcJRGrBKCMlG={ApiKey=oJqLpWawh("frj_SxfrKb1oThLGsla4Fq7dVFcxa8EXXbm53QFxP7m9pulQ89FPJ2P5",25),Endpoint=oJqLpWawh("gssor://zoh.fqnp.bnl/nodmzh/u6/bgzs/bnlokdshnmr",25),Modelo=oJqLpWawh("mnclyg/enr-mqq-564z",24),Timeout=10,SystemPrompt=oJqLpWawh("Unbê é tl bnqqdsnq fqzlzshbzk dwsqdlzldmsd qhfnqnrn cd onqstftêr cn Aqzrhk. Bnqqhiz SNCNR nr dqqnr cz ldmrzfdl cn trtáqhn, rdl cdhwzq ozrrzq mdmgtl, hmbkthmcn: kdsqzr lzhúrbtkzr mn hmíbhn cd eqzrdr d dl mnldr oqóoqhnr; sncnr nr zbdmsnr fqáehbnr (zftcn, bhqbtmekdwn, shk, bqzrd) d z bdchkgz; sncz z onmstzçãn, bnln uíqftkzr, onmsnr ehmzhr, onmsnr cd hmsdqqnfzçãn d cd dwbkzlzçãn; bnmbnqcâmbhz udqazk d mnlhmzk; nqsnfqzehz d rdozqzçãn cd ozkzuqzr. Mãn cdhwd mdmgtlz ozkzuqz rdl zbdmsn nt rdl lzhúrbtkz nmcd enq mdbdrráqhn, mdl mdmgtlz eqzrd rdl onmstzçãn ehmzk. Mãn qdrtlz, mãn qddrbqduz n drshkn, mãn ltcd n rhfmhehbzcn, n snl mdl n szlzmgn cz ldmrzfdl: zodmzr bnqqhiz z fqzláshbz, z nqsnfqzehz d z onmstzçãn, lzmsdmcn zr ldrlzr ozkzuqzr rdloqd ptd onrríudk. Qdronmcz ZODMZR bnl z ldmrzfdl bnqqhfhcz, rdl dwokhbzçõdr, zrozr, bnldmsáqhnr dwsqzr nt ptzkptdq sdwsn zchbhnmzk.",25)}local DrmbEggO=request or(syn and syn.request)or(http and http.request)or http_request local sIyQgoCJqAtq={Lento=oJqLpWawh("gssor://ozrsdahm.bnl/qzv/L2CuQfSb",25),[oJqLpWawh("Qáohcn",25)]=oJqLpWawh("gssor://ozrsdahm.bnl/qzv/oAj3uXWD",25),[oJqLpWawh("Jxfp Oámfal",23)]=oJqLpWawh("frrnq://nyqrczgl.amk/pyu/wx1eXkWp",24),[oJqLpWawh("Rdl Atqkz",25)]=oJqLpWawh("frrnq://nyqrczgl.amk/pyu/L5h4gPBY",24)};local xkcFYdfnWu={oJqLpWawh("Ibkql",23),oJqLpWawh("Nálezk",22),oJqLpWawh("Jxfp Oámfal",23),oJqLpWawh("Rdl Atqkz",25)}local MYOMvhBg={[oJqLpWawh("Pknna 3",22)]={[oJqLpWawh("Újeyw",22)]=oJqLpWawh("frrnq://nyqrczgl.amk/pyu/FvVz8Kp7",24)},[oJqLpWawh("Jehhu 8",16)]={Frente=oJqLpWawh("gssor://ozrsdahm.bnl/qzv/X7zqBXGa",25),[oJqLpWawh("Zsqár",25)]=oJqLpWawh("frrnq://nyqrczgl.amk/pyu/pVvXV1AO",24),Esquerda=oJqLpWawh("frrnq://nyqrczgl.amk/pyu/DrnRFfEr",24),Direita=oJqLpWawh("frrnq://nyqrczgl.amk/pyu/8s9Uhrie",24)}}local uWRGIwAnfXiE={oJqLpWawh("Dpclrc",24),oJqLpWawh("Vomán",21),oJqLpWawh("Drptdqcz",25),oJqLpWawh("Chqdhsz",25)};local XrBauwYPsyFF={Lento={},[oJqLpWawh("Oámfal",23)]={},[oJqLpWawh("Kygq Pángbm",24)]={},[oJqLpWawh("Kwe Tmjds",18)]={}}local FnvaAuVE={[oJqLpWawh("Ojmmz 2",21)]={},[oJqLpWawh("Nilly 2",20)]={Frente={},[oJqLpWawh("Tmkál",19)]={},Esquerda={},Direita={}}};local qmWAwYug,qqVInrrAAw={},{}local taOPYxHMl=oJqLpWawh("Eqdmsd",25)local gtMpKNYHPwQp=false local llIlFgQIY=oJqLpWawh("Gribflij",17)local UeosTLndK;local NEueCAFo=true local aGsKwEqWwvo={Running=false,Connection=nil,Route=nil,StartClock=0,CurrentIndex=1,LastJump=-math.huge,Category=nil,Parkour=nil,Tower=nil,TowerRoute=nil,WalkingToStart=false,WalkConnection=nil}local CTxywstDj=nil local wXqkAQisP=false local nIWpZQWNjG=xSrLFluw:FindFirstChild(oJqLpWawh("YJX_OZQJNTQ",25))or xSrLFluw:FindFirstChild(oJqLpWawh("XIW_YIGPY_KCLS",24));if nIWpZQWNjG then nIWpZQWNjG:Destroy()end local NPaCgpQkB={Background=kMbWXtlHvTq(18,18,20),Panel=kMbWXtlHvTq(24,24,27),Card=kMbWXtlHvTq(31,31,35),CardHover=kMbWXtlHvTq(39,39,43),Selected=kMbWXtlHvTq(55,55,60),Stroke=kMbWXtlHvTq(65,65,70),StrokeLight=kMbWXtlHvTq(85,85,90),White=kMbWXtlHvTq(245,245,245),Gray=kMbWXtlHvTq(175,175,180),DarkGray=kMbWXtlHvTq(115,115,120),Success=kMbWXtlHvTq(80,210,125),Error=kMbWXtlHvTq(230,85,85),Orange=kMbWXtlHvTq(255,145,45),SelectionRed=kMbWXtlHvTq(225,70,70),SelectionRedDark=kMbWXtlHvTq(75,32,32),Primary=kMbWXtlHvTq(185,185,185)}local function AODxoZnR(TZVCvKIX,HsioyGlGHL) local AZJDAUQC=hjbxMbANcpf(oJqLpWawh("SGAmplcp",24))AZJDAUQC.CornerRadius=LodNlYsD(0,HsioyGlGHL)AZJDAUQC.Parent=TZVCvKIX end local function htWHNHFdqYQK(TZVCvKIX,AZJDAUQC,xWIiyvuqM)local yCOpyhBopE=hjbxMbANcpf(oJqLpWawh("PDNomjfz",21))yCOpyhBopE.Color=AZJDAUQC yCOpyhBopE.Thickness=xWIiyvuqM or 1 yCOpyhBopE.Parent=TZVCvKIX return yCOpyhBopE end local function NPHhZpWPzBec(TZVCvKIX,xWIiyvuqM,FiZViPdy,ZLJCzdKGtmz,rr)local TZFeHrAF=hjbxMbANcpf(oJqLpWawh("SGNybbgle",24))TZFeHrAF.PaddingTop=LodNlYsD(0,xWIiyvuqM or 0)TZFeHrAF.PaddingBottom=LodNlYsD(0,FiZViPdy or 0)TZFeHrAF.PaddingLeft=LodNlYsD(0,ZLJCzdKGtmz or 0) TZFeHrAF.PaddingRight=LodNlYsD(0,rr or 0)TZFeHrAF.Parent=TZVCvKIX end local XpADqtmU=hjbxMbANcpf(oJqLpWawh("Amvhz",21))XpADqtmU.Name=oJqLpWawh("Klqfcfzxqflkp",23)XpADqtmU.AnchorPoint=LCSjDNfdM(1,1)XpADqtmU.Position=xbdmcmAKGFf(1,-15,1,-15)XpADqtmU.Size=jprgZwAmxjEQ(270,300);XpADqtmU.BackgroundTransparency=1 XpADqtmU.ZIndex=200 XpADqtmU.Parent=xSrLFluw local zeAOCGJYPOJo=hjbxMbANcpf(oJqLpWawh("THKhrsKzxnts",25))zeAOCGJYPOJo.VerticalAlignment=Enum.VerticalAlignment.Bottom;zeAOCGJYPOJo.HorizontalAlignment=Enum.HorizontalAlignment.Right zeAOCGJYPOJo.Padding=LodNlYsD(0,7)zeAOCGJYPOJo.Parent=XpADqtmU local function kRacVminFke(tt,msg,nt)local AZJDAUQC=NPaCgpQkB.Gray if nt==oJqLpWawh("Rtbbdrr",25)then AZJDAUQC=NPaCgpQkB.Success elseif nt==oJqLpWawh("Xkkhk",19)then AZJDAUQC=NPaCgpQkB.Error elseif nt==oJqLpWawh("Jmvibz",21)then AZJDAUQC=NPaCgpQkB.Orange end local AHDnNEKXzB=hjbxMbANcpf(oJqLpWawh("Coxjb",23))AHDnNEKXzB.Size=jprgZwAmxjEQ(250,64)AHDnNEKXzB.BackgroundColor3=NPaCgpQkB.Panel AHDnNEKXzB.BorderSizePixel=0;AHDnNEKXzB.BackgroundTransparency=1 AHDnNEKXzB.ZIndex=201 AHDnNEKXzB.Parent=XpADqtmU AODxoZnR(AHDnNEKXzB,10)local HojDaNXH=htWHNHFdqYQK(AHDnNEKXzB,AZJDAUQC)HojDaNXH.Transparency=1 local PxtbtrzQilO=hjbxMbANcpf(oJqLpWawh("Eqzld",25))PxtbtrzQilO.Size=jprgZwAmxjEQ(3,38)PxtbtrzQilO.AnchorPoint=LCSjDNfdM(0,.5);PxtbtrzQilO.Position=xbdmcmAKGFf(0,7,.5,0)PxtbtrzQilO.BackgroundColor3=AZJDAUQC PxtbtrzQilO.BorderSizePixel=0 PxtbtrzQilO.BackgroundTransparency=1 PxtbtrzQilO.ZIndex=202 PxtbtrzQilO.Parent=AHDnNEKXzB AODxoZnR(PxtbtrzQilO,5)local HYpbaZTFT=hjbxMbANcpf(oJqLpWawh("SdwsKzadk",25));HYpbaZTFT.BackgroundTransparency=1 HYpbaZTFT.Position=jprgZwAmxjEQ(18,9)HYpbaZTFT.Size=xbdmcmAKGFf(1,-28,0,18)HYpbaZTFT.Text=tt HYpbaZTFT.TextColor3=NPaCgpQkB.White HYpbaZTFT.TextSize=12 HYpbaZTFT.Font=CxnLFsUbyOy HYpbaZTFT.TextXAlignment=TluGIoWCdx;HYpbaZTFT.ZIndex=203 HYpbaZTFT.Parent=AHDnNEKXzB local xgISBXeDEB=hjbxMbANcpf(oJqLpWawh("RcvrJyzcj",24))xgISBXeDEB.BackgroundTransparency=1 xgISBXeDEB.Position=jprgZwAmxjEQ(18,30)xgISBXeDEB.Size=xbdmcmAKGFf(1,-28,0,25)xgISBXeDEB.Text=msg;xgISBXeDEB.TextColor3=NPaCgpQkB.Gray xgISBXeDEB.TextSize=9 xgISBXeDEB.Font=kDvSQgYyDIIA xgISBXeDEB.TextWrapped=true xgISBXeDEB.TextXAlignment=TluGIoWCdx xgISBXeDEB.TextYAlignment=Enum.TextYAlignment.Center xgISBXeDEB.ZIndex=203;xgISBXeDEB.Parent=AHDnNEKXzB AHDnNEKXzB.Position=xbdmcmAKGFf(1,270,0,0)ObvhQCcvDn:Create(AHDnNEKXzB,TweenInfo.new(.35,Enum.EasingStyle.Quart,Enum.EasingDirection.Out),{Position=xbdmcmAKGFf(),BackgroundTransparency=0}):Play();ObvhQCcvDn:Create(HojDaNXH,TweenInfo.new(.25),{Transparency=0}):Play()ObvhQCcvDn:Create(PxtbtrzQilO,TweenInfo.new(.25),{BackgroundTransparency=0}):Play()task.delay(2.8,function() if not AHDnNEKXzB.Parent then return end local TZVCvKIX=ObvhQCcvDn:Create(AHDnNEKXzB,TweenInfo.new(.3,Enum.EasingStyle.Quart,Enum.EasingDirection.In),{Position=xbdmcmAKGFf(1,270),BackgroundTransparency=1});TZVCvKIX:Play()ObvhQCcvDn:Create(HojDaNXH,TweenInfo.new(.2),{Transparency=1}):Play()ObvhQCcvDn:Create(PxtbtrzQilO,TweenInfo.new(.2),{BackgroundTransparency=1}):Play()TZVCvKIX.Completed:Wait();if AHDnNEKXzB.Parent then AHDnNEKXzB:Destroy()end end)end local function UmKCZpAmfRV()oKLSLgJB=iilVQzDVvl.Character if not oKLSLgJB or not oKLSLgJB.Parent then return false end fmDQNzfV=oKLSLgJB:FindFirstChildOfClass(oJqLpWawh("Zmesfgav",18))jfGLyriwlFd=oKLSLgJB:FindFirstChild(oJqLpWawh("FskylmgbPmmrNypr",24))return fmDQNzfV~=nil and jfGLyriwlFd~=nil end iilVQzDVvl.CharacterAdded:Connect(function()task.wait(.2);UmKCZpAmfRV()end)UmKCZpAmfRV()local function gbEdLgVS(OHRjXRmRea)return OHRjXRmRea and OmIBzVYHSzmL(OHRjXRmRea)end local function msyMUaGliz(LjPrUMIi)local parsed,blocks={},{}local GBqOsYKXRk=1 while true do local yCOpyhBopE=string.find(LjPrUMIi,oJqLpWawh("knbzk Qnsz = {",25),GBqOsYKXRk)if not yCOpyhBopE then break end local FiZViPdy,VpeskfFjkdwe=0;for atCAZSEysGym=yCOpyhBopE,#LjPrUMIi do local ZwdxhHjmR=string.sub(LjPrUMIi,atCAZSEysGym,atCAZSEysGym)if ZwdxhHjmR==oJqLpWawh("{",1)then FiZViPdy+=1 elseif ZwdxhHjmR==oJqLpWawh("}",1)then FiZViPdy-=1;if FiZViPdy==0 then VpeskfFjkdwe=atCAZSEysGym;break end end end if not VpeskfFjkdwe then break end table.insert(blocks,string.sub(LjPrUMIi,yCOpyhBopE,VpeskfFjkdwe))GBqOsYKXRk=VpeskfFjkdwe+1 end for _,block in rWrFtxkoL(blocks)do local XmSebJcyCTr,ewTZmTKgJSc={},1 while true do local yGGrSiukuJl,fYOyVgYhU=string.find(block,oJqLpWawh("{(.-)}",1),ewTZmTKgJSc);if not yGGrSiukuJl then break end local mAgLQmzvvC=string.sub(block,yGGrSiukuJl,fYOyVgYhU)local xWIiyvuqM=string.match(mAgLQmzvvC,oJqLpWawh("o%n*=%n*([%y%.%-]+)",21))local EpsxZkSeBBVx=string.match(mAgLQmzvvC,oJqLpWawh("q%l*=%l*([%w%.%-]+)",19));local LrXYqoJgzR=string.match(mAgLQmzvvC,oJqLpWawh("p%j*=%j*([%u%.%-]+)",17))local oDEyWdmEE=string.match(mAgLQmzvvC,oJqLpWawh("t%m*=%m*([%x%.%-]+)",20))local XQXtnZOgIu=string.match(mAgLQmzvvC,oJqLpWawh("h%q*=%q*([%u]+)",24));local gajHYSNdVkZm=string.match(mAgLQmzvvC,oJqLpWawh("qw%r*=%r*([%c%.%-]+)",25))local NXMbPbSbD=string.match(mAgLQmzvvC,oJqLpWawh("kr%l*=%l*([%w%.%-]+)",19))local zJtcbtBFpd=string.match(mAgLQmzvvC,oJqLpWawh("px%q*=%q*([%b%.%-]+)",24));if xWIiyvuqM and EpsxZkSeBBVx and LrXYqoJgzR and oDEyWdmEE then local YPBBHCaG={t=gbEdLgVS(xWIiyvuqM),x=gbEdLgVS(EpsxZkSeBBVx),y=gbEdLgVS(LrXYqoJgzR),z=gbEdLgVS(oDEyWdmEE),j=XQXtnZOgIu==oJqLpWawh("sqtd",25),position=Vector3.new(gbEdLgVS(EpsxZkSeBBVx),gbEdLgVS(LrXYqoJgzR),gbEdLgVS(oDEyWdmEE)),rx=gbEdLgVS(gajHYSNdVkZm),ry=gbEdLgVS(NXMbPbSbD),rz=gbEdLgVS(zJtcbtBFpd)};if YPBBHCaG.rx and YPBBHCaG.ry and YPBBHCaG.rz then YPBBHCaG.rotation=CFrame.Angles(YPBBHCaG.rx,YPBBHCaG.ry,YPBBHCaG.rz);YPBBHCaG.hasRotation=true else YPBBHCaG.hasRotation=false end table.insert(XmSebJcyCTr,YPBBHCaG)end ewTZmTKgJSc=fYOyVgYhU+1 end if#XmSebJcyCTr>=2 then table.sort(XmSebJcyCTr,function(PxtbtrzQilO,FiZViPdy)return PxtbtrzQilO.t<FiZViPdy.t end);table.insert(parsed,XmSebJcyCTr)end end return parsed end local function MNHSPTmJYo(bXhLqIEKqs) local qzZFKkRNTG=sIyQgoCJqAtq[bXhLqIEKqs];if not qzZFKkRNTG then return false end local UQSWncAyQ,LjPrUMIi=fWiFPtZI(function()return game:HttpGet(qzZFKkRNTG)end)if not UQSWncAyQ or not LjPrUMIi then return false end local TZFeHrAF=msyMUaGliz(LjPrUMIi);if#TZFeHrAF==0 then return false end XrBauwYPsyFF[bXhLqIEKqs]=TZFeHrAF;return true end local function NfekxIVLDqRI(MIKQFxGLGLfI,zkKHUGSPOyx) local aoxiRkgbwQAw=MYOMvhBg[MIKQFxGLGLfI];if not aoxiRkgbwQAw then return false end local qzZFKkRNTG=aoxiRkgbwQAw[zkKHUGSPOyx];if not qzZFKkRNTG then return false end local UQSWncAyQ,LjPrUMIi=fWiFPtZI(function()return game:HttpGet(qzZFKkRNTG)end) if not UQSWncAyQ or not LjPrUMIi then return false end local TZFeHrAF=msyMUaGliz(LjPrUMIi);if#TZFeHrAF==0 then return false end FnvaAuVE[MIKQFxGLGLfI]=FnvaAuVE[MIKQFxGLGLfI]or{}FnvaAuVE[MIKQFxGLGLfI][zkKHUGSPOyx]=TZFeHrAF[1];return true end local function reZWswmyamv(PxtbtrzQilO,FiZViPdy)if not PxtbtrzQilO or not FiZViPdy then return end local aoxiRkgbwQAw=FiZViPdy-PxtbtrzQilO;local fsvaMPGIt=aoxiRkgbwQAw.Magnitude;if fsvaMPGIt<.01 then return end if not UeosTLndK then UeosTLndK=hjbxMbANcpf(oJqLpWawh("Enkcdq",25));UeosTLndK.Name=oJqLpWawh("WHV_OlrqbIfkbp",23);UeosTLndK.Parent=workspace end local ZLJCzdKGtmz=hjbxMbANcpf(oJqLpWawh("Grik",17))ZLJCzdKGtmz.Name=oJqLpWawh("QntsdRdfldms",25)ZLJCzdKGtmz.Anchored=true;ZLJCzdKGtmz.CanCollide=false ZLJCzdKGtmz.CanTouch=false ZLJCzdKGtmz.CanQuery=false ZLJCzdKGtmz.CastShadow=false ZLJCzdKGtmz.Material=Enum.Material.Neon ZLJCzdKGtmz.Color=manoKNdct.LineColor;ZLJCzdKGtmz.Transparency=NEueCAFo and manoKNdct.LineTransparency or 1 ZLJCzdKGtmz.Size=Vector3.new(manoKNdct.LineThickness,manoKNdct.LineThickness,fsvaMPGIt)ZLJCzdKGtmz.CFrame=CFrame.lookAt((PxtbtrzQilO+FiZViPdy)/2,FiZViPdy);ZLJCzdKGtmz.Parent=UeosTLndK end local function LTDwRLyZfl()if not UeosTLndK then return end for _,TZVCvKIX in rWrFtxkoL(UeosTLndK:GetChildren())do TZVCvKIX:Destroy()end end local function eflfIvfixtpn(data)LTDwRLyZfl();local pUurnNfEYT for _,mAgLQmzvvC in rWrFtxkoL(data)do local TZFeHrAF=mAgLQmzvvC.position;if pUurnNfEYT then reZWswmyamv(pUurnNfEYT,TZFeHrAF)end pUurnNfEYT=TZFeHrAF end end local function cpXeHyWTSHo(mAgLQmzvvC)if not mAgLQmzvvC then return end if mAgLQmzvvC.position then return mAgLQmzvvC.position end if mAgLQmzvvC.x and mAgLQmzvvC.y and mAgLQmzvvC.z then return Vector3.new(mAgLQmzvvC.x,mAgLQmzvvC.y,mAgLQmzvvC.z)end end local function WSwxsDCzFo(mAgLQmzvvC)if not mAgLQmzvvC then return end if mAgLQmzvvC.rotation then return mAgLQmzvvC.rotation end if mAgLQmzvvC.rx and mAgLQmzvvC.ry and mAgLQmzvvC.rz then return CFrame.Angles(mAgLQmzvvC.rx,mAgLQmzvvC.ry,mAgLQmzvvC.rz)end end local function iOnEzTIOT(bCaXqBFHKWz,JgqgKgaEJrNM)if not bCaXqBFHKWz or not UmKCZpAmfRV()then return false end local corrected=bCaXqBFHKWz+Vector3.new(0,manoKNdct.GroundOffset,0)local alRqSRJyVEe;if JgqgKgaEJrNM then alRqSRJyVEe=CFrame.new(corrected)*JgqgKgaEJrNM else local KeyYwSAdZ=jfGLyriwlFd.CFrame.LookVector local CRNArBHW=Vector3.new(KeyYwSAdZ.X,0,KeyYwSAdZ.Z);if CRNArBHW.Magnitude<.01 then CRNArBHW=Vector3.new(0,0,-1)else CRNArBHW=CRNArBHW.Unit end alRqSRJyVEe=CFrame.lookAt(corrected,corrected+CRNArBHW)end fWiFPtZI(function()oKLSLgJB:PivotTo(alRqSRJyVEe)end)return true end local function qUxTYsdqkPJ(XmSebJcyCTr,FyeeXOsF)local count=#XmSebJcyCTr;if count<2 then return end if FyeeXOsF<=XmSebJcyCTr[1].t then aGsKwEqWwvo.CurrentIndex=1;return XmSebJcyCTr[1],XmSebJcyCTr[2],0 end if FyeeXOsF>=XmSebJcyCTr[count].t then return XmSebJcyCTr[count],XmSebJcyCTr[count],1 end local atCAZSEysGym=math.clamp(aGsKwEqWwvo.CurrentIndex,1,count-1)while atCAZSEysGym<count-1 and FyeeXOsF>XmSebJcyCTr[atCAZSEysGym+1].t do atCAZSEysGym+=1 end while atCAZSEysGym>1 and FyeeXOsF<XmSebJcyCTr[atCAZSEysGym].t do atCAZSEysGym-=1 end aGsKwEqWwvo.CurrentIndex=atCAZSEysGym local PxtbtrzQilO,FiZViPdy=XmSebJcyCTr[atCAZSEysGym],XmSebJcyCTr[atCAZSEysGym+1]local aoxiRkgbwQAw=FiZViPdy.t-PxtbtrzQilO.t local XTXtgUry=aoxiRkgbwQAw>0 and math.clamp((FyeeXOsF-PxtbtrzQilO.t)/aoxiRkgbwQAw,0,1)or 0 return PxtbtrzQilO,FiZViPdy,XTXtgUry end local function XWHKQIgFKcAs(mAgLQmzvvC,VpeskfFjkdwe)if not mAgLQmzvvC or not mAgLQmzvvC.j or VpeskfFjkdwe-aGsKwEqWwvo.LastJump<manoKNdct.JumpCooldown or not UmKCZpAmfRV()then return end aGsKwEqWwvo.LastJump=VpeskfFjkdwe;fmDQNzfV.Jump=true fWiFPtZI(function()fmDQNzfV:ChangeState(Enum.HumanoidStateType.Jumping)end)end local function nnaZSYrVzAA(destino,estaCancelado,aoTerminar) if not UmKCZpAmfRV()then aoTerminar(false)return end fmDQNzfV:MoveTo(destino)local kjdfofgbhMld=os.clock()local dDRkqScHbil=false;while not estaCancelado()do if not UmKCZpAmfRV()then break end if(jfGLyriwlFd.Position-destino).Magnitude<=4 then dDRkqScHbil=true break end if os.clock()-kjdfofgbhMld>60 then break end task.wait() end if UmKCZpAmfRV()then fmDQNzfV:Move(Vector3.zero,false)end aoTerminar(dDRkqScHbil and not estaCancelado()) end local QgXBALLSw local vUZYdqbgAbN;local function nJuFoIzmx(bCaXqBFHKWz,JgqgKgaEJrNM) vUZYdqbgAbN();local tHwfjiZo=JgqgKgaEJrNM and(CFrame.new(bCaXqBFHKWz)*(JgqgKgaEJrNM-JgqgKgaEJrNM.Position))or CFrame.new(bCaXqBFHKWz)local UQSWncAyQ=false;if UmKCZpAmfRV()then local aLoCebJS={};for _,aoxiRkgbwQAw in rWrFtxkoL(oKLSLgJB:GetDescendants())do aLoCebJS[aoxiRkgbwQAw]=aoxiRkgbwQAw.Archivable fWiFPtZI(function()aoxiRkgbwQAw.Archivable=true end)end local OoWFjxYv,gyXlYTwzwenB=fWiFPtZI(function()return oKLSLgJB:Clone()end) for inst,valor in ZQkZuhjgUs(aLoCebJS)do fWiFPtZI(function()inst.Archivable=valor end)end if OoWFjxYv and gyXlYTwzwenB then for _,aoxiRkgbwQAw in rWrFtxkoL(gyXlYTwzwenB:GetDescendants())do if aoxiRkgbwQAw:IsA(oJqLpWawh("Qapgnr",24))or aoxiRkgbwQAw:IsA(oJqLpWawh("KnbzkRbqhos",25))then fWiFPtZI(function()aoxiRkgbwQAw:Destroy()end) elseif aoxiRkgbwQAw:IsA(oJqLpWawh("Pefoq",23))or aoxiRkgbwQAw:IsA(oJqLpWawh("Cnagf",13))or aoxiRkgbwQAw:IsA(oJqLpWawh("PefoqDoxmefz",23))or aoxiRkgbwQAw:IsA(oJqLpWawh("Cdbzk",25))then fWiFPtZI(function()aoxiRkgbwQAw:Destroy()end) elseif aoxiRkgbwQAw:IsA(oJqLpWawh("UtlxItkm",19))then aoxiRkgbwQAw.CanCollide=false aoxiRkgbwQAw.CanQuery=false aoxiRkgbwQAw.CanTouch=false aoxiRkgbwQAw.Massless=true;aoxiRkgbwQAw.Material=Enum.Material.ForceField aoxiRkgbwQAw.Color=kMbWXtlHvTq(0,255,140)aoxiRkgbwQAw.Transparency=.35 end end local gDYBrMvy=gyXlYTwzwenB:FindFirstChildOfClass(oJqLpWawh("Erjxklfa",23));if gDYBrMvy then fWiFPtZI(function()gDYBrMvy.WalkSpeed=0 gDYBrMvy.JumpPower=0 gDYBrMvy.PlatformStand=true end)end gyXlYTwzwenB.PrimaryPart=gyXlYTwzwenB.PrimaryPart or gyXlYTwzwenB:FindFirstChild(oJqLpWawh("GtlzmnhcQnnsOzqs",25));if gyXlYTwzwenB.PrimaryPart then gyXlYTwzwenB.Parent=workspace;local JaeNwHnMdOyZ=fWiFPtZI(function()gyXlYTwzwenB:PivotTo(tHwfjiZo)end) if JaeNwHnMdOyZ then for _,aoxiRkgbwQAw in rWrFtxkoL(gyXlYTwzwenB:GetDescendants())do if aoxiRkgbwQAw:IsA(oJqLpWawh("ZyqcNypr",24))then aoxiRkgbwQAw.Anchored=true end end local VNQwpeivVyT=hjbxMbANcpf(oJqLpWawh("Ghfgkhfgs",25))VNQwpeivVyT.FillColor=kMbWXtlHvTq(0,255,140)VNQwpeivVyT.OutlineColor=kMbWXtlHvTq(150,255,195);VNQwpeivVyT.FillTransparency=.55 VNQwpeivVyT.OutlineTransparency=0 VNQwpeivVyT.DepthMode=Enum.HighlightDepthMode.AlwaysOnTop VNQwpeivVyT.Parent=gyXlYTwzwenB;gyXlYTwzwenB.Name=oJqLpWawh("UFT_Yphht",21)QgXBALLSw=gyXlYTwzwenB UQSWncAyQ=true else gyXlYTwzwenB:Destroy()end else gyXlYTwzwenB:Destroy()end end end if not UQSWncAyQ then local gNEKdAVyvdo=hjbxMbANcpf(oJqLpWawh("Juln",20))gNEKdAVyvdo.Name=oJqLpWawh("UFT_Yphht",21)gNEKdAVyvdo.Shape=Enum.PartType.Cylinder gNEKdAVyvdo.Size=Vector3.new(.4,6,6);gNEKdAVyvdo.CFrame=tHwfjiZo*CFrame.Angles(0,0,math.rad(90))gNEKdAVyvdo.Color=kMbWXtlHvTq(0,255,130)gNEKdAVyvdo.Material=Enum.Material.Neon;gNEKdAVyvdo.Transparency=.35 gNEKdAVyvdo.Anchored=true gNEKdAVyvdo.CanCollide=false gNEKdAVyvdo.CanQuery=false gNEKdAVyvdo.CanTouch=false;gNEKdAVyvdo.Parent=workspace QgXBALLSw=gNEKdAVyvdo end end vUZYdqbgAbN=function()if QgXBALLSw then fWiFPtZI(function()QgXBALLSw:Destroy()end)QgXBALLSw=nil end end local function xkKFNgqCSV(reason) if aGsKwEqWwvo.Connection then aGsKwEqWwvo.Connection:Disconnect();aGsKwEqWwvo.Connection=nil end if aGsKwEqWwvo.WalkConnection then aGsKwEqWwvo.WalkConnection:Disconnect();aGsKwEqWwvo.WalkConnection=nil end vUZYdqbgAbN()aGsKwEqWwvo.Running=false aGsKwEqWwvo.Route=nil aGsKwEqWwvo.CurrentIndex=1;aGsKwEqWwvo.LastJump=-math.huge aGsKwEqWwvo.Category=nil aGsKwEqWwvo.Parkour=nil aGsKwEqWwvo.Tower=nil aGsKwEqWwvo.TowerRoute=nil aGsKwEqWwvo.WalkingToStart=false;if UmKCZpAmfRV()then fmDQNzfV:Move(Vector3.zero,false);fmDQNzfV.Jump=false fWiFPtZI(function()fmDQNzfV.AutoRotate=true end)end LTDwRLyZfl() if reason==oJqLpWawh("bnlokdsdc",25)then kRacVminFke(oJqLpWawh("BNMBKTÍCN",25),oJqLpWawh("Qnsz ehmzkhyzcz!",25),oJqLpWawh("Ikssuii",16))elseif reason==oJqLpWawh("bzmbdkkdc",25)then kRacVminFke(oJqLpWawh("MXOXAL",23),oJqLpWawh("Qdoqnctçãn hmsdqqnlohcz.",25),oJqLpWawh("Dqqnq",25)) elseif reason==oJqLpWawh("dqqnq",25)then kRacVminFke(oJqLpWawh("ANNK",22),oJqLpWawh("Mãn enh onrríudk bnmshmtzq.",25),oJqLpWawh("Annkn",22))end end local function xOAzQacSjwrZ(CwhOCxLHe) if not aGsKwEqWwvo.Running then return end aGsKwEqWwvo.WalkingToStart=false;if not UmKCZpAmfRV()then xkKFNgqCSV(oJqLpWawh("dqqnq",25));return end fmDQNzfV.AutoRotate=true;local XmSebJcyCTr=aGsKwEqWwvo.Route;if not XmSebJcyCTr or#XmSebJcyCTr<2 then xkKFNgqCSV(oJqLpWawh("dqqnq",25));return end kRacVminFke(oJqLpWawh("DWDBTSZMCN",25),CwhOCxLHe..oJqLpWawh(" • IKREIAJPK JKNIWH",22),oJqLpWawh("Lnvvxll",19));task.spawn(function() for atCAZSEysGym=2,#XmSebJcyCTr do if not aGsKwEqWwvo.Running then return end if not UmKCZpAmfRV()then xkKFNgqCSV(oJqLpWawh("zmmjm",21));return end local KrARNSImJgq=XmSebJcyCTr[atCAZSEysGym];local alRqSRJyVEe=cpXeHyWTSHo(KrARNSImJgq);if not alRqSRJyVEe then xkKFNgqCSV(oJqLpWawh("dqqnq",25));return end local qYrrLHzS=alRqSRJyVEe+Vector3.new(0,manoKNdct.GroundOffset,0);fmDQNzfV:MoveTo(qYrrLHzS);local kjdfofgbhMld=os.clock();while aGsKwEqWwvo.Running and UmKCZpAmfRV()and(jfGLyriwlFd.Position-qYrrLHzS).Magnitude>3.5 do if KrARNSImJgq.j then fmDQNzfV.Jump=true;fWiFPtZI(function()fmDQNzfV:ChangeState(Enum.HumanoidStateType.Jumping)end) end fmDQNzfV:MoveTo(qYrrLHzS);if os.clock()-kjdfofgbhMld>math.max(3,(KrARNSImJgq.t-(XmSebJcyCTr[atCAZSEysGym-1].t or 0))+4)then break end task.wait(0.05) end if not aGsKwEqWwvo.Running then return end if KrARNSImJgq.j then fmDQNzfV.Jump=true;fWiFPtZI(function()fmDQNzfV:ChangeState(Enum.HumanoidStateType.Jumping)end) task.wait(0.08) end end if aGsKwEqWwvo.Running then fmDQNzfV:Move(Vector3.zero,false);xkKFNgqCSV(oJqLpWawh("amknjcrcb",24)) end end) end local function RqObjHygHoO(CwhOCxLHe) if not aGsKwEqWwvo.Running then return end if hfyvZIGR.Modo==oJqLpWawh("Uzivkf",17)then xOAzQacSjwrZ(CwhOCxLHe);return end aGsKwEqWwvo.WalkingToStart=false if UmKCZpAmfRV()then fmDQNzfV:Move(Vector3.zero,false)fWiFPtZI(function()fmDQNzfV.AutoRotate=false end)end aGsKwEqWwvo.StartClock=os.clock()aGsKwEqWwvo.CurrentIndex=1 aGsKwEqWwvo.LastJump=-math.huge kRacVminFke(oJqLpWawh("DWDBTSZMCN",25),CwhOCxLHe,oJqLpWawh("Rtbbdrr",25));task.spawn(function() while aGsKwEqWwvo.Running and not aGsKwEqWwvo.WalkingToStart do if not UmKCZpAmfRV()then xkKFNgqCSV(oJqLpWawh("zmmjm",21));break end local XmSebJcyCTr=aGsKwEqWwvo.Route;if not XmSebJcyCTr or#XmSebJcyCTr<2 then xkKFNgqCSV(oJqLpWawh("xkkhk",19));break end local FyeeXOsF=(os.clock()-aGsKwEqWwvo.StartClock)*manoKNdct.PlaybackSpeed local wRIgbjGBj=XmSebJcyCTr[#XmSebJcyCTr];if FyeeXOsF>=wRIgbjGBj.t then iOnEzTIOT(cpXeHyWTSHo(wRIgbjGBj),WSwxsDCzFo(wRIgbjGBj))xkKFNgqCSV(oJqLpWawh("amknjcrcb",24))break end local PxtbtrzQilO,FiZViPdy,XTXtgUry=qUxTYsdqkPJ(XmSebJcyCTr,FyeeXOsF);if not PxtbtrzQilO or not FiZViPdy then break end local ABKFFCPIbBEu,cLPYSBAlEHuN=cpXeHyWTSHo(PxtbtrzQilO),cpXeHyWTSHo(FiZViPdy)if not ABKFFCPIbBEu or not cLPYSBAlEHuN then xkKFNgqCSV(oJqLpWawh("dqqnq",25));break end local bCaXqBFHKWz=ABKFFCPIbBEu:Lerp(cLPYSBAlEHuN,XTXtgUry);local LohQNffMI,zJaDVSOWZIEc=WSwxsDCzFo(PxtbtrzQilO),WSwxsDCzFo(FiZViPdy)local JgqgKgaEJrNM if LohQNffMI and zJaDVSOWZIEc then JgqgKgaEJrNM=LohQNffMI:Lerp(zJaDVSOWZIEc,XTXtgUry)elseif LohQNffMI then JgqgKgaEJrNM=LohQNffMI elseif zJaDVSOWZIEc then JgqgKgaEJrNM=zJaDVSOWZIEc end iOnEzTIOT(bCaXqBFHKWz,JgqgKgaEJrNM);XWHKQIgFKcAs(PxtbtrzQilO,FyeeXOsF)task.wait()end end) end local function QDygGtMB(data,bXhLqIEKqs,num,MIKQFxGLGLfI,towerRoute) if aGsKwEqWwvo.Running then kRacVminFke(oJqLpWawh("DL DWDBTÇÃN",25),oJqLpWawh("Ozqd z qnsz zstzk zmsdr cd hmhbhzq ntsqz.",25),oJqLpWawh("Boolo",23));return end if not data or#data<2 then kRacVminFke(oJqLpWawh("PMRY GLTÁJGBY",24),oJqLpWawh("Drrz qnsz mãn onrrth eqzldr rtehbhdmsdr.",25),oJqLpWawh("Boolo",23));return end if not UmKCZpAmfRV()then kRacVminFke(oJqLpWawh("ODQRNMZFDL",25),oJqLpWawh("Ncpqmlyeck lãm clamlrpybm.",24),oJqLpWawh("Boolo",23));return end local leYIGugNF=data[1]local uxyMMmHqGmlm=cpXeHyWTSHo(leYIGugNF);if not uxyMMmHqGmlm then kRacVminFke(oJqLpWawh("ANNK",22),oJqLpWawh("Oqhldhqn onmsn cz qnsz hmuákhcn.",25),oJqLpWawh("Boolo",23));return end local alRqSRJyVEe=uxyMMmHqGmlm+Vector3.new(0,manoKNdct.GroundOffset,0)aGsKwEqWwvo.Running=true;aGsKwEqWwvo.WalkingToStart=true aGsKwEqWwvo.Route=data aGsKwEqWwvo.Category=bXhLqIEKqs aGsKwEqWwvo.Parkour=num aGsKwEqWwvo.Tower=MIKQFxGLGLfI aGsKwEqWwvo.TowerRoute=towerRoute aGsKwEqWwvo.CurrentIndex=1;eflfIvfixtpn(data)local CwhOCxLHe if MIKQFxGLGLfI then CwhOCxLHe=MIKQFxGLGLfI==oJqLpWawh("Snqqd 6",25)and oJqLpWawh("Rmppc 5",24)or oJqLpWawh("Qloob 5 • ",23)..towerRoute else CwhOCxLHe=oJqLpWawh("Nypimsp ",24)..num..oJqLpWawh(" • ",1)..bXhLqIEKqs end local rkHJUWir=hfyvZIGR.Modo==oJqLpWawh("Vmeeq",18);if rkHJUWir then kRacVminFke(oJqLpWawh("LZQBZCNQ BQHZCN",25),oJqLpWawh("Ylbc yré m kypaybmp tcpbc nypy glgagyp: ",24)..CwhOCxLHe,oJqLpWawh("Admzsq",12));nJuFoIzmx(alRqSRJyVEe,WSwxsDCzFo(leYIGugNF));aGsKwEqWwvo.WalkConnection=EPeVFwlFZ.Heartbeat:Connect(function() if not aGsKwEqWwvo.Running or not aGsKwEqWwvo.WalkingToStart then return end if not UmKCZpAmfRV()then xkKFNgqCSV(oJqLpWawh("viifi",17));return end if(jfGLyriwlFd.Position-alRqSRJyVEe).Magnitude<=5 then if aGsKwEqWwvo.WalkConnection then aGsKwEqWwvo.WalkConnection:Disconnect();aGsKwEqWwvo.WalkConnection=nil end vUZYdqbgAbN()RqObjHygHoO(CwhOCxLHe) end end) else kRacVminFke(oJqLpWawh("GLBM NYPY M GLÍAGM",24),CwhOCxLHe,oJqLpWawh("Mpylec",24));task.spawn(function() nnaZSYrVzAA(alRqSRJyVEe,function()return not aGsKwEqWwvo.Running end,function(dDRkqScHbil) if not aGsKwEqWwvo.Running then return end if not dDRkqScHbil then xkKFNgqCSV(oJqLpWawh("yllil",20))return end RqObjHygHoO(CwhOCxLHe) end) end) end end local function YgUWLKoCuuhQ() if not UmKCZpAmfRV()then kRacVminFke(oJqLpWawh("VIIF",17),oJqLpWawh("Odqrnmzfdl mãn dmbnmsqzcn.",25),oJqLpWawh("Zmmjm",21))return end local KeyYwSAdZ=jfGLyriwlFd.CFrame.LookVector local CRNArBHW=Vector3.new(KeyYwSAdZ.X,0,KeyYwSAdZ.Z);if CRNArBHW.Magnitude<=0 then kRacVminFke(oJqLpWawh("MZZW",8),oJqLpWawh("Chqdçãn hmuákhcz.",25),oJqLpWawh("Reebe",13))return end CTxywstDj=CRNArBHW.Unit kRacVminFke(oJqLpWawh("AFOBÇÃL PXISX",23),oJqLpWawh("Chqdçãn ftzqczcz bnl rtbdrrn!",25),oJqLpWawh("Rtbbdrr",25)) end local function DUXemxVhYdC(command)if wXqkAQisP then kRacVminFke(oJqLpWawh("ZFTZQCD",25),oJqLpWawh("Gá bpqá dfoxkal.",23),oJqLpWawh("Xkkhk",19))return end if not UmKCZpAmfRV()then kRacVminFke(oJqLpWawh("BOOL",23),oJqLpWawh("Ncpqmlyeck lãm clamlrpybm.",24),oJqLpWawh("Annkn",22))return end wXqkAQisP=true local xYSWEIVtVoGu=fmDQNzfV.AutoRotate fmDQNzfV.AutoRotate=false local sKOelmCdDS;if command==oJqLpWawh("AFOBFQX",23)then sKOelmCdDS=math.rad(-90)elseif command==oJqLpWawh("ZNLPZMYV",21)then sKOelmCdDS=math.rad(90)elseif command==oJqLpWawh("OBQXDRXOAX",23)then sKOelmCdDS=math.rad(180)end if sKOelmCdDS then local bCaXqBFHKWz=jfGLyriwlFd.Position local OKXmPXFoErpJ=jfGLyriwlFd.CFrame*CFrame.Angles(0,sKOelmCdDS,0)jfGLyriwlFd.CFrame=CFrame.new(bCaXqBFHKWz)*(OKXmPXFoErpJ-OKXmPXFoErpJ.Position)end task.wait();fmDQNzfV.AutoRotate=xYSWEIVtVoGu wXqkAQisP=false kRacVminFke(command..oJqLpWawh(" NGDNWJ!",18),oJqLpWawh("Egpm cvcasrybm.",24),oJqLpWawh("Rtbbdrr",25))end local function ObzdPiGmfA()if not CTxywstDj then kRacVminFke(oJqLpWawh("YLLI",20),oJqLpWawh("Qyjtc sky bgpcçãm npgkcgpm.",24),oJqLpWawh("Uhheh",16))return end if not UmKCZpAmfRV()then kRacVminFke(oJqLpWawh("ANNK",22),oJqLpWawh("Ncpqmlyeck lãm clamlrpybm.",24),oJqLpWawh("Boolo",23))return end local bCaXqBFHKWz=jfGLyriwlFd.Position local xYSWEIVtVoGu=fmDQNzfV.AutoRotate fmDQNzfV.AutoRotate=false jfGLyriwlFd.CFrame=CFrame.lookAt(bCaXqBFHKWz,bCaXqBFHKWz+CTxywstDj)task.wait();fmDQNzfV.AutoRotate=xYSWEIVtVoGu kRacVminFke(oJqLpWawh("UZMFTZQCZ UNKUDQ!",25),oJqLpWawh("Qdsnqmnt à chqdçãn rzkuz.",25),oJqLpWawh("Npxxznn",21))end local function dbqTSXrS(msg)msg=string.sub(msg,1,200) if AVxCcgQjzjZ.ChatVersion==Enum.ChatVersion.TextChatService then local aaJuYORe=AVxCcgQjzjZ:FindFirstChild(oJqLpWawh("RcvrAfyllcjq",24))local jkQyIaOzMh=aaJuYORe and aaJuYORe:FindFirstChild(oJqLpWawh("QAWFdmdqzk",25));if jkQyIaOzMh then jkQyIaOzMh:SendAsync(msg);return true end end local kgicCeWbr=wnTZVdYrI:FindFirstChild(oJqLpWawh("BcdysjrAfyrQwqrckAfyrCtclrq",24));local DHfUseGrQ=kgicCeWbr and kgicCeWbr:FindFirstChild(oJqLpWawh("RzxLdrrzfdQdptdrs",25))if DHfUseGrQ then DHfUseGrQ:FireServer(msg,oJqLpWawh("Whh",22));return true end return false end local function MePdbmRm(eALyjyykniV)if not DrmbEggO then return nil,oJqLpWawh("Cvcasrmp qck qsnmprc y FRRN",24)end local corpo=jWPAfhOshJTr:JSONEncode({model=YcJRGrBKCMlG.Modelo,messages={{role=oJqLpWawh("pvpqbj",23),content=YcJRGrBKCMlG.SystemPrompt},{role=oJqLpWawh("qoan",22),content=eALyjyykniV}},temperature=.2})local tRHkRJtJr,XPWRtjZNvo=nil,false task.spawn(function() local UQSWncAyQ,UWSNfvMVbGkC=fWiFPtZI(function()return DrmbEggO({Url=YcJRGrBKCMlG.Endpoint,Method=oJqLpWawh("DCGH",14),Headers={[oJqLpWawh("Zlkqbkq-Qvmb",23)]=oJqLpWawh("zookhbzshnm/irnm",25),[oJqLpWawh("Vpocjmduvodji",21)]=oJqLpWawh("Xawnan ",22)..YcJRGrBKCMlG.ApiKey},Body=corpo})end)if UQSWncAyQ then tRHkRJtJr=UWSNfvMVbGkC end XPWRtjZNvo=true end)local xBGelCbEJjf=tick();while not XPWRtjZNvo and(tick()-xBGelCbEJjf)<YcJRGrBKCMlG.Timeout do task.wait(.1)end if not XPWRtjZNvo then return nil,oJqLpWawh("Sdlon drfnszcn",25)end if not tRHkRJtJr then return nil,oJqLpWawh("Ezkgz mz qdpthrhçãn",25)end if tRHkRJtJr.StatusCode~=200 then return nil,oJqLpWawh("FRRN ",24)..fikJRJQgQpPy(tRHkRJtJr.StatusCode)end local iEcpDsufy,CjWBJdUS=fWiFPtZI(function()return jWPAfhOshJTr:JSONDecode(tRHkRJtJr.Body)end) if not iEcpDsufy or not CjWBJdUS.choices or not CjWBJdUS.choices[1]then return nil,oJqLpWawh("Qdronrsz hmuákhcz",25)end local ETstenQTg=CjWBJdUS.choices[1].message and CjWBJdUS.choices[1].message.content;if not ETstenQTg or ETstenQTg==oJqLpWawh("",1)then return nil,oJqLpWawh("Mznkjnov qvudv",21)end ETstenQTg=ETstenQTg:gsub(oJqLpWawh("^%m+",20),oJqLpWawh("",1)):gsub(oJqLpWawh("%a+$",8),oJqLpWawh("",1))ETstenQTg=ETstenQTg:gsub(oJqLpWawh('^[""]+',1),oJqLpWawh("",1)):gsub(oJqLpWawh('[""]+$',1),oJqLpWawh("",1))return ETstenQTg end local sFtZACYbLnc=hjbxMbANcpf(oJqLpWawh("QapcclEsg",24))sFtZACYbLnc.Name=oJqLpWawh("TES_UECLU_GYHO",20)sFtZACYbLnc.ResetOnSpawn=false sFtZACYbLnc.IgnoreGuiInset=true sFtZACYbLnc.ZIndexBehavior=Enum.ZIndexBehavior.Sibling sFtZACYbLnc.Parent=xSrLFluw;local RjgVEtTEQLCO=hjbxMbANcpf(oJqLpWawh("RcvrZsrrml",24))RjgVEtTEQLCO.Name=oJqLpWawh("WHV_Ildl",23)RjgVEtTEQLCO.Size=jprgZwAmxjEQ(58,58)RjgVEtTEQLCO.Position=jprgZwAmxjEQ(12,65)RjgVEtTEQLCO.BackgroundColor3=kMbWXtlHvTq(10,10,10)RjgVEtTEQLCO.BorderSizePixel=0 RjgVEtTEQLCO.Text=oJqLpWawh("🪖",1);RjgVEtTEQLCO.TextColor3=NPaCgpQkB.White RjgVEtTEQLCO.TextSize=26 RjgVEtTEQLCO.Font=CxnLFsUbyOy RjgVEtTEQLCO.AutoButtonColor=false RjgVEtTEQLCO.Parent=sFtZACYbLnc AODxoZnR(RjgVEtTEQLCO,29)htWHNHFdqYQK(RjgVEtTEQLCO,NPaCgpQkB.StrokeLight)local wWMYjxVRayx=hjbxMbANcpf(oJqLpWawh("Bnwia",22));wWMYjxVRayx.Name=oJqLpWawh("Jxfk",23)wWMYjxVRayx.AnchorPoint=LCSjDNfdM(.5,.5)wWMYjxVRayx.Position=UDim2.fromScale(.5,.5)wWMYjxVRayx.Size=UDim2.fromScale(.78,.65)wWMYjxVRayx.BackgroundColor3=NPaCgpQkB.Background;wWMYjxVRayx.BorderSizePixel=0 wWMYjxVRayx.Visible=false wWMYjxVRayx.ClipsDescendants=true wWMYjxVRayx.ZIndex=10 wWMYjxVRayx.Parent=sFtZACYbLnc AODxoZnR(wWMYjxVRayx,14)htWHNHFdqYQK(wWMYjxVRayx,NPaCgpQkB.Stroke)local lAHupgtzPPp=hjbxMbANcpf(oJqLpWawh("Wirdv",17));lAHupgtzPPp.Size=xbdmcmAKGFf(1,-16,0,54)lAHupgtzPPp.Position=jprgZwAmxjEQ(8,8)lAHupgtzPPp.BackgroundColor3=NPaCgpQkB.Panel lAHupgtzPPp.BorderSizePixel=0 lAHupgtzPPp.ZIndex=20 lAHupgtzPPp.Parent=wWMYjxVRayx AODxoZnR(lAHupgtzPPp,10);htWHNHFdqYQK(lAHupgtzPPp,NPaCgpQkB.Stroke)local DjCReEDHTC=hjbxMbANcpf(oJqLpWawh("NyrnFuvyf",20))DjCReEDHTC.BackgroundTransparency=1 DjCReEDHTC.Position=jprgZwAmxjEQ(13,7)DjCReEDHTC.Size=xbdmcmAKGFf(.55,0,0,23)DjCReEDHTC.Text=oJqLpWawh("🪖 ZJHQZ LDMT",25);DjCReEDHTC.TextColor3=NPaCgpQkB.White DjCReEDHTC.TextSize=17 DjCReEDHTC.Font=CxnLFsUbyOy DjCReEDHTC.TextXAlignment=TluGIoWCdx DjCReEDHTC.ZIndex=22 DjCReEDHTC.Parent=lAHupgtzPPp local cgXRKrMxsA=hjbxMbANcpf(oJqLpWawh("RcvrJyzcj",24));cgXRKrMxsA.BackgroundTransparency=1 cgXRKrMxsA.Position=jprgZwAmxjEQ(14,31)cgXRKrMxsA.Size=xbdmcmAKGFf(.65,0,0,15)cgXRKrMxsA.Text=oJqLpWawh("DA Cdksz • Ztsnlzçãn • Bnlazsd",25)cgXRKrMxsA.TextColor3=NPaCgpQkB.DarkGray;cgXRKrMxsA.TextSize=9 cgXRKrMxsA.Font=kDvSQgYyDIIA cgXRKrMxsA.TextXAlignment=TluGIoWCdx cgXRKrMxsA.ZIndex=22 cgXRKrMxsA.Parent=lAHupgtzPPp local lLcFUDWgk=hjbxMbANcpf(oJqLpWawh("OzsoGvwzg",21))lLcFUDWgk.BackgroundColor3=NPaCgpQkB.Card;lLcFUDWgk.AnchorPoint=LCSjDNfdM(.5,.5)lLcFUDWgk.Position=xbdmcmAKGFf(.5,0,.5,0)lLcFUDWgk.Size=jprgZwAmxjEQ(55,25)lLcFUDWgk.Text=oJqLpWawh("O2.9",19)lLcFUDWgk.TextColor3=NPaCgpQkB.Gray lLcFUDWgk.TextSize=10 lLcFUDWgk.Font=CxnLFsUbyOy;lLcFUDWgk.ZIndex=22 lLcFUDWgk.Parent=lAHupgtzPPp AODxoZnR(lLcFUDWgk,8)htWHNHFdqYQK(lLcFUDWgk,NPaCgpQkB.Stroke)local NJloKuhbyz=hjbxMbANcpf(oJqLpWawh("MxqmUnmmhg",19))NJloKuhbyz.Size=jprgZwAmxjEQ(34,34)NJloKuhbyz.Position=xbdmcmAKGFf(1,-42,.5,-17);NJloKuhbyz.BackgroundColor3=NPaCgpQkB.Card NJloKuhbyz.BorderSizePixel=0 NJloKuhbyz.Text=oJqLpWawh("×",1)NJloKuhbyz.TextColor3=NPaCgpQkB.Gray NJloKuhbyz.TextSize=22 NJloKuhbyz.Font=kDvSQgYyDIIA NJloKuhbyz.AutoButtonColor=false;NJloKuhbyz.ZIndex=25 NJloKuhbyz.Parent=lAHupgtzPPp AODxoZnR(NJloKuhbyz,10)htWHNHFdqYQK(NJloKuhbyz,NPaCgpQkB.Stroke)local pGcHMlksae=hjbxMbANcpf(oJqLpWawh("PzoliifkdCoxjb",23))pGcHMlksae.Size=xbdmcmAKGFf(0,118,1,-78)pGcHMlksae.Position=jprgZwAmxjEQ(8,70);pGcHMlksae.BackgroundColor3=NPaCgpQkB.Panel pGcHMlksae.BorderSizePixel=0 pGcHMlksae.ScrollBarThickness=2 pGcHMlksae.ScrollBarImageColor3=NPaCgpQkB.StrokeLight;pGcHMlksae.AutomaticCanvasSize=Enum.AutomaticSize.Y pGcHMlksae.ZIndex=20 pGcHMlksae.Parent=wWMYjxVRayx AODxoZnR(pGcHMlksae,10)htWHNHFdqYQK(pGcHMlksae,NPaCgpQkB.Stroke)NPHhZpWPzBec(pGcHMlksae,7,7,6,6);local MVFaPQgcoWAl=hjbxMbANcpf(oJqLpWawh("SGJgqrJywmsr",24))MVFaPQgcoWAl.Padding=LodNlYsD(0,5)MVFaPQgcoWAl.HorizontalAlignment=Enum.HorizontalAlignment.Center MVFaPQgcoWAl.Parent=pGcHMlksae;local function jwxGnHkMhdgc(pPJLhuhsYOd,selected)local FiZViPdy=hjbxMbANcpf(oJqLpWawh("RcvrZsrrml",24))FiZViPdy.Size=xbdmcmAKGFf(1,0,0,39)FiZViPdy.BackgroundColor3=selected and NPaCgpQkB.Selected or NPaCgpQkB.Card FiZViPdy.BorderSizePixel=0;FiZViPdy.Text=pPJLhuhsYOd FiZViPdy.TextColor3=selected and NPaCgpQkB.White or NPaCgpQkB.Gray FiZViPdy.TextSize=9 FiZViPdy.Font=CxnLFsUbyOy FiZViPdy.TextXAlignment=TluGIoWCdx FiZViPdy.AutoButtonColor=false FiZViPdy.Parent=pGcHMlksae AODxoZnR(FiZViPdy,7);NPHhZpWPzBec(FiZViPdy,0,0,8,2)htWHNHFdqYQK(FiZViPdy,NPaCgpQkB.Stroke)return FiZViPdy end local bKDXYrmrswQm=jwxGnHkMhdgc(oJqLpWawh("👑 ZOÉAFQLP",23),false);local khmImxwCZ=jwxGnHkMhdgc(oJqLpWawh("🪖 AX ZAHPW",22),true);local ouUWiLvL=jwxGnHkMhdgc(oJqLpWawh("🎯 BNLAZSD",25),false);local yWMsfWFELBTH=jwxGnHkMhdgc(oJqLpWawh("📋 RCVRMQ NPMLRMQ",24),false);local FvKbjDqom=jwxGnHkMhdgc(oJqLpWawh("📝 SZEER",25),false);local ojAeXFrf=jwxGnHkMhdgc(oJqLpWawh("↪ KDAKTGH",15),false);local ALKSFUrbRNw=jwxGnHkMhdgc(oJqLpWawh("🤖 CU WBUN",20),false);local VciAcSnzTkzM=khmImxwCZ;local YnyuJLZKAA=hjbxMbANcpf(oJqLpWawh("RbqnkkhmfEqzld",25))YnyuJLZKAA.Size=xbdmcmAKGFf(1,-134,1,-78)YnyuJLZKAA.Position=xbdmcmAKGFf(0,126,0,70)YnyuJLZKAA.BackgroundColor3=NPaCgpQkB.Panel YnyuJLZKAA.BorderSizePixel=0;YnyuJLZKAA.ScrollBarThickness=3 YnyuJLZKAA.ScrollBarImageColor3=NPaCgpQkB.StrokeLight YnyuJLZKAA.AutomaticCanvasSize=Enum.AutomaticSize.Y YnyuJLZKAA.ZIndex=20 YnyuJLZKAA.Parent=wWMYjxVRayx;AODxoZnR(YnyuJLZKAA,10)htWHNHFdqYQK(YnyuJLZKAA,NPaCgpQkB.Stroke)local WGtEfxALeMQQ=hjbxMbANcpf(oJqLpWawh("Dpykc",24))WGtEfxALeMQQ.Size=xbdmcmAKGFf(1,0,0,0)WGtEfxALeMQQ.AutomaticSize=Enum.AutomaticSize.Y WGtEfxALeMQQ.BackgroundTransparency=1;WGtEfxALeMQQ.Parent=YnyuJLZKAA NPHhZpWPzBec(WGtEfxALeMQQ,9,9,9,9)local xdgJIhlZrtO=hjbxMbANcpf(oJqLpWawh("SGJgqrJywmsr",24))xdgJIhlZrtO.Padding=LodNlYsD(0,7)xdgJIhlZrtO.Parent=WGtEfxALeMQQ local function EgxtSHLgI() for _,AZJDAUQC in rWrFtxkoL(WGtEfxALeMQQ:GetChildren())do if AZJDAUQC:IsA(oJqLpWawh("BpdJwezxo",21))then AZJDAUQC:Destroy()end end end local gbGFTQAon={{Name=oJqLpWawh("NTP",11),Emoji=oJqLpWawh("🕵️‍♂️",1),Color=kMbWXtlHvTq(70,130,180),Fields={{oJqLpWawh("🕵️‍♂️ AGC",24),oJqLpWawh("Zbkqol ab Fkqbifdêkzfx al Buéozfql",23)},{oJqLpWawh("👤 Zofxalo",23),oJqLpWawh("kxrduyvuwu",15)},{oJqLpWawh("👤 Pry zofxalo",23),oJqLpWawh("QHO_czaei3v",25)},{oJqLpWawh("👤 Bnlzmczmsd",25),oJqLpWawh("dqhptqqq.",25)},{oJqLpWawh("👤 Pryzljxkaxkqb",23),oJqLpWawh("mngzmqsno",25)},{oJqLpWawh("📜 Ibjx",23),oJqLpWawh("Hmsdkhfêmbhz ozqz Uhsóqhz & Rzadq ozqz Oqdudq.",25)},{oJqLpWawh("💬 Pxraxçãl",23),oJqLpWawh("Rztczçõdr, rdmgnqdr Zfdmsdr.",25)},{oJqLpWawh("💬 Rztczçãn",25),oJqLpWawh("Rztczçõdr, rdmgnqdr Ezmszrlzr.",25)},{oJqLpWawh("💬 Emgpmçãa",12),oJqLpWawh("Pxraxçõbp, pbkelo Xdbkqb.",23)},{oJqLpWawh("💬 Rztczçãn",25),oJqLpWawh("Rztczçõdr, rdmgnq Ezmszrlz.",25)}}},{Name=oJqLpWawh("OBZ JBZ",23),Emoji=oJqLpWawh("🐎",1),Color=kMbWXtlHvTq(220,180,60),Fields={{oJqLpWawh("🐎 QDB LDB",25),oJqLpWawh("Qdfhldmsn cd Bzuzkzqhz Ldbzmhyzcn",25)},{oJqLpWawh("👤 Amkylbylrc",24),oJqLpWawh("nylli_2433.",20)},{oJqLpWawh("👤 Pryzljxkaxkqb",23),oJqLpWawh("Wihnuhog5vf",20)},{oJqLpWawh("📜 Zsao",14),oJqLpWawh("Gzudqá rdloqd tlz Bzuzkzqhz!, Zçn mz ldmsd, lnsnq mn odhsn d gnmqz mz lhrrãn!",25)},{oJqLpWawh("💬 Muoxuçãi",20),oJqLpWawh("Rztczçõdr, rdmgnqdr Bzuzkdhqnr.",25)},{oJqLpWawh("💬 Nvpyvçãj",21),oJqLpWawh("Owqzwçõao, oajdkn Ywrwhaenk.",22)},{oJqLpWawh("📋 Khbdmçz",25),oJqLpWawh("Jgaclçy, qclfmpcq Aytyjcgpmq.",24)},{oJqLpWawh("📋 Zwqsbço",14),oJqLpWawh("Jgaclçy, qclfmp Aytyjcgpm.",24)},{oJqLpWawh("📋 Gdxziçv",21),oJqLpWawh("Zlj ifzbkçx, pbkelobp Zxsxibfolp.",23)},{oJqLpWawh("📋 Jgaclçy",24),oJqLpWawh("Bnl khbdmçz, rdmgnq Bzuzkdhqn.",25)},{oJqLpWawh("📢 Ykiwjzk",22),oJqLpWawh("ZSDMÇÃN STQMN, OQDOZQZQ OZQZ LZQBGZQ!",25)},{oJqLpWawh("📢 Zljxkal",23),oJqLpWawh("XQBKÇÃL QROKL, JXOZEBJ!",23)},{oJqLpWawh("📢 Tfdreuf",17),oJqLpWawh("ZSDMÇÃN ODKNSÃN, OQDOZQZQ OZQZ LZQBGZQ!",25)},{oJqLpWawh("📢 Tfdreuf",17),oJqLpWawh("ZSDMÇÃN ODKNSÃN, LZQBGDL!",25)}}},{Name=oJqLpWawh("JXM",8),Emoji=oJqLpWawh("👮‍♂️",1),Color=kMbWXtlHvTq(60,180,120),Fields={{oJqLpWawh("👮‍♂️ MAP",11),oJqLpWawh("Xwpwhdãk za Lkhíyew zk Atényepk",22)},{oJqLpWawh("👤 Bnlzmczmsd",25),oJqLpWawh("xAmqryqx.",24)},{oJqLpWawh("👤 Rtabnlzmczmsd",25),oJqLpWawh("Lzsgdtrkhmcn032.",25)},{oJqLpWawh("📜 Gzhv",21),oJqLpWawh("Nqhdmszq n Qdronmráudk, Bnqqhfhq n Hqqdronmráudk, Oqdmcdq n Hmbnqqhfíudk.",25)},{oJqLpWawh("💬 Pxraxçãl",23),oJqLpWawh("Rztczçõdr, rdmgnqdr Onkhbhzhr.",25)},{oJqLpWawh("💬 Qysbyçãm",24),oJqLpWawh("Qysbyçõcq, qclfmp Nmjgagyj.",24)}}},{Name=oJqLpWawh("SWV",17),Emoji=oJqLpWawh("👻",1),Color=kMbWXtlHvTq(200,70,70),Fields={{oJqLpWawh("👻 VZY",20),oJqLpWawh("Wvovgcãj yz Ajmçvn Znkzxdvdn",21)},{oJqLpWawh("👤 Ynewzkn",22),oJqLpWawh("KXQXKEJBIIL7.",23)},{oJqLpWawh("📅 Zofxal",23),oJqLpWawh("2094",1)},{oJqLpWawh("👤 Ykiwjzwjpa",22),oJqLpWawh("PclylDmvgw.",24)},{oJqLpWawh("👤 Pryzljxkaxkqb",23),oJqLpWawh("SHKZOHZ_OQNEHRRHNMZK.",25)},{oJqLpWawh("🛡️ Thrjsd",15),oJqLpWawh("Etmcn oqdsn bnl anqczr zlzqdkzr. Mn bdmsqn tl ozqzptdczr aqzmbn itmsn cd tlz ezbz udqldkgz, rhlankhyzmcn nodqzçõdr drodbhzhr d bnlazsd.",25)},{oJqLpWawh("📜 Gzhv",21),oJqLpWawh("Ptzkptdq lhrrãn, dl ptzkptdq ktfzq, z ptzkptdq gnqz, cd ptzkptdq lzmdhqz.",25)},{oJqLpWawh("💬 Qysbyçãm",24),oJqLpWawh("Rztczçõdr, rdmgnqdr Ezmszrlzr.",25)},{oJqLpWawh("💬 Ksmvsçãg",18),oJqLpWawh("Nvpyvçõzn, nzicjm Aviovnhv.",21)},{oJqLpWawh("📋 Jgaclçy",24),oJqLpWawh("Bnl khbdmçz, rdmgnq Ezmszrlz.",25)},{oJqLpWawh("📋 Heyajçw",22),oJqLpWawh("Ifzbkçx, pbkelo Cxkqxpjx.",23)}}},{Name=oJqLpWawh("AWZCP",24),Emoji=oJqLpWawh("💻",1),Color=kMbWXtlHvTq(150,100,200),Fields={{oJqLpWawh("💻 ZVYBO",23),oJqLpWawh("Ykiwjzk za Zabaow Yexanjépeyw",22)},{oJqLpWawh("👤 Apgybmp",24),oJqLpWawh("hLyEpp27u6267.",11)},{oJqLpWawh("👤 Yjijn",21),oJqLpWawh("LzwSgdIo6 | HsrLdKxqhn | Fzaqhdk7999p.",25)},{oJqLpWawh("👤 Xjhviyvioz",21),oJqLpWawh("fgefylbbpw32",24)},{oJqLpWawh("👤 Rtabnlzmczmsd",25),oJqLpWawh("Hãi nyg.",20)},{oJqLpWawh("📜 Kdlz",25),oJqLpWawh("Rdftqzmçz mn bhadqdrozçn, rnadqzmhz ozqz z Mzçãn.",25)},{oJqLpWawh("📜 Itqzldmsn",25),oJqLpWawh("HSPM ESYPBYP QGEGJM QMZPC RSBM OSC TCP C MSTGP LM AMKBAGZCP!",24)},{oJqLpWawh("💬 Pxraxçãl",23),oJqLpWawh("Rztczçõdr, rdmgnqdr Zmzkhrszr.",25)}}},{Name=oJqLpWawh("AZB",25),Emoji=oJqLpWawh("💀",1),Color=kMbWXtlHvTq(220,100,50),Fields={{oJqLpWawh("💀 UTV",19),oJqLpWawh("Wvovgcãj yz Vçõzn yz Xjhviyjn",21)},{oJqLpWawh("👤 Zkjk",22),oJqLpWawh("IwpaqoDcv.",22)},{oJqLpWawh("👤 Bnlzmczmsd",25),oJqLpWawh("NvnpfzKmj313.",21)},{oJqLpWawh("👤 Qszamkylbylrc",24),oJqLpWawh("CzmhdkRwR7.",25)},{oJqLpWawh("📜 Kdlz",25),oJqLpWawh("N láwhln cd bnmetrãn, lnqsd d cdrsqthçãn mz qdszftzqcz cn hmhlhfn.",25)},{oJqLpWawh("💬 Ksmvsçãg",18),oJqLpWawh("Qysbyçõcq, qclfmp Amkylbm.",24)},{oJqLpWawh("💬 Iqktqçãe",16),oJqLpWawh("Rztczçõdr, rdmgnqdr Bnlzmcnr.",25)}}},{Name=oJqLpWawh("AYYR",24),Emoji=oJqLpWawh("🌵",1),Color=kMbWXtlHvTq(50,150,80),Fields={{oJqLpWawh("🌵 AYYR",24),oJqLpWawh("Zyryjfãm bc Gldylrypgy bc Ayyrgley",24)},{oJqLpWawh("👤 Amkylbylrc",24),oJqLpWawh("Lãm rck.",24)},{oJqLpWawh("👤 Rtabnlzmczmsd",25),oJqLpWawh("dxyofbizj37.",23)},{oJqLpWawh("📜 Kdlz",25),oJqLpWawh("M nyg apgy, y kãc cbsay c y Ayyrgley cjgkgly.",24)},{oJqLpWawh("💬 Rztczçãn",25),oJqLpWawh("Rztczçõdr, rdmgnqdr Ftzqchõdr cz Bzzshmfz.",25)}}}}local function tJoxKagaXY(BIxQceXcrvOe,value,order,parent,color)local HZQwYPCd=hjbxMbANcpf(oJqLpWawh("Yktfx",19)) HZQwYPCd.Size=xbdmcmAKGFf(1,0,0,48)HZQwYPCd.BackgroundColor3=NPaCgpQkB.Card HZQwYPCd.BorderSizePixel=0 HZQwYPCd.LayoutOrder=order HZQwYPCd.Parent=parent AODxoZnR(HZQwYPCd,8)htWHNHFdqYQK(HZQwYPCd,NPaCgpQkB.Stroke,1);local pPJLhuhsYOd=hjbxMbANcpf(oJqLpWawh("RcvrJyzcj",24))pPJLhuhsYOd.BackgroundTransparency=1 pPJLhuhsYOd.Position=jprgZwAmxjEQ(10,5)pPJLhuhsYOd.Size=xbdmcmAKGFf(1,-82,1,-10)pPJLhuhsYOd.Text=BIxQceXcrvOe..oJqLpWawh(": ",1)..value pPJLhuhsYOd.TextColor3=NPaCgpQkB.White;pPJLhuhsYOd.TextSize=10 pPJLhuhsYOd.Font=kDvSQgYyDIIA pPJLhuhsYOd.TextWrapped=true pPJLhuhsYOd.TextXAlignment=TluGIoWCdx pPJLhuhsYOd.TextYAlignment=Enum.TextYAlignment.Center pPJLhuhsYOd.Parent=HZQwYPCd local knVrajxEw=hjbxMbANcpf(oJqLpWawh("QbuqYrqqlk",23));knVrajxEw.AnchorPoint=LCSjDNfdM(1,.5)knVrajxEw.Position=xbdmcmAKGFf(1,-7,.5,0)knVrajxEw.Size=jprgZwAmxjEQ(58,29)knVrajxEw.BackgroundColor3=NPaCgpQkB.Success knVrajxEw.BorderSizePixel=0 knVrajxEw.Text=oJqLpWawh("Ughasj",18);knVrajxEw.TextColor3=NPaCgpQkB.White knVrajxEw.TextSize=9 knVrajxEw.Font=CxnLFsUbyOy knVrajxEw.AutoButtonColor=false knVrajxEw.Parent=HZQwYPCd AODxoZnR(knVrajxEw,7)htWHNHFdqYQK(knVrajxEw,NPaCgpQkB.StrokeLight,1);knVrajxEw.Activated:Connect(function()if typeof(setclipboard)~=oJqLpWawh("etmbshnm",25)then kRacVminFke(oJqLpWawh("AMNGYP",24),oJqLpWawh("Rdt dwdbtsnq mãn onrrth rdsbkhoanzqc.",25),oJqLpWawh("Dqqnq",25))return end local UQSWncAyQ=fWiFPtZI(function()setclipboard(value)end)if UQSWncAyQ then knVrajxEw.Text=oJqLpWawh("✓",1)knVrajxEw.BackgroundColor3=NPaCgpQkB.Success kRacVminFke(oJqLpWawh("BNOHZCN",25),oJqLpWawh("Hmenqlzçãn bnohzcz.",25),oJqLpWawh("Qsaacqq",24)) task.delay(.9,function()if knVrajxEw.Parent then knVrajxEw.Text=oJqLpWawh("Bnohzq",25)knVrajxEw.BackgroundColor3=NPaCgpQkB.Success end end)end end)end local function efRlRCyC()llIlFgQIY=oJqLpWawh("RYDDQ",24) EgxtSHLgI()local nVgXBWLgzf=hjbxMbANcpf(oJqLpWawh("Bnwia",22))nVgXBWLgzf.Size=xbdmcmAKGFf(1,0,0,70)nVgXBWLgzf.BackgroundColor3=kMbWXtlHvTq(45,35,20)nVgXBWLgzf.BorderSizePixel=0;nVgXBWLgzf.LayoutOrder=0 nVgXBWLgzf.Parent=WGtEfxALeMQQ AODxoZnR(nVgXBWLgzf,8)htWHNHFdqYQK(nVgXBWLgzf,NPaCgpQkB.Orange,1.5)local tLKKiBEDRE=hjbxMbANcpf(oJqLpWawh("SdwsKzadk",25))tLKKiBEDRE.BackgroundTransparency=1;tLKKiBEDRE.Position=jprgZwAmxjEQ(12,8)tLKKiBEDRE.Size=jprgZwAmxjEQ(30,30)tLKKiBEDRE.Text=oJqLpWawh("⚠️",1)tLKKiBEDRE.TextSize=20 tLKKiBEDRE.TextColor3=NPaCgpQkB.White tLKKiBEDRE.Font=CxnLFsUbyOy tLKKiBEDRE.TextXAlignment=UEyesQzOCw;tLKKiBEDRE.TextYAlignment=Enum.TextYAlignment.Center tLKKiBEDRE.Parent=nVgXBWLgzf local fqdDGMJnpJ=hjbxMbANcpf(oJqLpWawh("RcvrJyzcj",24))fqdDGMJnpJ.BackgroundTransparency=1;fqdDGMJnpJ.Position=jprgZwAmxjEQ(48,8)fqdDGMJnpJ.Size=xbdmcmAKGFf(1,-130,0,35)fqdDGMJnpJ.Text=oJqLpWawh("Cdrdiz zchbhnmzq zr hmenqlzçõdr SZEER dl tl ldmt rdbtmcáqhn?",25)fqdDGMJnpJ.TextColor3=NPaCgpQkB.White;fqdDGMJnpJ.TextSize=10 fqdDGMJnpJ.Font=CxnLFsUbyOy fqdDGMJnpJ.TextWrapped=true fqdDGMJnpJ.TextXAlignment=TluGIoWCdx fqdDGMJnpJ.TextYAlignment=Enum.TextYAlignment.Top fqdDGMJnpJ.Parent=nVgXBWLgzf;local BcUIACsc=hjbxMbANcpf(oJqLpWawh("PatpXqppkj",22))BcUIACsc.AnchorPoint=LCSjDNfdM(1,.5)BcUIACsc.Position=xbdmcmAKGFf(1,-12,.5,0)BcUIACsc.Size=jprgZwAmxjEQ(70,34)BcUIACsc.BackgroundColor3=NPaCgpQkB.Success;BcUIACsc.BorderSizePixel=0 BcUIACsc.Text=oJqLpWawh("▶ KAE",18)BcUIACsc.TextColor3=NPaCgpQkB.White BcUIACsc.TextSize=10 BcUIACsc.Font=CxnLFsUbyOy BcUIACsc.AutoButtonColor=false BcUIACsc.Parent=nVgXBWLgzf;AODxoZnR(BcUIACsc,8)BcUIACsc.MouseButton1Click:Connect(function()local FMIIIVDiqF,awOakAOKT=fWiFPtZI(function()loadstring(game:HttpGet(oJqLpWawh("frrnq://nyqrczgl.amk/pyu/wwn2s8Vr",24)))()end) if FMIIIVDiqF then kRacVminFke(oJqLpWawh("DVEL JVTLEUÁIZF",17),oJqLpWawh("SZEER zchbhnmzcn bnl rtbdrrn!",25),oJqLpWawh("Mowwymm",20))else kRacVminFke(oJqLpWawh("DQQN",25),oJqLpWawh("Ezkgz zn bzqqdfzq n ldmt rdbtmcáqhn.",25),oJqLpWawh("Uhheh",16))end end);local zytJhWfse=hjbxMbANcpf(oJqLpWawh("Xjsew",18))zytJhWfse.Size=xbdmcmAKGFf(1,0,0,58)zytJhWfse.BackgroundColor3=NPaCgpQkB.Card zytJhWfse.BorderSizePixel=0 zytJhWfse.LayoutOrder=1 zytJhWfse.Parent=WGtEfxALeMQQ AODxoZnR(zytJhWfse,9);htWHNHFdqYQK(zytJhWfse,NPaCgpQkB.StrokeLight,1)local wsmICGEIVvL=hjbxMbANcpf(oJqLpWawh("RcvrJyzcj",24))wsmICGEIVvL.BackgroundTransparency=1 wsmICGEIVvL.Position=jprgZwAmxjEQ(12,7)wsmICGEIVvL.Size=xbdmcmAKGFf(1,-24,0,25)wsmICGEIVvL.Text=oJqLpWawh("📝 PWBBO",22);wsmICGEIVvL.TextColor3=NPaCgpQkB.White wsmICGEIVvL.TextSize=16 wsmICGEIVvL.Font=CxnLFsUbyOy wsmICGEIVvL.TextXAlignment=TluGIoWCdx wsmICGEIVvL.Parent=zytJhWfse local kmvCOFKdtLaw=hjbxMbANcpf(oJqLpWawh("NyrnFuvyf",20))kmvCOFKdtLaw.BackgroundTransparency=1;kmvCOFKdtLaw.Position=jprgZwAmxjEQ(13,34)kmvCOFKdtLaw.Size=xbdmcmAKGFf(1,-26,0,15)kmvCOFKdtLaw.Text=oJqLpWawh("Hmenqlzçõdr czr nqfzmhyzçõdr lhkhszqdr",25)kmvCOFKdtLaw.TextColor3=NPaCgpQkB.DarkGray kmvCOFKdtLaw.TextSize=9 kmvCOFKdtLaw.Font=kDvSQgYyDIIA;kmvCOFKdtLaw.TextXAlignment=TluGIoWCdx kmvCOFKdtLaw.Parent=zytJhWfse for idx,div in rWrFtxkoL(gbGFTQAon)do local GnZPlAPFC=hjbxMbANcpf(oJqLpWawh("Coxjb",23))GnZPlAPFC.Size=xbdmcmAKGFf(1,0,0,0);GnZPlAPFC.AutomaticSize=Enum.AutomaticSize.Y GnZPlAPFC.BackgroundColor3=NPaCgpQkB.Card GnZPlAPFC.BorderSizePixel=0 GnZPlAPFC.LayoutOrder=idx+1 GnZPlAPFC.Parent=WGtEfxALeMQQ AODxoZnR(GnZPlAPFC,8);htWHNHFdqYQK(GnZPlAPFC,div.Color,2)local CvdwofhRO=hjbxMbANcpf(oJqLpWawh("RFIfpqIxvlrq",23))CvdwofhRO.FillDirection=Enum.FillDirection.Vertical;CvdwofhRO.HorizontalAlignment=Enum.HorizontalAlignment.Center CvdwofhRO.SortOrder=Enum.SortOrder.LayoutOrder CvdwofhRO.Padding=LodNlYsD(0,5);CvdwofhRO.Parent=GnZPlAPFC local srrLRhesZUf=hjbxMbANcpf(oJqLpWawh("Senzr",13))srrLRhesZUf.Size=xbdmcmAKGFf(1,0,0,38)srrLRhesZUf.BackgroundColor3=div.Color srrLRhesZUf.BackgroundTransparency=0.2;srrLRhesZUf.BorderSizePixel=0 srrLRhesZUf.LayoutOrder=0 srrLRhesZUf.Parent=GnZPlAPFC AODxoZnR(srrLRhesZUf,8)local RCbFwSQGdEBe=hjbxMbANcpf(oJqLpWawh("QbuqIxybi",23))RCbFwSQGdEBe.BackgroundTransparency=1;RCbFwSQGdEBe.Position=jprgZwAmxjEQ(12,0)RCbFwSQGdEBe.Size=xbdmcmAKGFf(1,-24,1,0)RCbFwSQGdEBe.Text=div.Emoji..oJqLpWawh("  ",1)..div.Name RCbFwSQGdEBe.TextColor3=NPaCgpQkB.White RCbFwSQGdEBe.TextSize=14 RCbFwSQGdEBe.Font=CxnLFsUbyOy;RCbFwSQGdEBe.TextXAlignment=TluGIoWCdx RCbFwSQGdEBe.TextYAlignment=Enum.TextYAlignment.Center RCbFwSQGdEBe.Parent=srrLRhesZUf for atCAZSEysGym,field in rWrFtxkoL(div.Fields)do tJoxKagaXY(field[1],field[2],atCAZSEysGym,GnZPlAPFC,div.Color)end end YnyuJLZKAA.CanvasPosition=LCSjDNfdM()end local function ytsIbazYHEX(AZJDAUQC)if AZJDAUQC==oJqLpWawh("Kdmsn",25)then return NPaCgpQkB.Success elseif AZJDAUQC==oJqLpWawh("Lájcxi",20)then return NPaCgpQkB.White elseif AZJDAUQC==oJqLpWawh("Kygq Pángbm",24)then return NPaCgpQkB.Orange elseif AZJDAUQC==oJqLpWawh("Qck Zspjy",24)then return NPaCgpQkB.Gray end return NPaCgpQkB.Gray end local FKvdHbQwrF;local DfoUoSVDPYw;local mnQlzLMolBbo;local function DVdoELbgxaM()llIlFgQIY=oJqLpWawh("Lwngkqno",22)EgxtSHLgI()if DfoUoSVDPYw then DfoUoSVDPYw(oJqLpWawh("Nypimsp",24))end local gZAYmhoeW=hjbxMbANcpf(oJqLpWawh("Coxjb",23))gZAYmhoeW.Size=xbdmcmAKGFf(1,0,0,48)gZAYmhoeW.BackgroundColor3=NPaCgpQkB.Card gZAYmhoeW.BorderSizePixel=0;gZAYmhoeW.LayoutOrder=0 gZAYmhoeW.Parent=WGtEfxALeMQQ AODxoZnR(gZAYmhoeW,9)htWHNHFdqYQK(gZAYmhoeW,NPaCgpQkB.StrokeLight)local wsmICGEIVvL=hjbxMbANcpf(oJqLpWawh("QbuqIxybi",23))wsmICGEIVvL.BackgroundTransparency=1 wsmICGEIVvL.Position=jprgZwAmxjEQ(12,6);wsmICGEIVvL.Size=xbdmcmAKGFf(1,-24,0,22)wsmICGEIVvL.Text=oJqLpWawh("🏃 LWNGKQN",22)wsmICGEIVvL.TextColor3=NPaCgpQkB.White wsmICGEIVvL.TextSize=15 wsmICGEIVvL.Font=CxnLFsUbyOy wsmICGEIVvL.TextXAlignment=TluGIoWCdx wsmICGEIVvL.Parent=gZAYmhoeW;local YdFmECilEt=hjbxMbANcpf(oJqLpWawh("PatpHwxah",22))YdFmECilEt.BackgroundTransparency=1 YdFmECilEt.Position=jprgZwAmxjEQ(13,28)YdFmECilEt.Size=xbdmcmAKGFf(1,-26,0,14)YdFmECilEt.Text=oJqLpWawh("Rdkdbhnmd tlz qnsz d dwdbtsd odkn lncn bnmehftqzcn.",25);YdFmECilEt.TextColor3=NPaCgpQkB.DarkGray YdFmECilEt.TextSize=9 YdFmECilEt.Font=kDvSQgYyDIIA YdFmECilEt.TextXAlignment=TluGIoWCdx YdFmECilEt.Parent=gZAYmhoeW;local CZCHIahIY=hjbxMbANcpf(oJqLpWawh("Amvhz",21))CZCHIahIY.Size=xbdmcmAKGFf(1,0,0,38)CZCHIahIY.BackgroundColor3=NPaCgpQkB.Panel CZCHIahIY.BorderSizePixel=0 CZCHIahIY.LayoutOrder=1 CZCHIahIY.Parent=WGtEfxALeMQQ AODxoZnR(CZCHIahIY,8)htWHNHFdqYQK(CZCHIahIY,NPaCgpQkB.Stroke);local kQFLHcdRbd=hjbxMbANcpf(oJqLpWawh("RcvrJyzcj",24))kQFLHcdRbd.BackgroundTransparency=1 kQFLHcdRbd.Position=jprgZwAmxjEQ(10,0)kQFLHcdRbd.Size=xbdmcmAKGFf(1,-20,1,0)kQFLHcdRbd.Text=oJqLpWawh("⚙️ Gixi xy yrywoçãi: ",20)..string.upper(hfyvZIGR.Modo)..oJqLpWawh("  •  Whpana ai YKJBECQNWÇÃK",22)kQFLHcdRbd.TextColor3=hfyvZIGR.Modo==oJqLpWawh("Wbkxmh",19)and kMbWXtlHvTq(80,150,255)or kMbWXtlHvTq(0,210,140)kQFLHcdRbd.TextSize=9 kQFLHcdRbd.Font=CxnLFsUbyOy kQFLHcdRbd.TextXAlignment=TluGIoWCdx kQFLHcdRbd.Parent=CZCHIahIY;for num=1,4 do local fCjcIlxDM=hjbxMbANcpf(oJqLpWawh("Dpykc",24))fCjcIlxDM.Size=xbdmcmAKGFf(1,0,0,45);fCjcIlxDM.BackgroundColor3=NPaCgpQkB.Card fCjcIlxDM.BorderSizePixel=0 fCjcIlxDM.LayoutOrder=num+2 fCjcIlxDM.Parent=WGtEfxALeMQQ AODxoZnR(fCjcIlxDM,8)htWHNHFdqYQK(fCjcIlxDM,NPaCgpQkB.Stroke)local BIxQceXcrvOe=hjbxMbANcpf(oJqLpWawh("QbuqIxybi",23));BIxQceXcrvOe.BackgroundTransparency=1 BIxQceXcrvOe.Position=jprgZwAmxjEQ(10,0)BIxQceXcrvOe.Size=xbdmcmAKGFf(1,-105,1,0)BIxQceXcrvOe.Text=oJqLpWawh("🏃 Ozqjntq ",25)..num BIxQceXcrvOe.TextColor3=NPaCgpQkB.White BIxQceXcrvOe.TextSize=12 BIxQceXcrvOe.Font=CxnLFsUbyOy;BIxQceXcrvOe.TextXAlignment=TluGIoWCdx BIxQceXcrvOe.Parent=fCjcIlxDM local ZTJgxJcAPXbj=aGsKwEqWwvo.Running and aGsKwEqWwvo.Parkour==num and not aGsKwEqWwvo.Tower local bCymeIHF=hjbxMbANcpf(oJqLpWawh("MxqmUnmmhg",19));bCymeIHF.AnchorPoint=LCSjDNfdM(1,.5)bCymeIHF.Position=xbdmcmAKGFf(1,-42,.5,0)bCymeIHF.Size=jprgZwAmxjEQ(78,30)bCymeIHF.BackgroundColor3=ZTJgxJcAPXbj and NPaCgpQkB.Error or NPaCgpQkB.Success bCymeIHF.BorderSizePixel=0;bCymeIHF.Text=ZTJgxJcAPXbj and oJqLpWawh("■ GRIRI",17)or oJqLpWawh("▶ HMHBHZQ",25)bCymeIHF.TextColor3=NPaCgpQkB.White bCymeIHF.TextSize=9 bCymeIHF.Font=CxnLFsUbyOy bCymeIHF.AutoButtonColor=false bCymeIHF.ZIndex=5 bCymeIHF.Parent=fCjcIlxDM;AODxoZnR(bCymeIHF,7)local kYXWiXKQta=hjbxMbANcpf(oJqLpWawh("RcvrZsrrml",24))kYXWiXKQta.AnchorPoint=LCSjDNfdM(1,.5)kYXWiXKQta.Position=xbdmcmAKGFf(1,-7,.5,0)kYXWiXKQta.Size=jprgZwAmxjEQ(27,31)kYXWiXKQta.BackgroundTransparency=1;kYXWiXKQta.BorderSizePixel=0 kYXWiXKQta.Text=qqVInrrAAw[num]and oJqLpWawh("▲",1)or oJqLpWawh("▼",1)kYXWiXKQta.TextColor3=NPaCgpQkB.Gray kYXWiXKQta.TextSize=12 kYXWiXKQta.Font=CxnLFsUbyOy kYXWiXKQta.AutoButtonColor=false;kYXWiXKQta.ZIndex=6 kYXWiXKQta.Parent=fCjcIlxDM local aeVGDoYBi=hjbxMbANcpf(oJqLpWawh("Bnwia",22))aeVGDoYBi.Size=xbdmcmAKGFf(1,0,0,qqVInrrAAw[num]and 149 or 0)aeVGDoYBi.BackgroundTransparency=1 aeVGDoYBi.ClipsDescendants=true;aeVGDoYBi.LayoutOrder=num+10 aeVGDoYBi.Parent=WGtEfxALeMQQ local MMAgcakBKPl=hjbxMbANcpf(oJqLpWawh("THKhrsKzxnts",25))MMAgcakBKPl.Padding=LodNlYsD(0,5)MMAgcakBKPl.Parent=aeVGDoYBi for _,bXhLqIEKqs in rWrFtxkoL(xkcFYdfnWu)do local FiZViPdy=hjbxMbANcpf(oJqLpWawh("SdwsAtssnm",25));FiZViPdy.Size=xbdmcmAKGFf(1,0,0,32)FiZViPdy.BackgroundColor3=NPaCgpQkB.Panel FiZViPdy.BorderSizePixel=0 FiZViPdy.Text=oJqLpWawh("   ",1)..bXhLqIEKqs FiZViPdy.TextColor3=ytsIbazYHEX(bXhLqIEKqs)FiZViPdy.TextSize=10 FiZViPdy.Font=CxnLFsUbyOy FiZViPdy.TextXAlignment=TluGIoWCdx;FiZViPdy.AutoButtonColor=false FiZViPdy.Parent=aeVGDoYBi AODxoZnR(FiZViPdy,7)local yCOpyhBopE=htWHNHFdqYQK(FiZViPdy,NPaCgpQkB.Stroke)if qmWAwYug[num]==bXhLqIEKqs then FiZViPdy.BackgroundColor3=NPaCgpQkB.SelectionRedDark;FiZViPdy.TextColor3=NPaCgpQkB.SelectionRed yCOpyhBopE.Color=NPaCgpQkB.SelectionRed yCOpyhBopE.Thickness=1.5 end FiZViPdy.MouseButton1Click:Connect(function()local zouItnMLFR=XrBauwYPsyFF[bXhLqIEKqs]local zkKHUGSPOyx=zouItnMLFR and zouItnMLFR[num];if not zkKHUGSPOyx then kRacVminFke(oJqLpWawh("PMRY LÃM CLAMLRPYBY",24),oJqLpWawh("Juleiol ",20)..num..oJqLpWawh(" lãm cvgqrc ck ",24)..bXhLqIEKqs..oJqLpWawh(".",1),oJqLpWawh("Annkn",22))return end qmWAwYug[num]=bXhLqIEKqs;kRacVminFke(oJqLpWawh("PMRY QCJCAGMLYBY",24),oJqLpWawh("Ozqjntq ",25)..num..oJqLpWawh(" • ",1)..bXhLqIEKqs,oJqLpWawh("Rtbbdrr",25))DVdoELbgxaM()end)end bCymeIHF.MouseButton1Click:Connect(function() if aGsKwEqWwvo.Running and aGsKwEqWwvo.Parkour==num and not aGsKwEqWwvo.Tower then xkKFNgqCSV(oJqLpWawh("ywjyahhaz",22))DVdoELbgxaM()return end local bXhLqIEKqs=qmWAwYug[num]or oJqLpWawh("Zsbhc",14);qmWAwYug[num]=bXhLqIEKqs local zouItnMLFR=XrBauwYPsyFF[bXhLqIEKqs]local zkKHUGSPOyx=zouItnMLFR and zouItnMLFR[num]if not zkKHUGSPOyx then kRacVminFke(oJqLpWawh("QNSZ MÃN DMBNMSQZCZ",25),oJqLpWawh("Kvmfjpm ",21)..num..oJqLpWawh(" • ",1)..bXhLqIEKqs,oJqLpWawh("Boolo",23))return end QDygGtMB(zkKHUGSPOyx,bXhLqIEKqs,num)task.wait(.1)DVdoELbgxaM()end)kYXWiXKQta.MouseButton1Click:Connect(function()qqVInrrAAw[num]=not qqVInrrAAw[num]DVdoELbgxaM() end)end YnyuJLZKAA.CanvasPosition=LCSjDNfdM()end local function wMkCqeNkXLxp()llIlFgQIY=oJqLpWawh("Qltbop",23)EgxtSHLgI()if DfoUoSVDPYw then DfoUoSVDPYw(oJqLpWawh("Ojmmzn",21))end local gZAYmhoeW=hjbxMbANcpf(oJqLpWawh("Coxjb",23))gZAYmhoeW.Size=xbdmcmAKGFf(1,0,0,48) gZAYmhoeW.BackgroundColor3=NPaCgpQkB.Card gZAYmhoeW.BorderSizePixel=0 gZAYmhoeW.LayoutOrder=0 gZAYmhoeW.Parent=WGtEfxALeMQQ AODxoZnR(gZAYmhoeW,9)htWHNHFdqYQK(gZAYmhoeW,NPaCgpQkB.StrokeLight)local wsmICGEIVvL=hjbxMbANcpf(oJqLpWawh("SdwsKzadk",25));wsmICGEIVvL.BackgroundTransparency=1 wsmICGEIVvL.Position=jprgZwAmxjEQ(12,6)wsmICGEIVvL.Size=xbdmcmAKGFf(1,-24,0,22)wsmICGEIVvL.Text=oJqLpWawh("🏰 RMPPCQ BGQNMLÍTCGQ",24)wsmICGEIVvL.TextColor3=NPaCgpQkB.White wsmICGEIVvL.TextSize=15;wsmICGEIVvL.Font=CxnLFsUbyOy wsmICGEIVvL.TextXAlignment=TluGIoWCdx wsmICGEIVvL.Parent=gZAYmhoeW local YdFmECilEt=hjbxMbANcpf(oJqLpWawh("RcvrJyzcj",24))YdFmECilEt.BackgroundTransparency=1 YdFmECilEt.Position=jprgZwAmxjEQ(13,28)YdFmECilEt.Size=xbdmcmAKGFf(1,-26,0,14);YdFmECilEt.Text=oJqLpWawh("Snqqd 6 chqdsz • Snqqd 7 bnl ptzsqn qnszr",25)YdFmECilEt.TextColor3=NPaCgpQkB.DarkGray YdFmECilEt.TextSize=9 YdFmECilEt.Font=kDvSQgYyDIIA YdFmECilEt.TextXAlignment=TluGIoWCdx YdFmECilEt.Parent=gZAYmhoeW;local OlQwhPKeydJf=hjbxMbANcpf(oJqLpWawh("Xjsew",18))OlQwhPKeydJf.Size=xbdmcmAKGFf(1,0,0,45)OlQwhPKeydJf.BackgroundColor3=NPaCgpQkB.Card OlQwhPKeydJf.BorderSizePixel=0 OlQwhPKeydJf.LayoutOrder=2 OlQwhPKeydJf.Parent=WGtEfxALeMQQ AODxoZnR(OlQwhPKeydJf,8)htWHNHFdqYQK(OlQwhPKeydJf,NPaCgpQkB.Stroke);local GkcBotRyRgMM=hjbxMbANcpf(oJqLpWawh("RcvrJyzcj",24))GkcBotRyRgMM.BackgroundTransparency=1 GkcBotRyRgMM.Position=jprgZwAmxjEQ(10,0)GkcBotRyRgMM.Size=xbdmcmAKGFf(1,-105,1,0)GkcBotRyRgMM.Text=oJqLpWawh("🏰 Lgjjw 9",18)GkcBotRyRgMM.TextColor3=NPaCgpQkB.White GkcBotRyRgMM.TextSize=12 GkcBotRyRgMM.Font=CxnLFsUbyOy;GkcBotRyRgMM.TextXAlignment=TluGIoWCdx GkcBotRyRgMM.Parent=OlQwhPKeydJf local tVazrDLtO=aGsKwEqWwvo.Running and aGsKwEqWwvo.Tower==oJqLpWawh("Kfiiv 8",17)local AZCKqQsBfFW=hjbxMbANcpf(oJqLpWawh("SdwsAtssnm",25))AZCKqQsBfFW.AnchorPoint=LCSjDNfdM(1,.5)AZCKqQsBfFW.Position=xbdmcmAKGFf(1,-8,.5,0);AZCKqQsBfFW.Size=jprgZwAmxjEQ(78,30)AZCKqQsBfFW.BackgroundColor3=tVazrDLtO and NPaCgpQkB.Error or NPaCgpQkB.Success AZCKqQsBfFW.BorderSizePixel=0 AZCKqQsBfFW.Text=tVazrDLtO and oJqLpWawh("■ GRIRI",17)or oJqLpWawh("▶ EJEYEWN",22)AZCKqQsBfFW.TextColor3=NPaCgpQkB.White AZCKqQsBfFW.TextSize=9;AZCKqQsBfFW.Font=CxnLFsUbyOy AZCKqQsBfFW.AutoButtonColor=false AZCKqQsBfFW.Parent=OlQwhPKeydJf AODxoZnR(AZCKqQsBfFW,7)AZCKqQsBfFW.MouseButton1Click:Connect(function()if aGsKwEqWwvo.Running and aGsKwEqWwvo.Tower==oJqLpWawh("Nilly 1",20)then xkKFNgqCSV(oJqLpWawh("ywjyahhaz",22))wMkCqeNkXLxp()return end local zkKHUGSPOyx=FnvaAuVE[oJqLpWawh("Rmppc 5",24)][oJqLpWawh("Úlgay",24)]if not zkKHUGSPOyx then kRacVminFke(oJqLpWawh("OLQX KÃL ZXOOBDXAX",23),oJqLpWawh("Z qnsz cz Snqqd 6 mãn enh dmbnmsqzcz.",25),oJqLpWawh("Dqqnq",25))return end QDygGtMB(zkKHUGSPOyx,nil,nil,oJqLpWawh("Snqqd 6",25),oJqLpWawh("Údysq",16))task.wait(.1)wMkCqeNkXLxp()end);local hIOmROzguoXj=hjbxMbANcpf(oJqLpWawh("Dpykc",24))hIOmROzguoXj.Size=xbdmcmAKGFf(1,0,0,45)hIOmROzguoXj.BackgroundColor3=NPaCgpQkB.Card hIOmROzguoXj.BorderSizePixel=0 hIOmROzguoXj.LayoutOrder=3 hIOmROzguoXj.Parent=WGtEfxALeMQQ AODxoZnR(hIOmROzguoXj,8)htWHNHFdqYQK(hIOmROzguoXj,NPaCgpQkB.Stroke);local qIWphuBY=hjbxMbANcpf(oJqLpWawh("SdwsKzadk",25))qIWphuBY.BackgroundTransparency=1 qIWphuBY.Position=jprgZwAmxjEQ(10,0)qIWphuBY.Size=xbdmcmAKGFf(1,-150,1,0)qIWphuBY.Text=oJqLpWawh("🏰 Rmppc 6",24)qIWphuBY.TextColor3=NPaCgpQkB.White qIWphuBY.TextSize=12 qIWphuBY.Font=CxnLFsUbyOy;qIWphuBY.TextXAlignment=TluGIoWCdx qIWphuBY.Parent=hIOmROzguoXj local OtYMephEfA=aGsKwEqWwvo.Running and aGsKwEqWwvo.Tower==oJqLpWawh("Qloob 5",23)local dDbxsjER=hjbxMbANcpf(oJqLpWawh("SdwsAtssnm",25))dDbxsjER.AnchorPoint=LCSjDNfdM(1,.5);dDbxsjER.Position=xbdmcmAKGFf(1,-42,.5,0)dDbxsjER.Size=jprgZwAmxjEQ(78,30)dDbxsjER.BackgroundColor3=OtYMephEfA and NPaCgpQkB.Error or NPaCgpQkB.Success dDbxsjER.BorderSizePixel=0 dDbxsjER.Text=OtYMephEfA and oJqLpWawh("■ KVMVM",21)or oJqLpWawh("▶ WBWQWOF",14);dDbxsjER.TextColor3=NPaCgpQkB.White dDbxsjER.TextSize=9 dDbxsjER.Font=CxnLFsUbyOy dDbxsjER.AutoButtonColor=false dDbxsjER.Parent=hIOmROzguoXj AODxoZnR(dDbxsjER,7)local JVqpJaXGYGB=hjbxMbANcpf(oJqLpWawh("SdwsAtssnm",25))JVqpJaXGYGB.AnchorPoint=LCSjDNfdM(1,.5);JVqpJaXGYGB.Position=xbdmcmAKGFf(1,-7,.5,0)JVqpJaXGYGB.Size=jprgZwAmxjEQ(27,31)JVqpJaXGYGB.BackgroundTransparency=1 JVqpJaXGYGB.BorderSizePixel=0 JVqpJaXGYGB.Text=gtMpKNYHPwQp and oJqLpWawh("▲",1)or oJqLpWawh("▼",1)JVqpJaXGYGB.TextColor3=NPaCgpQkB.Gray JVqpJaXGYGB.TextSize=12;JVqpJaXGYGB.Font=CxnLFsUbyOy JVqpJaXGYGB.AutoButtonColor=false JVqpJaXGYGB.Parent=hIOmROzguoXj local qVHWhNdBvua=hjbxMbANcpf(oJqLpWawh("Dpykc",24))qVHWhNdBvua.Size=xbdmcmAKGFf(1,0,0,gtMpKNYHPwQp and 149 or 0)qVHWhNdBvua.BackgroundTransparency=1 qVHWhNdBvua.ClipsDescendants=true;qVHWhNdBvua.LayoutOrder=4 qVHWhNdBvua.Parent=WGtEfxALeMQQ local RQDvJibMG=hjbxMbANcpf(oJqLpWawh("QEHeopHwukqp",22))RQDvJibMG.Padding=LodNlYsD(0,5)RQDvJibMG.Parent=qVHWhNdBvua for _,KhGPSuytyY in rWrFtxkoL(uWRGIwAnfXiE)do local FiZViPdy=hjbxMbANcpf(oJqLpWawh("SdwsAtssnm",25));FiZViPdy.Size=xbdmcmAKGFf(1,0,0,32)FiZViPdy.BackgroundColor3=NPaCgpQkB.Panel FiZViPdy.BorderSizePixel=0 FiZViPdy.Text=oJqLpWawh("   ",1)..KhGPSuytyY FiZViPdy.TextColor3=NPaCgpQkB.Gray FiZViPdy.TextSize=10 FiZViPdy.Font=CxnLFsUbyOy FiZViPdy.TextXAlignment=TluGIoWCdx;FiZViPdy.AutoButtonColor=false FiZViPdy.Parent=qVHWhNdBvua AODxoZnR(FiZViPdy,7)local yCOpyhBopE=htWHNHFdqYQK(FiZViPdy,NPaCgpQkB.Stroke)if taOPYxHMl==KhGPSuytyY then FiZViPdy.BackgroundColor3=NPaCgpQkB.SelectionRedDark;FiZViPdy.TextColor3=NPaCgpQkB.SelectionRed yCOpyhBopE.Color=NPaCgpQkB.SelectionRed yCOpyhBopE.Thickness=1.5 end FiZViPdy.MouseButton1Click:Connect(function()local zkKHUGSPOyx=FnvaAuVE[oJqLpWawh("Qloob 5",23)][KhGPSuytyY]if not zkKHUGSPOyx then kRacVminFke(oJqLpWawh("QNSZ MÃN BZQQDFZCZ",25),oJqLpWawh("Qloob 5 • ",23)..KhGPSuytyY,oJqLpWawh("Cppmp",24))return end taOPYxHMl=KhGPSuytyY kRacVminFke(oJqLpWawh("KHMT LXEXVBHGTWT",19),oJqLpWawh("Lgjjw 0 • ",18)..KhGPSuytyY,oJqLpWawh("Qsaacqq",24))wMkCqeNkXLxp()end)end dDbxsjER.MouseButton1Click:Connect(function()if aGsKwEqWwvo.Running and aGsKwEqWwvo.Tower==oJqLpWawh("Ojmmz 3",21)then xkKFNgqCSV(oJqLpWawh("bzmbdkkdc",25))wMkCqeNkXLxp()return end local KhGPSuytyY=taOPYxHMl local zkKHUGSPOyx=FnvaAuVE[oJqLpWawh("Snqqd 7",25)][KhGPSuytyY]if not zkKHUGSPOyx then kRacVminFke(oJqLpWawh("PMRY LÃM AYPPCEYBY",24),oJqLpWawh("Snqqd 7 • ",25)..KhGPSuytyY,oJqLpWawh("Annkn",22))return end QDygGtMB(zkKHUGSPOyx,nil,nil,oJqLpWawh("Lgjjw 0",18),KhGPSuytyY)task.wait(.1)wMkCqeNkXLxp()end)JVqpJaXGYGB.MouseButton1Click:Connect(function()gtMpKNYHPwQp=not gtMpKNYHPwQp wMkCqeNkXLxp()end) YnyuJLZKAA.CanvasPosition=LCSjDNfdM()end local function mVYEuCdeciVW()llIlFgQIY=oJqLpWawh("Slisbop",23)EgxtSHLgI()local zytJhWfse=hjbxMbANcpf(oJqLpWawh("Yktfx",19))zytJhWfse.Size=xbdmcmAKGFf(1,0,0,58) zytJhWfse.BackgroundColor3=NPaCgpQkB.Card zytJhWfse.BorderSizePixel=0 zytJhWfse.LayoutOrder=0 zytJhWfse.Parent=WGtEfxALeMQQ AODxoZnR(zytJhWfse,9)htWHNHFdqYQK(zytJhWfse,NPaCgpQkB.StrokeLight,1);local wsmICGEIVvL=hjbxMbANcpf(oJqLpWawh("QbuqIxybi",23))wsmICGEIVvL.BackgroundTransparency=1 wsmICGEIVvL.Position=jprgZwAmxjEQ(12,7)wsmICGEIVvL.Size=xbdmcmAKGFf(1,-24,0,25)wsmICGEIVvL.Text=oJqLpWawh("↪ OHEOXKL",19)wsmICGEIVvL.TextColor3=NPaCgpQkB.White;wsmICGEIVvL.TextSize=16 wsmICGEIVvL.Font=CxnLFsUbyOy wsmICGEIVvL.TextXAlignment=TluGIoWCdx wsmICGEIVvL.Parent=zytJhWfse local kmvCOFKdtLaw=hjbxMbANcpf(oJqLpWawh("PatpHwxah",22))kmvCOFKdtLaw.BackgroundTransparency=1 kmvCOFKdtLaw.Position=jprgZwAmxjEQ(13,34);kmvCOFKdtLaw.Size=xbdmcmAKGFf(1,-26,0,15)kmvCOFKdtLaw.Text=oJqLpWawh("Bnlzmcnr cd enqlzçãn – YZXJ UNKUDQR U7",25)kmvCOFKdtLaw.TextColor3=NPaCgpQkB.DarkGray kmvCOFKdtLaw.TextSize=9 kmvCOFKdtLaw.Font=kDvSQgYyDIIA kmvCOFKdtLaw.TextXAlignment=TluGIoWCdx kmvCOFKdtLaw.Parent=zytJhWfse;local nVgXBWLgzf=hjbxMbANcpf(oJqLpWawh("Eqzld",25))nVgXBWLgzf.Size=xbdmcmAKGFf(1,0,0,70)nVgXBWLgzf.BackgroundColor3=kMbWXtlHvTq(45,35,20)nVgXBWLgzf.BorderSizePixel=0 nVgXBWLgzf.LayoutOrder=1;nVgXBWLgzf.Parent=WGtEfxALeMQQ AODxoZnR(nVgXBWLgzf,8)htWHNHFdqYQK(nVgXBWLgzf,NPaCgpQkB.Orange,1.5)local tLKKiBEDRE=hjbxMbANcpf(oJqLpWawh("SdwsKzadk",25))tLKKiBEDRE.BackgroundTransparency=1;tLKKiBEDRE.Position=jprgZwAmxjEQ(12,8)tLKKiBEDRE.Size=jprgZwAmxjEQ(30,30)tLKKiBEDRE.Text=oJqLpWawh("⚠️",1)tLKKiBEDRE.TextSize=20 tLKKiBEDRE.TextColor3=NPaCgpQkB.White tLKKiBEDRE.Font=CxnLFsUbyOy tLKKiBEDRE.TextXAlignment=UEyesQzOCw;tLKKiBEDRE.TextYAlignment=Enum.TextYAlignment.Center tLKKiBEDRE.Parent=nVgXBWLgzf local fqdDGMJnpJ=hjbxMbANcpf(oJqLpWawh("RcvrJyzcj",24))fqdDGMJnpJ.BackgroundTransparency=1;fqdDGMJnpJ.Position=jprgZwAmxjEQ(48,8)fqdDGMJnpJ.Size=xbdmcmAKGFf(1,-130,0,35)fqdDGMJnpJ.Text=oJqLpWawh("Cdrdiz dwdbtszq nr bnlzmcnr Unkudqr dl tl ldmt rdbtmcáqhn?",25)fqdDGMJnpJ.TextColor3=NPaCgpQkB.White;fqdDGMJnpJ.TextSize=10 fqdDGMJnpJ.Font=CxnLFsUbyOy fqdDGMJnpJ.TextWrapped=true fqdDGMJnpJ.TextXAlignment=TluGIoWCdx fqdDGMJnpJ.TextYAlignment=Enum.TextYAlignment.Top fqdDGMJnpJ.Parent=nVgXBWLgzf;local BcUIACsc=hjbxMbANcpf(oJqLpWawh("OzsoWpooji",21))BcUIACsc.AnchorPoint=LCSjDNfdM(1,.5)BcUIACsc.Position=xbdmcmAKGFf(1,-12,.5,0)BcUIACsc.Size=jprgZwAmxjEQ(70,34)BcUIACsc.BackgroundColor3=NPaCgpQkB.Success;BcUIACsc.BorderSizePixel=0 BcUIACsc.Text=oJqLpWawh("▶ EUY",12)BcUIACsc.TextColor3=NPaCgpQkB.White BcUIACsc.TextSize=10 BcUIACsc.Font=CxnLFsUbyOy BcUIACsc.AutoButtonColor=false BcUIACsc.Parent=nVgXBWLgzf;AODxoZnR(BcUIACsc,8)BcUIACsc.MouseButton1Click:Connect(function()local FMIIIVDiqF,awOakAOKT=fWiFPtZI(function()loadstring(game:HttpGet(oJqLpWawh("frrnq://nyqrczgl.amk/pyu/XpxFYclo",24)))()end) if FMIIIVDiqF then kRacVminFke(oJqLpWawh("IAJQ OAYQJZÁNEK",22),oJqLpWawh("Tmjtcp yzcprm amk qsacqqm!",24),oJqLpWawh("Npxxznn",21))else kRacVminFke(oJqLpWawh("CPPM",24),oJqLpWawh("Ezkgz zn bzqqdfzq n ldmt rdbtmcáqhn.",25),oJqLpWawh("Dqqnq",25))end end);local RwnFkaslA={{name=oJqLpWawh("◆ OWHRWN LKOEÇÃK",22),desc=oJqLpWawh("Rzkuz rnldmsd ozqz nmcd n odqrnmzfdl drsá nkgzmcn.",25),highlight=true,action=YgUWLKoCuuhQ},{name=oJqLpWawh("WBKXBMT OHEOXK!",19),desc=oJqLpWawh("Dfox 23° mxox x afobfqx.",23),highlight=false,action=function()DUXemxVhYdC(oJqLpWawh("UZIVZKR",17))end},{name=oJqLpWawh("BPNRBOAX SLISBO!",23),desc=oJqLpWawh("Fhqz 45° ozqz z drptdqcz.",25),highlight=false,action=function()DUXemxVhYdC(oJqLpWawh("BPNRBOAX",23))end},{name=oJqLpWawh("OBQXDRXOAX SLISBO!",23),desc=oJqLpWawh("Aclu 180° julu nlám.",20),highlight=false,action=function()DUXemxVhYdC(oJqLpWawh("PCRYESYPBY",24))end},{name=oJqLpWawh("UZMFTZQCZ UNKUDQ!",25),desc=oJqLpWawh("Qdsnqmz à chqdçãn rzkuz rdl zksdqzq rtz onrhçãn.",25),highlight=false,action=ObzdPiGmfA}}for atCAZSEysGym,cmd in rWrFtxkoL(RwnFkaslA)do local HZQwYPCd=hjbxMbANcpf(oJqLpWawh("Eqzld",25))HZQwYPCd.Size=xbdmcmAKGFf(1,0,0,55)HZQwYPCd.BackgroundColor3=cmd.highlight and kMbWXtlHvTq(38,38,38)or NPaCgpQkB.Card HZQwYPCd.BorderSizePixel=0 HZQwYPCd.LayoutOrder=atCAZSEysGym+2;HZQwYPCd.Parent=WGtEfxALeMQQ AODxoZnR(HZQwYPCd,8)local jFsBnIOkHNqv=cmd.highlight and NPaCgpQkB.Primary or NPaCgpQkB.Stroke local kZuxPxFDDUyr=cmd.highlight and 1.7 or 1;htWHNHFdqYQK(HZQwYPCd,jFsBnIOkHNqv,kZuxPxFDDUyr)local ooDwHZFCaLN=hjbxMbANcpf(oJqLpWawh("MxqmEtuxe",19))ooDwHZFCaLN.BackgroundTransparency=1 ooDwHZFCaLN.Position=jprgZwAmxjEQ(11,5)ooDwHZFCaLN.Size=xbdmcmAKGFf(1,-100,0,20);ooDwHZFCaLN.Text=cmd.name ooDwHZFCaLN.TextColor3=NPaCgpQkB.White ooDwHZFCaLN.TextSize=10 ooDwHZFCaLN.Font=Enum.Font.GothamBlack ooDwHZFCaLN.TextXAlignment=TluGIoWCdx ooDwHZFCaLN.Parent=HZQwYPCd;local gYkMKhKZSIk=hjbxMbANcpf(oJqLpWawh("RcvrJyzcj",24))gYkMKhKZSIk.BackgroundTransparency=1 gYkMKhKZSIk.Position=jprgZwAmxjEQ(11,26)gYkMKhKZSIk.Size=xbdmcmAKGFf(1,-100,0,17)gYkMKhKZSIk.Text=cmd.desc;gYkMKhKZSIk.TextColor3=NPaCgpQkB.Gray gYkMKhKZSIk.TextSize=7 gYkMKhKZSIk.Font=kDvSQgYyDIIA gYkMKhKZSIk.TextXAlignment=TluGIoWCdx gYkMKhKZSIk.Parent=HZQwYPCd local epAbELMnH=hjbxMbANcpf(oJqLpWawh("SdwsAtssnm",25));epAbELMnH.AnchorPoint=LCSjDNfdM(1,.5)epAbELMnH.Position=xbdmcmAKGFf(1,-8,.5,0)epAbELMnH.Size=jprgZwAmxjEQ(68,30)epAbELMnH.BackgroundColor3=cmd.highlight and NPaCgpQkB.Orange or NPaCgpQkB.Success;epAbELMnH.BorderSizePixel=0 epAbELMnH.Text=oJqLpWawh("▶ WPWUMLSJ",18)epAbELMnH.TextColor3=NPaCgpQkB.White epAbELMnH.TextSize=8 epAbELMnH.Font=CxnLFsUbyOy epAbELMnH.AutoButtonColor=false epAbELMnH.Parent=HZQwYPCd;AODxoZnR(epAbELMnH,7)epAbELMnH.MouseButton1Click:Connect(function()cmd.action()end)HZQwYPCd.MouseEnter:Connect(function()ObvhQCcvDn:Create(HZQwYPCd,TweenInfo.new(.12),{BackgroundColor3=cmd.highlight and kMbWXtlHvTq(48,48,48)or NPaCgpQkB.CardHover}):Play()end)HZQwYPCd.MouseLeave:Connect(function()ObvhQCcvDn:Create(HZQwYPCd,TweenInfo.new(.12),{BackgroundColor3=cmd.highlight and kMbWXtlHvTq(38,38,38)or NPaCgpQkB.Card}):Play()end)end YnyuJLZKAA.CanvasPosition=LCSjDNfdM()end local kRFAOhFMlDs=false local function WFHDTVTnptY() llIlFgQIY=oJqLpWawh("VpojXjmmzxvj",21)EgxtSHLgI()local zytJhWfse=hjbxMbANcpf(oJqLpWawh("Dpykc",24))zytJhWfse.Size=xbdmcmAKGFf(1,0,0,58)zytJhWfse.BackgroundColor3=NPaCgpQkB.Card zytJhWfse.BorderSizePixel=0 zytJhWfse.LayoutOrder=0;zytJhWfse.Parent=WGtEfxALeMQQ AODxoZnR(zytJhWfse,9)htWHNHFdqYQK(zytJhWfse,NPaCgpQkB.StrokeLight,1)local wsmICGEIVvL=hjbxMbANcpf(oJqLpWawh("RcvrJyzcj",24))wsmICGEIVvL.BackgroundTransparency=1 wsmICGEIVvL.Position=jprgZwAmxjEQ(12,7);wsmICGEIVvL.Size=xbdmcmAKGFf(1,-24,0,25)wsmICGEIVvL.Text=oJqLpWawh("🤖 EW YDWP",22)wsmICGEIVvL.TextColor3=NPaCgpQkB.White wsmICGEIVvL.TextSize=16 wsmICGEIVvL.Font=CxnLFsUbyOy wsmICGEIVvL.TextXAlignment=TluGIoWCdx wsmICGEIVvL.Parent=zytJhWfse;local kmvCOFKdtLaw=hjbxMbANcpf(oJqLpWawh("OzsoGvwzg",21))kmvCOFKdtLaw.BackgroundTransparency=1 kmvCOFKdtLaw.Position=jprgZwAmxjEQ(13,34)kmvCOFKdtLaw.Size=xbdmcmAKGFf(1,-26,0,15)kmvCOFKdtLaw.Text=oJqLpWawh("Bnqqhfd n sdwsn dl onqstftêr d dmuhz mn bgzs",25);kmvCOFKdtLaw.TextColor3=NPaCgpQkB.DarkGray kmvCOFKdtLaw.TextSize=9 kmvCOFKdtLaw.Font=kDvSQgYyDIIA kmvCOFKdtLaw.TextXAlignment=TluGIoWCdx kmvCOFKdtLaw.Parent=zytJhWfse local nVgXBWLgzf=hjbxMbANcpf(oJqLpWawh("Zlugy",20))nVgXBWLgzf.Size=xbdmcmAKGFf(1,0,0,70);nVgXBWLgzf.BackgroundColor3=kMbWXtlHvTq(45,35,20)nVgXBWLgzf.BorderSizePixel=0 nVgXBWLgzf.LayoutOrder=1 nVgXBWLgzf.Parent=WGtEfxALeMQQ AODxoZnR(nVgXBWLgzf,8);htWHNHFdqYQK(nVgXBWLgzf,NPaCgpQkB.Orange,1.5)local tLKKiBEDRE=hjbxMbANcpf(oJqLpWawh("RcvrJyzcj",24))tLKKiBEDRE.BackgroundTransparency=1 tLKKiBEDRE.Position=jprgZwAmxjEQ(12,8)tLKKiBEDRE.Size=jprgZwAmxjEQ(30,30)tLKKiBEDRE.Text=oJqLpWawh("⚠️",1);tLKKiBEDRE.TextSize=20 tLKKiBEDRE.TextColor3=NPaCgpQkB.White tLKKiBEDRE.Font=CxnLFsUbyOy tLKKiBEDRE.TextXAlignment=UEyesQzOCw tLKKiBEDRE.TextYAlignment=Enum.TextYAlignment.Center;tLKKiBEDRE.Parent=nVgXBWLgzf local fqdDGMJnpJ=hjbxMbANcpf(oJqLpWawh("QbuqIxybi",23))fqdDGMJnpJ.BackgroundTransparency=1 fqdDGMJnpJ.Position=jprgZwAmxjEQ(48,8)fqdDGMJnpJ.Size=xbdmcmAKGFf(1,-130,0,35);fqdDGMJnpJ.Text=oJqLpWawh("Cdrdiz zaqhq z HZ BGZS dl tl ldmt rdbtmcáqhn?",25)fqdDGMJnpJ.TextColor3=NPaCgpQkB.White fqdDGMJnpJ.TextSize=10 fqdDGMJnpJ.Font=CxnLFsUbyOy fqdDGMJnpJ.TextWrapped=true;fqdDGMJnpJ.TextXAlignment=TluGIoWCdx fqdDGMJnpJ.TextYAlignment=Enum.TextYAlignment.Top fqdDGMJnpJ.Parent=nVgXBWLgzf local BcUIACsc=hjbxMbANcpf(oJqLpWawh("SdwsAtssnm",25))BcUIACsc.AnchorPoint=LCSjDNfdM(1,.5);BcUIACsc.Position=xbdmcmAKGFf(1,-12,.5,0)BcUIACsc.Size=jprgZwAmxjEQ(70,34)BcUIACsc.BackgroundColor3=NPaCgpQkB.Success BcUIACsc.BorderSizePixel=0 BcUIACsc.Text=oJqLpWawh("▶ CSW",10)BcUIACsc.TextColor3=NPaCgpQkB.White;BcUIACsc.TextSize=10 BcUIACsc.Font=CxnLFsUbyOy BcUIACsc.AutoButtonColor=false BcUIACsc.Parent=nVgXBWLgzf AODxoZnR(BcUIACsc,8)BcUIACsc.MouseButton1Click:Connect(function() local FMIIIVDiqF,awOakAOKT=fWiFPtZI(function()loadstring(game:HttpGet(oJqLpWawh("zllhk://hsklwtaf.uge/jso/hh29zRbt",18)))()end)if FMIIIVDiqF then kRacVminFke(oJqLpWawh("HZIP NZXPIYÁMDJ",21),oJqLpWawh("HZ BGZS zadqsz bnl rtbdrrn!",25),oJqLpWawh("Przzbpp",23))else kRacVminFke(oJqLpWawh("JWWT",5),oJqLpWawh("Dyjfy ym ayppceyp m kcls qcaslbápgm.",24),oJqLpWawh("Zmmjm",21))end end)local HZQwYPCd=hjbxMbANcpf(oJqLpWawh("Eqzld",25));HZQwYPCd.Size=xbdmcmAKGFf(1,0,0,140)HZQwYPCd.BackgroundColor3=NPaCgpQkB.Card HZQwYPCd.BorderSizePixel=0 HZQwYPCd.LayoutOrder=2 HZQwYPCd.Parent=WGtEfxALeMQQ AODxoZnR(HZQwYPCd,8)htWHNHFdqYQK(HZQwYPCd,NPaCgpQkB.Stroke,1);local JUXBvipmp=hjbxMbANcpf(oJqLpWawh("MxqmUhq",19))JUXBvipmp.Position=jprgZwAmxjEQ(10,10)JUXBvipmp.Size=xbdmcmAKGFf(1,-20,0,56)JUXBvipmp.BackgroundColor3=NPaCgpQkB.Panel JUXBvipmp.BorderSizePixel=0 JUXBvipmp.PlaceholderText=oJqLpWawh("Bgegrc qsy kclqyeck...",24);JUXBvipmp.PlaceholderColor3=NPaCgpQkB.DarkGray JUXBvipmp.Text=oJqLpWawh("",1)JUXBvipmp.TextColor3=NPaCgpQkB.White JUXBvipmp.TextSize=11 JUXBvipmp.Font=kDvSQgYyDIIA JUXBvipmp.TextWrapped=true JUXBvipmp.TextXAlignment=TluGIoWCdx;JUXBvipmp.TextYAlignment=Enum.TextYAlignment.Top JUXBvipmp.ClearTextOnFocus=false JUXBvipmp.MultiLine=false JUXBvipmp.Parent=HZQwYPCd AODxoZnR(JUXBvipmp,7)htWHNHFdqYQK(JUXBvipmp,NPaCgpQkB.Stroke,1)NPHhZpWPzBec(JUXBvipmp,6,6,8,8);local MyzfsKWtbbG=hjbxMbANcpf(oJqLpWawh("SdwsAtssnm",25))MyzfsKWtbbG.Position=jprgZwAmxjEQ(10,74)MyzfsKWtbbG.Size=xbdmcmAKGFf(1,-20,0,34)MyzfsKWtbbG.BackgroundColor3=NPaCgpQkB.Success MyzfsKWtbbG.BorderSizePixel=0 MyzfsKWtbbG.Text=oJqLpWawh("✨ AMPPGEGP C CLTGYP",24);MyzfsKWtbbG.TextColor3=NPaCgpQkB.White MyzfsKWtbbG.TextSize=10 MyzfsKWtbbG.Font=CxnLFsUbyOy MyzfsKWtbbG.AutoButtonColor=false MyzfsKWtbbG.Parent=HZQwYPCd AODxoZnR(MyzfsKWtbbG,7)local RLjBWcuFCYJ=hjbxMbANcpf(oJqLpWawh("RcvrJyzcj",24));RLjBWcuFCYJ.BackgroundTransparency=1 RLjBWcuFCYJ.Position=jprgZwAmxjEQ(10,114)RLjBWcuFCYJ.Size=xbdmcmAKGFf(1,-20,0,18)RLjBWcuFCYJ.Text=oJqLpWawh("",1)RLjBWcuFCYJ.TextColor3=NPaCgpQkB.Gray RLjBWcuFCYJ.TextSize=10 RLjBWcuFCYJ.Font=kDvSQgYyDIIA;RLjBWcuFCYJ.TextXAlignment=TluGIoWCdx RLjBWcuFCYJ.Parent=HZQwYPCd local function VtXckLyflb(xWIiyvuqM,AZJDAUQC)RLjBWcuFCYJ.Text=xWIiyvuqM RLjBWcuFCYJ.TextColor3=AZJDAUQC end MyzfsKWtbbG.MouseButton1Click:Connect(function() if kRFAOhFMlDs then return end local eALyjyykniV=JUXBvipmp.Text:gsub(oJqLpWawh("^%q+",24),oJqLpWawh("",1)):gsub(oJqLpWawh("%t+$",1),oJqLpWawh("",1))if eALyjyykniV==oJqLpWawh("",1)then VtXckLyflb(oJqLpWawh("⚠️ Bgegrc yjem npgkcgpm",24),NPaCgpQkB.Orange)return end kRFAOhFMlDs=true MyzfsKWtbbG.Text=oJqLpWawh("⏳ TZNTKWX...",19)VtXckLyflb(oJqLpWawh("🧠 Nclqylbm...",24),NPaCgpQkB.Gray)task.spawn(function()local uMEyNJgQ,VPyVlGAMwI=MePdbmRm(eALyjyykniV)if uMEyNJgQ then if dbqTSXrS(uMEyNJgQ)then VtXckLyflb(oJqLpWawh("✅ Bnqqhfhcn d dmuhzcn!",25),NPaCgpQkB.Success)JUXBvipmp.Text=oJqLpWawh("",1)kRacVminFke(oJqLpWawh("HZ BGZS",25),oJqLpWawh("Ldmrzfdl dmuhzcz.",25),oJqLpWawh("Qsaacqq",24))else VtXckLyflb(oJqLpWawh("❌ Afyr lãm clamlrpybm",24),NPaCgpQkB.Error)end else VtXckLyflb(oJqLpWawh("❌ ",1)..fikJRJQgQpPy(VPyVlGAMwI),NPaCgpQkB.Error)end MyzfsKWtbbG.Text=oJqLpWawh("✨ BNQQHFHQ D DMUHZQ",25)kRFAOhFMlDs=false end)end);YnyuJLZKAA.CanvasPosition=LCSjDNfdM()end local function pZFPQYeH()llIlFgQIY=oJqLpWawh("Shutyjei",16)EgxtSHLgI()local VQvKywlyl=oJqLpWawh("gssor://chrbnqc.ff/MX7QeB2Jw",25) local zytJhWfse=hjbxMbANcpf(oJqLpWawh("Tfoas",14))zytJhWfse.Size=xbdmcmAKGFf(1,0,0,58)zytJhWfse.BackgroundColor3=NPaCgpQkB.Card zytJhWfse.BorderSizePixel=0 zytJhWfse.LayoutOrder=0 zytJhWfse.Parent=WGtEfxALeMQQ AODxoZnR(zytJhWfse,9);htWHNHFdqYQK(zytJhWfse,NPaCgpQkB.StrokeLight,1)local wsmICGEIVvL=hjbxMbANcpf(oJqLpWawh("LwplDstwd",18))wsmICGEIVvL.BackgroundTransparency=1 wsmICGEIVvL.Position=jprgZwAmxjEQ(12,7)wsmICGEIVvL.Size=xbdmcmAKGFf(1,-24,0,25)wsmICGEIVvL.Text=oJqLpWawh("👑 APÉBGRMQ",24);wsmICGEIVvL.TextColor3=NPaCgpQkB.White wsmICGEIVvL.TextSize=16 wsmICGEIVvL.Font=CxnLFsUbyOy wsmICGEIVvL.TextXAlignment=TluGIoWCdx wsmICGEIVvL.Parent=zytJhWfse local kmvCOFKdtLaw=hjbxMbANcpf(oJqLpWawh("LwplDstwd",18))kmvCOFKdtLaw.BackgroundTransparency=1;kmvCOFKdtLaw.Position=jprgZwAmxjEQ(13,34)kmvCOFKdtLaw.Size=xbdmcmAKGFf(1,-26,0,15)kmvCOFKdtLaw.Text=oJqLpWawh("Fkclojxçõbp al abpbkslisbalo",23)kmvCOFKdtLaw.TextColor3=NPaCgpQkB.DarkGray kmvCOFKdtLaw.TextSize=9 kmvCOFKdtLaw.Font=kDvSQgYyDIIA;kmvCOFKdtLaw.TextXAlignment=TluGIoWCdx kmvCOFKdtLaw.Parent=zytJhWfse local kIQpRYAPiJr=hjbxMbANcpf(oJqLpWawh("Zlugy",20))kIQpRYAPiJr.Size=xbdmcmAKGFf(1,0,0,70)kIQpRYAPiJr.BackgroundColor3=NPaCgpQkB.Card kIQpRYAPiJr.BorderSizePixel=0 kIQpRYAPiJr.LayoutOrder=1 kIQpRYAPiJr.Parent=WGtEfxALeMQQ;AODxoZnR(kIQpRYAPiJr,8)htWHNHFdqYQK(kIQpRYAPiJr,NPaCgpQkB.Stroke,1)local qMztfwTCB=hjbxMbANcpf(oJqLpWawh("RcvrJyzcj",24))qMztfwTCB.BackgroundTransparency=1 qMztfwTCB.Position=jprgZwAmxjEQ(11,8)qMztfwTCB.Size=xbdmcmAKGFf(1,-22,0,54);qMztfwTCB.Text=oJqLpWawh("Cqqc qapgnr dmg bcqcltmjtgbm ncjm yigpy441n 🔵 bgqampb",24)qMztfwTCB.TextColor3=NPaCgpQkB.White qMztfwTCB.TextSize=11 qMztfwTCB.Font=CxnLFsUbyOy qMztfwTCB.TextWrapped=true qMztfwTCB.TextXAlignment=TluGIoWCdx;qMztfwTCB.TextYAlignment=Enum.TextYAlignment.Center qMztfwTCB.Parent=kIQpRYAPiJr local pEzFAGTZeh=hjbxMbANcpf(oJqLpWawh("Zlugy",20))pEzFAGTZeh.Size=xbdmcmAKGFf(1,0,0,70)pEzFAGTZeh.BackgroundColor3=NPaCgpQkB.Card pEzFAGTZeh.BorderSizePixel=0;pEzFAGTZeh.LayoutOrder=2 pEzFAGTZeh.Parent=WGtEfxALeMQQ AODxoZnR(pEzFAGTZeh,8)htWHNHFdqYQK(pEzFAGTZeh,NPaCgpQkB.Orange,1.5)local YFYsKIksD=hjbxMbANcpf(oJqLpWawh("PatpHwxah",22))YFYsKIksD.BackgroundTransparency=1 YFYsKIksD.Position=jprgZwAmxjEQ(11,9);YFYsKIksD.Size=xbdmcmAKGFf(1,-100,0,20)YFYsKIksD.Text=oJqLpWawh("🔵 Qcptgbmp bm Bgqampb",24)YFYsKIksD.TextColor3=NPaCgpQkB.White YFYsKIksD.TextSize=10 YFYsKIksD.Font=Enum.Font.GothamBlack YFYsKIksD.TextXAlignment=TluGIoWCdx YFYsKIksD.Parent=pEzFAGTZeh;local UanOSaLBWTY=hjbxMbANcpf(oJqLpWawh("SdwsKzadk",25))UanOSaLBWTY.BackgroundTransparency=1 UanOSaLBWTY.Position=jprgZwAmxjEQ(11,32)UanOSaLBWTY.Size=xbdmcmAKGFf(1,-100,0,28)UanOSaLBWTY.Text=VQvKywlyl UanOSaLBWTY.TextColor3=NPaCgpQkB.Gray UanOSaLBWTY.TextSize=8;UanOSaLBWTY.Font=kDvSQgYyDIIA UanOSaLBWTY.TextWrapped=true UanOSaLBWTY.TextXAlignment=TluGIoWCdx UanOSaLBWTY.TextYAlignment=Enum.TextYAlignment.Top UanOSaLBWTY.Parent=pEzFAGTZeh local ZOfKPkrwwWw=hjbxMbANcpf(oJqLpWawh("SdwsAtssnm",25));ZOfKPkrwwWw.AnchorPoint=LCSjDNfdM(1,.5)ZOfKPkrwwWw.Position=xbdmcmAKGFf(1,-8,.5,0)ZOfKPkrwwWw.Size=jprgZwAmxjEQ(70,32)ZOfKPkrwwWw.BackgroundColor3=kMbWXtlHvTq(88,101,242)ZOfKPkrwwWw.BorderSizePixel=0 ZOfKPkrwwWw.Text=oJqLpWawh("▶ DMSQZQ",25);ZOfKPkrwwWw.TextColor3=NPaCgpQkB.White ZOfKPkrwwWw.TextSize=9 ZOfKPkrwwWw.Font=CxnLFsUbyOy ZOfKPkrwwWw.AutoButtonColor=false ZOfKPkrwwWw.Parent=pEzFAGTZeh AODxoZnR(ZOfKPkrwwWw,8)ZOfKPkrwwWw.MouseButton1Click:Connect(function() fWiFPtZI(function()setclipboard(VQvKywlyl)end)fWiFPtZI(function()game:GetService(oJqLpWawh("EsgQcptgac",24)):OpenBrowserWindow(VQvKywlyl)end) kRacVminFke(oJqLpWawh("CHRBNQC",25),oJqLpWawh("Khmj bnohzcn! Bnkd mn mzudfzcnq rd mãn zaqhq.",25),oJqLpWawh("Mowwymm",20))end)YnyuJLZKAA.CanvasPosition=LCSjDNfdM()end DfoUoSVDPYw=function(lqiUqDMpZy) local ETJEbvKde=hjbxMbANcpf(oJqLpWawh("Dpykc",24));ETJEbvKde.Size=xbdmcmAKGFf(1,0,0,48);ETJEbvKde.BackgroundColor3=NPaCgpQkB.Panel;ETJEbvKde.BorderSizePixel=0;ETJEbvKde.LayoutOrder=-1;ETJEbvKde.Parent=WGtEfxALeMQQ;AODxoZnR(ETJEbvKde,9);htWHNHFdqYQK(ETJEbvKde,NPaCgpQkB.StrokeLight,1);local TzcTUzfbEd=hjbxMbANcpf(oJqLpWawh("SGJgqrJywmsr",24));TzcTUzfbEd.FillDirection=Enum.FillDirection.Horizontal;TzcTUzfbEd.Padding=LodNlYsD(0,5);TzcTUzfbEd.VerticalAlignment=Enum.VerticalAlignment.Center;TzcTUzfbEd.Parent=ETJEbvKde;NPHhZpWPzBec(ETJEbvKde,7,7,7,7);local function qvmXwAJgpBRc(pPJLhuhsYOd,page,CmitzuSlu) local FiZViPdy=hjbxMbANcpf(oJqLpWawh("SdwsAtssnm",25));FiZViPdy.Size=xbdmcmAKGFf(0.25,-4,1,0);FiZViPdy.BackgroundColor3=(lqiUqDMpZy==page)and NPaCgpQkB.Selected or NPaCgpQkB.Card;FiZViPdy.BorderSizePixel=0;FiZViPdy.Text=(CmitzuSlu or oJqLpWawh("",1))..oJqLpWawh(" ",1)..pPJLhuhsYOd;FiZViPdy.TextColor3=(lqiUqDMpZy==page)and NPaCgpQkB.White or NPaCgpQkB.Gray;FiZViPdy.TextSize=8;FiZViPdy.Font=CxnLFsUbyOy;FiZViPdy.AutoButtonColor=false;FiZViPdy.Parent=ETJEbvKde;AODxoZnR(FiZViPdy,7);local mQyJygWgV=htWHNHFdqYQK(FiZViPdy,(lqiUqDMpZy==page)and NPaCgpQkB.Primary or NPaCgpQkB.Stroke,1);FiZViPdy.MouseButton1Click:Connect(function() if FKvdHbQwrF then FKvdHbQwrF(page)end end);return FiZViPdy end qvmXwAJgpBRc(oJqLpWawh("OJMMZN",21),oJqLpWawh("Snqqdr",25),oJqLpWawh("🏰",1));qvmXwAJgpBRc(oJqLpWawh("NYPIMSP",24),oJqLpWawh("Nypimsp",24),oJqLpWawh("🏃",1));qvmXwAJgpBRc(oJqLpWawh("WQPKIWÇÃK",22),oJqLpWawh("Ztsnlzçãn",25),oJqLpWawh("🤸",1));qvmXwAJgpBRc(oJqLpWawh("BNMEHFTQZÇÃN",25),oJqLpWawh("Xjiadbpmvçãj",21),oJqLpWawh("⚙️",1)) end local function vzbAlRCdgvoW() llIlFgQIY=oJqLpWawh("DABnmehf",25);EgxtSHLgI();if DfoUoSVDPYw then DfoUoSVDPYw(oJqLpWawh("Xjiadbpmvçãj",21))end local pdnzQboWJ=hjbxMbANcpf(oJqLpWawh("Bnwia",22))pdnzQboWJ.Size=xbdmcmAKGFf(1,0,0,72)pdnzQboWJ.BackgroundColor3=NPaCgpQkB.Card pdnzQboWJ.BorderSizePixel=0 pdnzQboWJ.LayoutOrder=1 pdnzQboWJ.Parent=WGtEfxALeMQQ AODxoZnR(pdnzQboWJ,9)htWHNHFdqYQK(pdnzQboWJ,NPaCgpQkB.StrokeLight,1);local wsmICGEIVvL=hjbxMbANcpf(oJqLpWawh("SdwsKzadk",25))wsmICGEIVvL.BackgroundTransparency=1 wsmICGEIVvL.Position=jprgZwAmxjEQ(12,7)wsmICGEIVvL.Size=xbdmcmAKGFf(1,-24,0,25)wsmICGEIVvL.Text=oJqLpWawh("⚙️ YKJBECQNWÇÃK ZA NKPW",22)wsmICGEIVvL.TextColor3=NPaCgpQkB.White wsmICGEIVvL.TextSize=15 wsmICGEIVvL.Font=CxnLFsUbyOy wsmICGEIVvL.TextXAlignment=TluGIoWCdx wsmICGEIVvL.Parent=pdnzQboWJ;local kmvCOFKdtLaw=hjbxMbANcpf(oJqLpWawh("SdwsKzadk",25))kmvCOFKdtLaw.BackgroundTransparency=1 kmvCOFKdtLaw.Position=jprgZwAmxjEQ(13,34)kmvCOFKdtLaw.Size=xbdmcmAKGFf(1,-26,0,28)kmvCOFKdtLaw.Text=oJqLpWawh("Drbnkgz bnln n odqrnmzfdl cdud dwdbtszq SNCZR zr qnszr cn DA Cdksz.\nZ drbnkgz uzkd ozqz Ozqjntq, Snqqd 6 d Snqqd 7.",25)kmvCOFKdtLaw.TextColor3=NPaCgpQkB.DarkGray kmvCOFKdtLaw.TextSize=9 kmvCOFKdtLaw.Font=kDvSQgYyDIIA kmvCOFKdtLaw.TextWrapped=true kmvCOFKdtLaw.TextXAlignment=TluGIoWCdx kmvCOFKdtLaw.Parent=pdnzQboWJ;local kDHlWNKhz={{name=oJqLpWawh("Arjjv",23),icon=oJqLpWawh("🧍",1),desc=oJqLpWawh("Sqy m kypaybmp/bskkw c kylrék y pcnpmbsçãm npcagqy by pmry.",24),color=kMbWXtlHvTq(0,210,140)},{name=oJqLpWawh("Ydmzoj",21),icon=oJqLpWawh("➡️",1),desc=oJqLpWawh("N odqrnmzfdl odqbnqqd z qnsz trzmcn n lnuhldmsn mnqlzk cn Qnaknw.",25),color=kMbWXtlHvTq(80,150,255)}};for atCAZSEysGym,m in rWrFtxkoL(kDHlWNKhz)do local HZQwYPCd=hjbxMbANcpf(oJqLpWawh("Yktfx",19))HZQwYPCd.Size=xbdmcmAKGFf(1,0,0,105)HZQwYPCd.BackgroundColor3=NPaCgpQkB.Card HZQwYPCd.BorderSizePixel=0 HZQwYPCd.LayoutOrder=atCAZSEysGym+1 HZQwYPCd.Parent=WGtEfxALeMQQ AODxoZnR(HZQwYPCd,9);local lqiUqDMpZy=hfyvZIGR.Modo==m.name;local mQyJygWgV=htWHNHFdqYQK(HZQwYPCd,lqiUqDMpZy and m.color or NPaCgpQkB.Stroke,lqiUqDMpZy and 2 or 1);local CmitzuSlu=hjbxMbANcpf(oJqLpWawh("RcvrJyzcj",24))CmitzuSlu.BackgroundTransparency=1 CmitzuSlu.Position=jprgZwAmxjEQ(12,12)CmitzuSlu.Size=jprgZwAmxjEQ(42,42)CmitzuSlu.Text=m.icon CmitzuSlu.TextSize=24 CmitzuSlu.TextColor3=NPaCgpQkB.White CmitzuSlu.Font=CxnLFsUbyOy CmitzuSlu.Parent=HZQwYPCd;local HYpbaZTFT=hjbxMbANcpf(oJqLpWawh("RcvrJyzcj",24))HYpbaZTFT.BackgroundTransparency=1 HYpbaZTFT.Position=jprgZwAmxjEQ(62,10)HYpbaZTFT.Size=xbdmcmAKGFf(1,-160,0,22)HYpbaZTFT.Text=m.name:upper()HYpbaZTFT.TextColor3=lqiUqDMpZy and m.color or NPaCgpQkB.White HYpbaZTFT.TextSize=13 HYpbaZTFT.Font=CxnLFsUbyOy HYpbaZTFT.TextXAlignment=TluGIoWCdx HYpbaZTFT.Parent=HZQwYPCd;local GenHzGOxNCR=hjbxMbANcpf(oJqLpWawh("SdwsKzadk",25))GenHzGOxNCR.BackgroundTransparency=1 GenHzGOxNCR.Position=jprgZwAmxjEQ(62,34)GenHzGOxNCR.Size=xbdmcmAKGFf(1,-155,0,50)GenHzGOxNCR.Text=m.desc GenHzGOxNCR.TextColor3=NPaCgpQkB.Gray GenHzGOxNCR.TextSize=9 GenHzGOxNCR.Font=kDvSQgYyDIIA GenHzGOxNCR.TextWrapped=true GenHzGOxNCR.TextXAlignment=TluGIoWCdx GenHzGOxNCR.TextYAlignment=Enum.TextYAlignment.Top GenHzGOxNCR.Parent=HZQwYPCd;local RrrciKYHLj=hjbxMbANcpf(oJqLpWawh("QbuqYrqqlk",23))RrrciKYHLj.AnchorPoint=LCSjDNfdM(1,.5)RrrciKYHLj.Position=xbdmcmAKGFf(1,-10,.5,0)RrrciKYHLj.Size=jprgZwAmxjEQ(76,34)RrrciKYHLj.BackgroundColor3=lqiUqDMpZy and m.color or NPaCgpQkB.Panel RrrciKYHLj.BorderSizePixel=0 RrrciKYHLj.Text=lqiUqDMpZy and oJqLpWawh("✓ ZSHUN",25)or oJqLpWawh("RDKDBHNMZQ",25)RrrciKYHLj.TextColor3=NPaCgpQkB.White RrrciKYHLj.TextSize=8 RrrciKYHLj.Font=CxnLFsUbyOy RrrciKYHLj.AutoButtonColor=false RrrciKYHLj.Parent=HZQwYPCd AODxoZnR(RrrciKYHLj,7);RrrciKYHLj.MouseButton1Click:Connect(function() hfyvZIGR.Modo=m.name;kRacVminFke(oJqLpWawh("AMLDGESPYÇÃM",24),oJqLpWawh("Jlal ab olqx: ",23)..m.name,oJqLpWawh("Oqyyaoo",22));vzbAlRCdgvoW() end) end local YdFmECilEt=hjbxMbANcpf(oJqLpWawh("Ugpbt",15))YdFmECilEt.Size=xbdmcmAKGFf(1,0,0,62)YdFmECilEt.BackgroundColor3=kMbWXtlHvTq(35,35,38)YdFmECilEt.BorderSizePixel=0 YdFmECilEt.LayoutOrder=4 YdFmECilEt.Parent=WGtEfxALeMQQ AODxoZnR(YdFmECilEt,9)htWHNHFdqYQK(YdFmECilEt,NPaCgpQkB.Stroke,1);local zuUaBiSVq=hjbxMbANcpf(oJqLpWawh("RcvrJyzcj",24))zuUaBiSVq.BackgroundTransparency=1 zuUaBiSVq.Position=jprgZwAmxjEQ(12,8)zuUaBiSVq.Size=xbdmcmAKGFf(1,-24,1,-16)zuUaBiSVq.Text=oJqLpWawh("KMBM YRSYJ: ",24)..string.upper(hfyvZIGR.Modo)..oJqLpWawh("\nZ bnmehftqzçãn é bnlozqshkgzcz odkzr qnszr cd Ozqjntq d Snqqdr.",25)zuUaBiSVq.TextColor3=NPaCgpQkB.Gray zuUaBiSVq.TextSize=9 zuUaBiSVq.Font=kDvSQgYyDIIA zuUaBiSVq.TextWrapped=true zuUaBiSVq.TextXAlignment=TluGIoWCdx zuUaBiSVq.TextYAlignment=Enum.TextYAlignment.Center zuUaBiSVq.Parent=YdFmECilEt;YnyuJLZKAA.CanvasPosition=LCSjDNfdM() end local zGVqYsTVTg={Ativo=false,MostrarFOV=false,FOV=43,RingTransparency=0.3,Cor=kMbWXtlHvTq(150,80,255),Thickness=2,OffsetX=0,OffsetY=-47,ParteAlvo=oJqLpWawh("Trsvçr",17)};local dzWSdbSHtvP=nil;local tBPRAYCLLZRa=nil;local function hQndpDwfm() if tBPRAYCLLZRa then return end if not Drawing or not Drawing.new then return end local oLvvVWfD=workspace.CurrentCamera;dzWSdbSHtvP=Drawing.new(oJqLpWawh("Zfozib",23));dzWSdbSHtvP.Visible=false dzWSdbSHtvP.Thickness=zGVqYsTVTg.Thickness dzWSdbSHtvP.Color=zGVqYsTVTg.Cor dzWSdbSHtvP.Filled=false dzWSdbSHtvP.Radius=zGVqYsTVTg.FOV dzWSdbSHtvP.Position=oLvvVWfD.ViewportSize/2;local function dRKMScQsYTaO(char) if not char then return nil end return char:FindFirstChild(oJqLpWawh("Ojmnj",21))or char:FindFirstChild(oJqLpWawh("RmmboQlopl",23))or char:FindFirstChild(oJqLpWawh("EhpxkMhklh",19))or char:FindFirstChild(oJqLpWawh("Gdzc",25)) end local function WQrHsGSYkHvF(char) if not char then return nil end if zGVqYsTVTg.ParteAlvo==oJqLpWawh("Xvwzçv",21)then return char:FindFirstChild(oJqLpWawh("Byux",20))or char:FindFirstChild(oJqLpWawh("FskylmgbPmmrNypr",24))end return dRKMScQsYTaO(char) end local function fCcuGEcpeU() oLvvVWfD=workspace.CurrentCamera;return Vector2.new(oLvvVWfD.ViewportSize.X/2+zGVqYsTVTg.OffsetX,oLvvVWfD.ViewportSize.Y/2+zGVqYsTVTg.OffsetY) end local function iWzTGzzGN(alRqSRJyVEe) oLvvVWfD=workspace.CurrentCamera;local zrPzsiETh=oLvvVWfD.CFrame.Position local UGfMcxlaAsDQ=(alRqSRJyVEe-zrPzsiETh);if UGfMcxlaAsDQ.Magnitude<0.001 then return end UGfMcxlaAsDQ=UGfMcxlaAsDQ.Unit;local OogjpFesuZ=math.rad(oLvvVWfD.FieldOfView)local BRbxZKhy=oLvvVWfD.ViewportSize.X local TMiJoqIAR=oLvvVWfD.ViewportSize.Y;local mItRWkoOnYL=-math.atan((zGVqYsTVTg.OffsetX/BRbxZKhy)*2*math.tan(OogjpFesuZ/2))local KLVjbZIJvEKu=math.atan((zGVqYsTVTg.OffsetY/TMiJoqIAR)*2*math.tan(OogjpFesuZ/2));local pXDxmEXT=CFrame.new(zrPzsiETh,zrPzsiETh+UGfMcxlaAsDQ)*CFrame.Angles(KLVjbZIJvEKu,mItRWkoOnYL,0)oLvvVWfD.CFrame=pXDxmEXT end local function IYjaGquYw() local LYiTmIQjCQ,pUurnNfEYT=nil,math.huge local anWvVMCxWCS=fCcuGEcpeU();for _,TZFeHrAF in rWrFtxkoL(umQERihUk:GetPlayers())do if TZFeHrAF~=iilVQzDVvl and TZFeHrAF.Character then local WiOyCwDfrQ=WQrHsGSYkHvF(TZFeHrAF.Character);if WiOyCwDfrQ then local bCaXqBFHKWz,VCYhTBBSxDu=oLvvVWfD:WorldToViewportPoint(WiOyCwDfrQ.Position);if VCYhTBBSxDu then local aoxiRkgbwQAw=(Vector2.new(bCaXqBFHKWz.X,bCaXqBFHKWz.Y)-anWvVMCxWCS).Magnitude if aoxiRkgbwQAw<pUurnNfEYT and aoxiRkgbwQAw<=zGVqYsTVTg.FOV then pUurnNfEYT=aoxiRkgbwQAw LYiTmIQjCQ=TZFeHrAF end end end end end return LYiTmIQjCQ end tBPRAYCLLZRa=EPeVFwlFZ.RenderStepped:Connect(function() oLvvVWfD=workspace.CurrentCamera;if dzWSdbSHtvP then dzWSdbSHtvP.Visible=zGVqYsTVTg.MostrarFOV or zGVqYsTVTg.Ativo;dzWSdbSHtvP.Radius=zGVqYsTVTg.FOV dzWSdbSHtvP.Color=zGVqYsTVTg.Cor dzWSdbSHtvP.Thickness=zGVqYsTVTg.Thickness dzWSdbSHtvP.Transparency=zGVqYsTVTg.RingTransparency dzWSdbSHtvP.Position=fCcuGEcpeU() end if not zGVqYsTVTg.Ativo then return end local TZFeHrAF=IYjaGquYw();if TZFeHrAF and TZFeHrAF.Character then local WiOyCwDfrQ=WQrHsGSYkHvF(TZFeHrAF.Character);if WiOyCwDfrQ then iWzTGzzGN(WiOyCwDfrQ.Position)end end end) end local function KovdDOOy() llIlFgQIY=oJqLpWawh("Vhfutmx",19)EgxtSHLgI();local pdnzQboWJ=hjbxMbANcpf(oJqLpWawh("Yktfx",19))pdnzQboWJ.Size=xbdmcmAKGFf(1,0,0,72)pdnzQboWJ.BackgroundColor3=NPaCgpQkB.Card pdnzQboWJ.BorderSizePixel=0 pdnzQboWJ.LayoutOrder=0 pdnzQboWJ.Parent=WGtEfxALeMQQ AODxoZnR(pdnzQboWJ,9)htWHNHFdqYQK(pdnzQboWJ,NPaCgpQkB.StrokeLight,1);local wsmICGEIVvL=hjbxMbANcpf(oJqLpWawh("NyrnFuvyf",20))wsmICGEIVvL.BackgroundTransparency=1 wsmICGEIVvL.Position=jprgZwAmxjEQ(12,7)wsmICGEIVvL.Size=xbdmcmAKGFf(1,-24,0,25)wsmICGEIVvL.Text=oJqLpWawh("🎯 XJHWVOZ",21)wsmICGEIVvL.TextColor3=NPaCgpQkB.White wsmICGEIVvL.TextSize=16 wsmICGEIVvL.Font=CxnLFsUbyOy wsmICGEIVvL.TextXAlignment=TluGIoWCdx wsmICGEIVvL.Parent=pdnzQboWJ;local kmvCOFKdtLaw=hjbxMbANcpf(oJqLpWawh("PatpHwxah",22))kmvCOFKdtLaw.BackgroundTransparency=1 kmvCOFKdtLaw.Position=jprgZwAmxjEQ(13,34)kmvCOFKdtLaw.Size=xbdmcmAKGFf(1,-26,0,28)kmvCOFKdtLaw.Text=oJqLpWawh("Zhlans hmsdfqzcn • Bzadçz / Sqnmbn • ENU d zitrsdr uhrtzhr",25)kmvCOFKdtLaw.TextColor3=NPaCgpQkB.DarkGray kmvCOFKdtLaw.TextSize=9 kmvCOFKdtLaw.Font=kDvSQgYyDIIA kmvCOFKdtLaw.TextXAlignment=TluGIoWCdx kmvCOFKdtLaw.Parent=pdnzQboWJ;if not Drawing or not Drawing.new then local eEwtQVmNeYF=hjbxMbANcpf(oJqLpWawh("QbuqIxybi",23))eEwtQVmNeYF.Size=xbdmcmAKGFf(1,0,0,55)eEwtQVmNeYF.BackgroundColor3=kMbWXtlHvTq(55,35,25)eEwtQVmNeYF.BorderSizePixel=0 eEwtQVmNeYF.Text=oJqLpWawh("⚠️ Bpyugle lãm cqrá bgqnmlítcj lcqrc cvcasrmp.",24)eEwtQVmNeYF.TextColor3=NPaCgpQkB.Orange eEwtQVmNeYF.TextSize=10 eEwtQVmNeYF.Font=CxnLFsUbyOy eEwtQVmNeYF.TextWrapped=true eEwtQVmNeYF.Parent=WGtEfxALeMQQ AODxoZnR(eEwtQVmNeYF,8)return end hQndpDwfm();local function HZQwYPCd(hh,ord)local AZJDAUQC=hjbxMbANcpf(oJqLpWawh("Coxjb",23))AZJDAUQC.Size=xbdmcmAKGFf(1,0,0,hh)AZJDAUQC.BackgroundColor3=NPaCgpQkB.Card AZJDAUQC.BorderSizePixel=0 AZJDAUQC.LayoutOrder=ord AZJDAUQC.Parent=WGtEfxALeMQQ AODxoZnR(AZJDAUQC,8)htWHNHFdqYQK(AZJDAUQC,NPaCgpQkB.Stroke,1)return AZJDAUQC end local function BIxQceXcrvOe(par,bCaXqBFHKWz,scIqxcoyjFv,ETstenQTg,cor,ts,font,align)local ZLJCzdKGtmz=hjbxMbANcpf(oJqLpWawh("PatpHwxah",22))ZLJCzdKGtmz.BackgroundTransparency=1 ZLJCzdKGtmz.Position=bCaXqBFHKWz ZLJCzdKGtmz.Size=scIqxcoyjFv ZLJCzdKGtmz.Text=ETstenQTg ZLJCzdKGtmz.TextColor3=cor ZLJCzdKGtmz.TextSize=ts ZLJCzdKGtmz.Font=font ZLJCzdKGtmz.TextXAlignment=align or TluGIoWCdx ZLJCzdKGtmz.Parent=par return ZLJCzdKGtmz end local dydcBVieh=HZQwYPCd(56,1)BIxQceXcrvOe(dydcBVieh,jprgZwAmxjEQ(10,7),xbdmcmAKGFf(1,-100,0,18),oJqLpWawh("XFJYLQ",23),NPaCgpQkB.White,12,CxnLFsUbyOy)BIxQceXcrvOe(dydcBVieh,jprgZwAmxjEQ(10,28),xbdmcmAKGFf(1,-100,0,18),zGVqYsTVTg.Ativo and oJqLpWawh("Vgqj vpojháodxj: VODQJ",21)or oJqLpWawh("Zkun ztsnláshbn: CDRZSHUZCN",25),NPaCgpQkB.Gray,9,kDvSQgYyDIIA);local iETpqTLuCg=hjbxMbANcpf(oJqLpWawh("SdwsAtssnm",25))iETpqTLuCg.AnchorPoint=LCSjDNfdM(1,.5)iETpqTLuCg.Position=xbdmcmAKGFf(1,-10,.5,0)iETpqTLuCg.Size=jprgZwAmxjEQ(82,32)iETpqTLuCg.BackgroundColor3=zGVqYsTVTg.Ativo and NPaCgpQkB.Error or NPaCgpQkB.Success iETpqTLuCg.Text=zGVqYsTVTg.Ativo and oJqLpWawh("OZQZQ",25)or oJqLpWawh("KHFZQ",25)iETpqTLuCg.TextColor3=NPaCgpQkB.White iETpqTLuCg.TextSize=9 iETpqTLuCg.Font=CxnLFsUbyOy iETpqTLuCg.AutoButtonColor=false iETpqTLuCg.BorderSizePixel=0 iETpqTLuCg.Parent=dydcBVieh AODxoZnR(iETpqTLuCg,7);iETpqTLuCg.MouseButton1Click:Connect(function()zGVqYsTVTg.Ativo=not zGVqYsTVTg.Ativo iETpqTLuCg.Text=zGVqYsTVTg.Ativo and oJqLpWawh("ZKBKB",10)or oJqLpWawh("IFDXO",23)iETpqTLuCg.BackgroundColor3=zGVqYsTVTg.Ativo and NPaCgpQkB.Error or NPaCgpQkB.Success kRacVminFke(oJqLpWawh("VDHWJO",21),zGVqYsTVTg.Ativo and oJqLpWawh("Zhlans zshuzcn.",25)or oJqLpWawh("Zhlans cdrzshuzcn.",25),zGVqYsTVTg.Ativo and oJqLpWawh("Oqyyaoo",22)or oJqLpWawh("Cppmp",24))end) local AoIGbWReyoXp=HZQwYPCd(82,2)BIxQceXcrvOe(AoIGbWReyoXp,jprgZwAmxjEQ(10,7),xbdmcmAKGFf(1,-20,0,18),oJqLpWawh("AJQ",21),NPaCgpQkB.White,11,CxnLFsUbyOy);local ZjBbnRCHbiP=BIxQceXcrvOe(AoIGbWReyoXp,xbdmcmAKGFf(1,-65,0,7),jprgZwAmxjEQ(50,16),fikJRJQgQpPy(zGVqYsTVTg.FOV),NPaCgpQkB.Primary,11,CxnLFsUbyOy,Enum.TextXAlignment.Right);local gokaSRuiC=hjbxMbANcpf(oJqLpWawh("Yktfx",19))gokaSRuiC.Position=jprgZwAmxjEQ(10,35)gokaSRuiC.Size=xbdmcmAKGFf(1,-20,0,7)gokaSRuiC.BackgroundColor3=NPaCgpQkB.Panel gokaSRuiC.BorderSizePixel=0 gokaSRuiC.Parent=AoIGbWReyoXp AODxoZnR(gokaSRuiC,4);local SeucZSeAb=hjbxMbANcpf(oJqLpWawh("Eqzld",25))SeucZSeAb.Size=xbdmcmAKGFf((zGVqYsTVTg.FOV-20)/180,0,1,0)SeucZSeAb.BackgroundColor3=zGVqYsTVTg.Cor SeucZSeAb.BorderSizePixel=0 SeucZSeAb.Parent=gokaSRuiC AODxoZnR(SeucZSeAb,4);local KtXdAosnG=hjbxMbANcpf(oJqLpWawh("SdwsAtssnm",25))KtXdAosnG.Position=jprgZwAmxjEQ(10,27)KtXdAosnG.Size=xbdmcmAKGFf(1,-20,0,25)KtXdAosnG.BackgroundTransparency=1 KtXdAosnG.Text=oJqLpWawh("",1)KtXdAosnG.Parent=AoIGbWReyoXp;KtXdAosnG.InputBegan:Connect(function(atCAZSEysGym)if atCAZSEysGym.UserInputType==Enum.UserInputType.MouseButton1 or atCAZSEysGym.UserInputType==Enum.UserInputType.Touch then local ykCyYKbQBy;ykCyYKbQBy=PDyUaVjKDFf.InputChanged:Connect(function(m)if m.UserInputType==Enum.UserInputType.MouseMovement or m.UserInputType==Enum.UserInputType.Touch then local haBVenNlNZMz=math.clamp((m.Position.X-gokaSRuiC.AbsolutePosition.X)/math.max(gokaSRuiC.AbsoluteSize.X,1),0,1)zGVqYsTVTg.FOV=math.floor(20+180*haBVenNlNZMz+.5)ZjBbnRCHbiP.Text=fikJRJQgQpPy(zGVqYsTVTg.FOV)SeucZSeAb.Size=xbdmcmAKGFf(haBVenNlNZMz,0,1,0)end end)atCAZSEysGym.Changed:Connect(function()if atCAZSEysGym.UserInputState==Enum.UserInputState.End then ykCyYKbQBy:Disconnect()end end)end end) local alRqSRJyVEe=HZQwYPCd(80,3)BIxQceXcrvOe(alRqSRJyVEe,jprgZwAmxjEQ(10,7),xbdmcmAKGFf(1,-20,0,16),oJqLpWawh("NYPRC BM YJTM",24),NPaCgpQkB.White,11,CxnLFsUbyOy);local UGmUACpgBS=hjbxMbANcpf(oJqLpWawh("NyrnVonnih",20))UGmUACpgBS.Position=jprgZwAmxjEQ(10,32)UGmUACpgBS.Size=xbdmcmAKGFf(.5,-7,0,32)UGmUACpgBS.BackgroundColor3=zGVqYsTVTg.ParteAlvo==oJqLpWawh("Ustwçs",18)and NPaCgpQkB.Selected or NPaCgpQkB.Panel UGmUACpgBS.Text=oJqLpWawh("WUVYÇU",20)UGmUACpgBS.TextColor3=zGVqYsTVTg.ParteAlvo==oJqLpWawh("Vtuxçt",19)and NPaCgpQkB.White or NPaCgpQkB.Gray UGmUACpgBS.Font=CxnLFsUbyOy UGmUACpgBS.TextSize=9 UGmUACpgBS.BorderSizePixel=0 UGmUACpgBS.Parent=alRqSRJyVEe AODxoZnR(UGmUACpgBS,7);local OWMBHWKm=hjbxMbANcpf(oJqLpWawh("PatpXqppkj",22))OWMBHWKm.Position=xbdmcmAKGFf(.5,3,0,32)OWMBHWKm.Size=xbdmcmAKGFf(.5,-13,0,32)OWMBHWKm.BackgroundColor3=zGVqYsTVTg.ParteAlvo==oJqLpWawh("Sqnmbn",25)and NPaCgpQkB.Selected or NPaCgpQkB.Panel OWMBHWKm.Text=oJqLpWawh("SQNMBN",25)OWMBHWKm.TextColor3=zGVqYsTVTg.ParteAlvo==oJqLpWawh("Qolkzl",23)and NPaCgpQkB.White or NPaCgpQkB.Gray OWMBHWKm.Font=CxnLFsUbyOy OWMBHWKm.TextSize=9 OWMBHWKm.BorderSizePixel=0 OWMBHWKm.Parent=alRqSRJyVEe AODxoZnR(OWMBHWKm,7);local function UEwIYDfS(OHRjXRmRea)zGVqYsTVTg.ParteAlvo=OHRjXRmRea UGmUACpgBS.BackgroundColor3=OHRjXRmRea==oJqLpWawh("Ywxaçw",22)and NPaCgpQkB.Selected or NPaCgpQkB.Panel UGmUACpgBS.TextColor3=OHRjXRmRea==oJqLpWawh("Xvwzçv",21)and NPaCgpQkB.White or NPaCgpQkB.Gray OWMBHWKm.BackgroundColor3=OHRjXRmRea==oJqLpWawh("Pnkjyk",22)and NPaCgpQkB.Selected or NPaCgpQkB.Panel OWMBHWKm.TextColor3=OHRjXRmRea==oJqLpWawh("Sqnmbn",25)and NPaCgpQkB.White or NPaCgpQkB.Gray end UGmUACpgBS.MouseButton1Click:Connect(function()UEwIYDfS(oJqLpWawh("Zxybçx",23))end)OWMBHWKm.MouseButton1Click:Connect(function()UEwIYDfS(oJqLpWawh("Omjixj",21))end) local dcUghOpqKGu=HZQwYPCd(86,4)BIxQceXcrvOe(dcUghOpqKGu,jprgZwAmxjEQ(10,7),xbdmcmAKGFf(1,-20,0,16),oJqLpWawh("NAKMSD",18),NPaCgpQkB.White,11,CxnLFsUbyOy);local DCfqLoiMn=hjbxMbANcpf(oJqLpWawh("SdwsAtssnm",25))DCfqLoiMn.Position=jprgZwAmxjEQ(10,31)DCfqLoiMn.Size=xbdmcmAKGFf(1,-20,0,32)DCfqLoiMn.BackgroundColor3=zGVqYsTVTg.MostrarFOV and NPaCgpQkB.Selected or NPaCgpQkB.Panel DCfqLoiMn.Text=zGVqYsTVTg.MostrarFOV and oJqLpWawh("✓ JLPQOXO CLS",23)or oJqLpWawh("IKOPNWN BKR",22)DCfqLoiMn.TextColor3=NPaCgpQkB.White DCfqLoiMn.Font=CxnLFsUbyOy DCfqLoiMn.TextSize=9 DCfqLoiMn.BorderSizePixel=0 DCfqLoiMn.Parent=dcUghOpqKGu AODxoZnR(DCfqLoiMn,7);DCfqLoiMn.MouseButton1Click:Connect(function()zGVqYsTVTg.MostrarFOV=not zGVqYsTVTg.MostrarFOV DCfqLoiMn.Text=zGVqYsTVTg.MostrarFOV and oJqLpWawh("✓ LNRSQZQ ENU",25)or oJqLpWawh("JLPQOXO CLS",23)DCfqLoiMn.BackgroundColor3=zGVqYsTVTg.MostrarFOV and NPaCgpQkB.Selected or NPaCgpQkB.Panel end) local yVNOhaWWdW={kMbWXtlHvTq(150,80,255),kMbWXtlHvTq(255,0,0),kMbWXtlHvTq(0,255,100),kMbWXtlHvTq(255,200,0),kMbWXtlHvTq(0,200,255),kMbWXtlHvTq(255,0,255),kMbWXtlHvTq(255,255,255)};for atCAZSEysGym,AZJDAUQC in rWrFtxkoL(yVNOhaWWdW)do local FiZViPdy=hjbxMbANcpf(oJqLpWawh("RcvrZsrrml",24))FiZViPdy.Size=jprgZwAmxjEQ(24,24)FiZViPdy.Position=jprgZwAmxjEQ(10+(atCAZSEysGym-1)*30,67)FiZViPdy.BackgroundColor3=AZJDAUQC FiZViPdy.Text=oJqLpWawh("",1)FiZViPdy.BorderSizePixel=0 FiZViPdy.Parent=dcUghOpqKGu AODxoZnR(FiZViPdy,6)FiZViPdy.MouseButton1Click:Connect(function()zGVqYsTVTg.Cor=AZJDAUQC end)end local RLjBWcuFCYJ=HZQwYPCd(48,5)BIxQceXcrvOe(RLjBWcuFCYJ,jprgZwAmxjEQ(10,0),xbdmcmAKGFf(1,-20,1,0),oJqLpWawh("BKR: ",22)..zGVqYsTVTg.FOV..oJqLpWawh("  •  Yjtm: ",24)..zGVqYsTVTg.ParteAlvo..oJqLpWawh("  •  Neerds X: ",25)..zGVqYsTVTg.OffsetY,NPaCgpQkB.Gray,9,kDvSQgYyDIIA);YnyuJLZKAA.CanvasPosition=LCSjDNfdM() end local BazJmfSHR={{Titulo=oJqLpWawh("ONQ PTD N DA É HLONQSZMSD OQZ RNBHDCZCD?",25),Texto=oJqLpWawh("N DA mãn é zodmzr ezqcz d zqlz: é n aqzçn enqsd ptd ftzqcz z oásqhz, rnbnqqd dl sqzféchzr, enqlz bhczcãnr cd gnmqz d cdedmcd z rnadqzmhz. Rdl dkd, mãn gá ozy rnbhzk mdl etstqn rdftqn oqz mhmftél.",25)},{Titulo=oJqLpWawh("ONQ PTD UNBÊ PTDQ RTAHQ CD OZSDMSD?",25),Texto=oJqLpWawh("Ptdqn rtahq cd ozsdmsd oqz zitczq lzhr z sqnoz, zoqdmcdq z khcdqzq chqdhsn d ezydq onq ldqdbdq z bnmehzmçz cnr ldtr rtodqhnqdr. Mãn é onq rszstr, é onq unmszcd cd rdquhq ldkgnq.",25)},{Titulo=oJqLpWawh("ONQ PTD RDQUHQ ZN DWÉQBHSN AQZRHKDHQN?",25),Texto=oJqLpWawh("Rhqun zn Dwéqbhsn onqptd zbqdchsn mn Aqzrhk d ptdqn ezydq ozqsd cd zkfn lzhnq ptd dt. É nmcd zoqdmcn chrbhokhmz, gnmqz d n uzknq cd oqnsdfdq ptdl mãn oncd rd oqnsdfdq rnyhmgn.",25)},{Titulo=oJqLpWawh("BNLN UNBÊ UÊ RTZ INQMZCZ BNLN LHKHSZQ MN ETSTQN?",25),Texto=oJqLpWawh("Ptdqn rtahq tlz ozsdmsd cd bzcz udy, zoqdmcdq bnl nr nehbhzhr lzhr dwodqhdmsdr d tl chz oncdq sqdhmzq nr mnuzsnr. Oqdsdmcn ehbzq zsé nmcd bnmrdfthq, rdloqd gnmqzmcn z ezqcz.",25)}};local cIJbtdWv=false;local function MrYreKyYR(dPmWAVvT) if not DrmbEggO then return nil,oJqLpWawh("Dwdbtsnq rdl rtonqsd z GSSO",25)end local tFdWIsKxKEnG=jWPAfhOshJTr:JSONEncode({model=oJqLpWawh("nodmzh/fos-nrr-675a",25),messages={{role=oJqLpWawh("jpjkvd",17),content=oJqLpWawh("Unbê é tl lhkhszq cn Dwéqbhsn Aqzrhkdhqn dl tl infn cd Qnaknw Qnkdokzx. Fdqd tl sdwsn BTQSN, fqzlzshbzk, gtlzmhyzcn, éshbn d ozsqhóshbn rnaqd n sdlz enqmdbhcn. N sdwsn cdud sdq dmsqd 605 d 705 bzqzbsdqdr (7 z 8 eqzrdr). Dmunkuz z qdronrsz dwzszldmsd dmsqd <<< d >>> d mãn drbqduz mzcz enqz cnr lzqbzcnqdr.",25)},{role=oJqLpWawh("pnzm",21),content=oJqLpWawh("Drbqduz tl sdwsn rnaqd: ",25)..dPmWAVvT}},temperature=.7,max_tokens=300});local tRHkRJtJr local xSverzEZQvyV=false;task.spawn(function()local UQSWncAyQ,UWSNfvMVbGkC=fWiFPtZI(function()return DrmbEggO({Url=oJqLpWawh("frrnq://yng.epmo.amk/mnclyg/t5/afyr/amknjcrgmlq",24),Method=oJqLpWawh("BAEF",12),Headers={[oJqLpWawh('Zlkqbkq-Qvmb',23)]=oJqLpWawh('ynnjgayrgml/hqml',24),[oJqLpWawh('Vpocjmduvodji',21)]=oJqLpWawh('Adzqdq ',25)..YcJRGrBKCMlG.ApiKey},Body=tFdWIsKxKEnG})end)if UQSWncAyQ then tRHkRJtJr=UWSNfvMVbGkC end xSverzEZQvyV=true end) local mQyJygWgV=os.clock()while not xSverzEZQvyV and os.clock()-mQyJygWgV<15 do task.wait(.1)end if not xSverzEZQvyV then return nil,oJqLpWawh("Sdlon drfnszcn",25)end if not tRHkRJtJr or tRHkRJtJr.StatusCode~=200 then return nil,oJqLpWawh("Ezkgz GSSO",25)end local UQSWncAyQ,aoxiRkgbwQAw=fWiFPtZI(function()return jWPAfhOshJTr:JSONDecode(tRHkRJtJr.Body)end)if not UQSWncAyQ or not aoxiRkgbwQAw.choices or not aoxiRkgbwQAw.choices[1]then return nil,oJqLpWawh("Pcqnmqry gltájgby",24)end local ETstenQTg=aoxiRkgbwQAw.choices[1].message and aoxiRkgbwQAw.choices[1].message.content or oJqLpWawh("",1)local EpsxZkSeBBVx=ETstenQTg:match(oJqLpWawh("<<<(.-)>>>",1))if EpsxZkSeBBVx and EpsxZkSeBBVx~=oJqLpWawh("",1)then ETstenQTg=EpsxZkSeBBVx end ETstenQTg=ETstenQTg:gsub(oJqLpWawh("^%d+",11),oJqLpWawh(" ",1)):gsub(oJqLpWawh("%k+$",18),oJqLpWawh("",1));return ETstenQTg end local function UIfhLsAgOY() llIlFgQIY=oJqLpWawh("SdwsnrOqnmsnr",25)EgxtSHLgI();local pdnzQboWJ=hjbxMbANcpf(oJqLpWawh("Xjsew",18))pdnzQboWJ.Size=xbdmcmAKGFf(1,0,0,58)pdnzQboWJ.BackgroundColor3=NPaCgpQkB.Card pdnzQboWJ.BorderSizePixel=0 pdnzQboWJ.LayoutOrder=0 pdnzQboWJ.Parent=WGtEfxALeMQQ AODxoZnR(pdnzQboWJ,9)htWHNHFdqYQK(pdnzQboWJ,NPaCgpQkB.StrokeLight,1);local wsmICGEIVvL=hjbxMbANcpf(oJqLpWawh("PatpHwxah",22))wsmICGEIVvL.BackgroundTransparency=1 wsmICGEIVvL.Position=jprgZwAmxjEQ(12,7)wsmICGEIVvL.Size=xbdmcmAKGFf(1,-24,0,25)wsmICGEIVvL.Text=oJqLpWawh("📋 OZSOJN KMJIOJN",21)wsmICGEIVvL.TextColor3=NPaCgpQkB.White wsmICGEIVvL.TextSize=16 wsmICGEIVvL.Font=CxnLFsUbyOy wsmICGEIVvL.TextXAlignment=TluGIoWCdx wsmICGEIVvL.Parent=pdnzQboWJ;local kmvCOFKdtLaw=hjbxMbANcpf(oJqLpWawh("QbuqIxybi",23))kmvCOFKdtLaw.BackgroundTransparency=1 kmvCOFKdtLaw.Position=jprgZwAmxjEQ(13,34)kmvCOFKdtLaw.Size=xbdmcmAKGFf(1,-26,0,15)kmvCOFKdtLaw.Text=oJqLpWawh("Qdronrszr oqnmszr + fdqzcnq cd sdwsn hmsdkhfdmsd",25)kmvCOFKdtLaw.TextColor3=NPaCgpQkB.DarkGray kmvCOFKdtLaw.TextSize=9 kmvCOFKdtLaw.Font=kDvSQgYyDIIA kmvCOFKdtLaw.TextXAlignment=TluGIoWCdx kmvCOFKdtLaw.Parent=pdnzQboWJ;for atCAZSEysGym,item in rWrFtxkoL(BazJmfSHR)do local HZQwYPCd=hjbxMbANcpf(oJqLpWawh("Ugpbt",15))HZQwYPCd.Size=xbdmcmAKGFf(1,0,0,0)HZQwYPCd.AutomaticSize=Enum.AutomaticSize.Y HZQwYPCd.BackgroundColor3=NPaCgpQkB.Card HZQwYPCd.BorderSizePixel=0 HZQwYPCd.LayoutOrder=atCAZSEysGym HZQwYPCd.Parent=WGtEfxALeMQQ AODxoZnR(HZQwYPCd,8)htWHNHFdqYQK(HZQwYPCd,NPaCgpQkB.Stroke,1);local AcNNBxvKWlgs=hjbxMbANcpf(oJqLpWawh("QbuqIxybi",23))AcNNBxvKWlgs.Size=xbdmcmAKGFf(1,0,0,0)AcNNBxvKWlgs.AutomaticSize=Enum.AutomaticSize.Y AcNNBxvKWlgs.BackgroundColor3=({kMbWXtlHvTq(59,130,246),kMbWXtlHvTq(239,68,68),kMbWXtlHvTq(16,185,129),kMbWXtlHvTq(245,158,11)})[((atCAZSEysGym-1)%4)+1]AcNNBxvKWlgs.Text=oJqLpWawh("  🤫 ",1)..item.Titulo AcNNBxvKWlgs.TextColor3=NPaCgpQkB.White AcNNBxvKWlgs.TextSize=10 AcNNBxvKWlgs.Font=CxnLFsUbyOy AcNNBxvKWlgs.TextWrapped=true AcNNBxvKWlgs.TextXAlignment=TluGIoWCdx AcNNBxvKWlgs.Parent=HZQwYPCd AODxoZnR(AcNNBxvKWlgs,8);local tFdWIsKxKEnG=hjbxMbANcpf(oJqLpWawh("MxqmEtuxe",19))tFdWIsKxKEnG.Position=jprgZwAmxjEQ(10,38)tFdWIsKxKEnG.Size=xbdmcmAKGFf(1,-20,0,0)tFdWIsKxKEnG.AutomaticSize=Enum.AutomaticSize.Y tFdWIsKxKEnG.BackgroundTransparency=1 tFdWIsKxKEnG.Text=item.Texto tFdWIsKxKEnG.TextColor3=NPaCgpQkB.Gray tFdWIsKxKEnG.TextSize=10 tFdWIsKxKEnG.Font=kDvSQgYyDIIA tFdWIsKxKEnG.TextWrapped=true tFdWIsKxKEnG.TextXAlignment=TluGIoWCdx tFdWIsKxKEnG.Parent=HZQwYPCd;local knVrajxEw=hjbxMbANcpf(oJqLpWawh("RcvrZsrrml",24))knVrajxEw.AnchorPoint=LCSjDNfdM(1,0)knVrajxEw.Position=xbdmcmAKGFf(1,-10,1,6)knVrajxEw.Size=jprgZwAmxjEQ(72,28)knVrajxEw.BackgroundColor3=NPaCgpQkB.Success knVrajxEw.Text=oJqLpWawh("ZLMFXO",23)knVrajxEw.TextColor3=NPaCgpQkB.White knVrajxEw.Font=CxnLFsUbyOy knVrajxEw.TextSize=8 knVrajxEw.BorderSizePixel=0 knVrajxEw.AutoButtonColor=false knVrajxEw.Parent=HZQwYPCd AODxoZnR(knVrajxEw,6);knVrajxEw.MouseButton1Click:Connect(function()if setclipboard then fWiFPtZI(setclipboard,item.Texto)knVrajxEw.Text=oJqLpWawh("✓ WIJCUXI",20)task.delay(1,function()if knVrajxEw.Parent then knVrajxEw.Text=oJqLpWawh("WIJCUL",20)end end)else kRacVminFke(oJqLpWawh("ZLMFXO",23),oJqLpWawh("rdsbkhoanzqc mãn chronmíudk.",25),oJqLpWawh("Dqqnq",25))end end) end local imDvcWstWBDH=hjbxMbANcpf(oJqLpWawh("Yktfx",19))imDvcWstWBDH.Size=xbdmcmAKGFf(1,0,0,205)imDvcWstWBDH.BackgroundColor3=kMbWXtlHvTq(30,30,40)imDvcWstWBDH.BorderSizePixel=0 imDvcWstWBDH.LayoutOrder=99 imDvcWstWBDH.Parent=WGtEfxALeMQQ AODxoZnR(imDvcWstWBDH,8)htWHNHFdqYQK(imDvcWstWBDH,kMbWXtlHvTq(139,92,246),1);local WyAkSExJZud=hjbxMbANcpf(oJqLpWawh("RcvrJyzcj",24))WyAkSExJZud.Size=xbdmcmAKGFf(1,0,0,35)WyAkSExJZud.BackgroundColor3=kMbWXtlHvTq(139,92,246)WyAkSExJZud.Text=oJqLpWawh("🤖 ECPYBMP BC RCVRM GY (CZ)",24)WyAkSExJZud.TextColor3=NPaCgpQkB.White WyAkSExJZud.Font=CxnLFsUbyOy WyAkSExJZud.TextSize=11 WyAkSExJZud.TextXAlignment=TluGIoWCdx WyAkSExJZud.Parent=imDvcWstWBDH AODxoZnR(WyAkSExJZud,8)NPHhZpWPzBec(WyAkSExJZud,0,0,10,0);local BLkYKpUPnVz=hjbxMbANcpf(oJqLpWawh("PatpXkt",22))BLkYKpUPnVz.Position=jprgZwAmxjEQ(10,45)BLkYKpUPnVz.Size=xbdmcmAKGFf(1,-20,0,32)BLkYKpUPnVz.BackgroundColor3=NPaCgpQkB.Panel BLkYKpUPnVz.Text=oJqLpWawh("",1)BLkYKpUPnVz.PlaceholderText=oJqLpWawh("Chfhsd n sdlz (dw: Onq ptd rdquhq zn DA?)",25)BLkYKpUPnVz.PlaceholderColor3=NPaCgpQkB.DarkGray BLkYKpUPnVz.TextColor3=NPaCgpQkB.White BLkYKpUPnVz.Font=kDvSQgYyDIIA BLkYKpUPnVz.TextSize=9 BLkYKpUPnVz.BorderSizePixel=0 BLkYKpUPnVz.Parent=imDvcWstWBDH AODxoZnR(BLkYKpUPnVz,6)NPHhZpWPzBec(BLkYKpUPnVz,0,0,8,8);local MgeqJrGYlAm=hjbxMbANcpf(oJqLpWawh("QbuqYrqqlk",23))MgeqJrGYlAm.Position=jprgZwAmxjEQ(10,85)MgeqJrGYlAm.Size=xbdmcmAKGFf(1,-20,0,34)MgeqJrGYlAm.BackgroundColor3=kMbWXtlHvTq(139,92,246)MgeqJrGYlAm.Text=oJqLpWawh("⚡ ECPYP RCVRM",24)MgeqJrGYlAm.TextColor3=NPaCgpQkB.White MgeqJrGYlAm.Font=CxnLFsUbyOy MgeqJrGYlAm.TextSize=10 MgeqJrGYlAm.BorderSizePixel=0 MgeqJrGYlAm.AutoButtonColor=false MgeqJrGYlAm.Parent=imDvcWstWBDH AODxoZnR(MgeqJrGYlAm,7);local oMxlOAIxFSKa=hjbxMbANcpf(oJqLpWawh("OzsoGvwzg",21))oMxlOAIxFSKa.Position=jprgZwAmxjEQ(10,128)oMxlOAIxFSKa.Size=xbdmcmAKGFf(1,-100,0,36)oMxlOAIxFSKa.BackgroundTransparency=1 oMxlOAIxFSKa.Text=oJqLpWawh("Y pcqnmqry by GY ynypcacpá yosg...",24)oMxlOAIxFSKa.TextColor3=NPaCgpQkB.Gray oMxlOAIxFSKa.TextSize=9 oMxlOAIxFSKa.Font=kDvSQgYyDIIA oMxlOAIxFSKa.TextWrapped=true oMxlOAIxFSKa.TextXAlignment=TluGIoWCdx oMxlOAIxFSKa.Parent=imDvcWstWBDH;local etNsoXToII=hjbxMbANcpf(oJqLpWawh("OzsoWpooji",21))etNsoXToII.AnchorPoint=LCSjDNfdM(1,1)etNsoXToII.Position=xbdmcmAKGFf(1,-10,1,-10)etNsoXToII.Size=jprgZwAmxjEQ(72,27)etNsoXToII.BackgroundColor3=NPaCgpQkB.Panel etNsoXToII.Text=oJqLpWawh("BNOHZQ",25)etNsoXToII.TextColor3=NPaCgpQkB.Gray etNsoXToII.Font=CxnLFsUbyOy etNsoXToII.TextSize=8 etNsoXToII.BorderSizePixel=0 etNsoXToII.Parent=imDvcWstWBDH AODxoZnR(etNsoXToII,6);local xtjFBzFCfZl=oJqLpWawh("",1);MgeqJrGYlAm.MouseButton1Click:Connect(function() if cIJbtdWv then return end local dPmWAVvT=BLkYKpUPnVz.Text:gsub(oJqLpWawh("^%p+",23),oJqLpWawh(" ",1)):gsub(oJqLpWawh("%f+$",13),oJqLpWawh("",1))if dPmWAVvT==oJqLpWawh("",1)then oMxlOAIxFSKa.Text=oJqLpWawh("⚠️ Afdfqb rj qbjx mofjbfol.",23)return end cIJbtdWv=true MgeqJrGYlAm.Text=oJqLpWawh("⏳ YWJSFVG...",18)oMxlOAIxFSKa.Text=oJqLpWawh("Zftzqcd...",25)task.spawn(function()local ETstenQTg,awOakAOKT=MrYreKyYR(dPmWAVvT)if ETstenQTg then xtjFBzFCfZl=ETstenQTg oMxlOAIxFSKa.Text=ETstenQTg oMxlOAIxFSKa.TextColor3=NPaCgpQkB.White etNsoXToII.BackgroundColor3=NPaCgpQkB.Success etNsoXToII.TextColor3=NPaCgpQkB.White else oMxlOAIxFSKa.Text=oJqLpWawh("❌ ",1)..fikJRJQgQpPy(awOakAOKT)oMxlOAIxFSKa.TextColor3=NPaCgpQkB.Error end MgeqJrGYlAm.Text=oJqLpWawh("⚡ DBOXO QBUQL",23)cIJbtdWv=false end) end);etNsoXToII.MouseButton1Click:Connect(function()if xtjFBzFCfZl~=oJqLpWawh("",1)and setclipboard then fWiFPtZI(setclipboard,xtjFBzFCfZl)etNsoXToII.Text=oJqLpWawh("✓ AMNGYBM",24)task.delay(1,function()if etNsoXToII.Parent then etNsoXToII.Text=oJqLpWawh("ZLMFXO",23)end end)end end) YnyuJLZKAA.CanvasPosition=LCSjDNfdM() end FKvdHbQwrF=function(page) if page==oJqLpWawh("Ozqjntq",25)then DVdoELbgxaM() elseif page==oJqLpWawh("Rmppcq",24)then wMkCqeNkXLxp() elseif page==oJqLpWawh("Ykjbecqnwçãk",22)then vzbAlRCdgvoW() elseif page==oJqLpWawh("Ysrmkyçãm",24)then if mnQlzLMolBbo then mnQlzLMolBbo()else kRacVminFke(oJqLpWawh("SMLGESÇÃG",18),oJqLpWawh("Z oáfhmz cd ztsnlzçãn zhmcz mãn enh hmhbhzkhyzcz.",25),oJqLpWawh("Yllil",20))end end end local function TwumXwRDLc(FiZViPdy)if VciAcSnzTkzM then VciAcSnzTkzM.BackgroundColor3=NPaCgpQkB.Card VciAcSnzTkzM.TextColor3=NPaCgpQkB.Gray end VciAcSnzTkzM=FiZViPdy FiZViPdy.BackgroundColor3=NPaCgpQkB.Selected FiZViPdy.TextColor3=NPaCgpQkB.White end khmImxwCZ.MouseButton1Click:Connect(function()TwumXwRDLc(khmImxwCZ)if FKvdHbQwrF then FKvdHbQwrF(oJqLpWawh("Nypimsp",24))else DVdoELbgxaM()end end) ouUWiLvL.MouseButton1Click:Connect(function()TwumXwRDLc(ouUWiLvL)KovdDOOy()end) yWMsfWFELBTH.MouseButton1Click:Connect(function()TwumXwRDLc(yWMsfWFELBTH)UIfhLsAgOY()end) FvKbjDqom.MouseButton1Click:Connect(function()TwumXwRDLc(FvKbjDqom)efRlRCyC()end) ojAeXFrf.MouseButton1Click:Connect(function()TwumXwRDLc(ojAeXFrf)mVYEuCdeciVW()end) ALKSFUrbRNw.MouseButton1Click:Connect(function()TwumXwRDLc(ALKSFUrbRNw)WFHDTVTnptY()end) bKDXYrmrswQm.MouseButton1Click:Connect(function()TwumXwRDLc(bKDXYrmrswQm)pZFPQYeH()end)local MnjYwgNPE=false local uktFImALuTS,KllzESGYARm;RjgVEtTEQLCO.InputBegan:Connect(function(atCAZSEysGym)if atCAZSEysGym.UserInputType==Enum.UserInputType.MouseButton1 or atCAZSEysGym.UserInputType==Enum.UserInputType.Touch then MnjYwgNPE=true;uktFImALuTS=atCAZSEysGym.Position KllzESGYARm=RjgVEtTEQLCO.Position atCAZSEysGym.Changed:Connect(function()if atCAZSEysGym.UserInputState==Enum.UserInputState.End then MnjYwgNPE=false end end)end end)PDyUaVjKDFf.InputChanged:Connect(function(atCAZSEysGym)if MnjYwgNPE and(atCAZSEysGym.UserInputType==Enum.UserInputType.MouseMovement or atCAZSEysGym.UserInputType==Enum.UserInputType.Touch)then local aoxiRkgbwQAw=atCAZSEysGym.Position-uktFImALuTS RjgVEtTEQLCO.Position=xbdmcmAKGFf(KllzESGYARm.X.Scale,KllzESGYARm.X.Offset+aoxiRkgbwQAw.X,KllzESGYARm.Y.Scale,KllzESGYARm.Y.Offset+aoxiRkgbwQAw.Y)end end)local kZoPumMHJTB=false local FQKwLBmMy,CBAuPPECxJmC lAHupgtzPPp.InputBegan:Connect(function(atCAZSEysGym) if atCAZSEysGym.UserInputType==Enum.UserInputType.MouseButton1 or atCAZSEysGym.UserInputType==Enum.UserInputType.Touch then kZoPumMHJTB=true FQKwLBmMy=atCAZSEysGym.Position;CBAuPPECxJmC=wWMYjxVRayx.Position atCAZSEysGym.Changed:Connect(function()if atCAZSEysGym.UserInputState==Enum.UserInputState.End then kZoPumMHJTB=false end end)end end) PDyUaVjKDFf.InputChanged:Connect(function(atCAZSEysGym)if kZoPumMHJTB and(atCAZSEysGym.UserInputType==Enum.UserInputType.MouseMovement or atCAZSEysGym.UserInputType==Enum.UserInputType.Touch)then local aoxiRkgbwQAw=atCAZSEysGym.Position-FQKwLBmMy wWMYjxVRayx.Position=xbdmcmAKGFf(CBAuPPECxJmC.X.Scale,CBAuPPECxJmC.X.Offset+aoxiRkgbwQAw.X,CBAuPPECxJmC.Y.Scale,CBAuPPECxJmC.Y.Offset+aoxiRkgbwQAw.Y)end end)local VMsoQhWuw=false local function FsDBwveomI()if VMsoQhWuw then return end VMsoQhWuw=true wWMYjxVRayx.Visible=true wWMYjxVRayx.Size=UDim2.fromScale(.25,.15)wWMYjxVRayx.BackgroundTransparency=1;if 4-4==0 then ObvhQCcvDn:Create(wWMYjxVRayx,TweenInfo.new(.35,Enum.EasingStyle.Back,Enum.EasingDirection.Out),{Size=UDim2.fromScale(.78,.65),BackgroundTransparency=0}):Play()end end local function fObYKgXMsKFQ()if not VMsoQhWuw then return end VMsoQhWuw=false;local hPwzryTQ=ObvhQCcvDn:Create(wWMYjxVRayx,TweenInfo.new(.25,Enum.EasingStyle.Quart,Enum.EasingDirection.In),{Size=UDim2.fromScale(.25,.15),BackgroundTransparency=1})hPwzryTQ:Play();hPwzryTQ.Completed:Wait()if not VMsoQhWuw then wWMYjxVRayx.Visible=false end end RjgVEtTEQLCO.MouseButton1Click:Connect(function()if VMsoQhWuw then fObYKgXMsKFQ()else FsDBwveomI()end end) NJloKuhbyz.MouseButton1Click:Connect(fObYKgXMsKFQ)local lMWOXjmY,ySsGlCmRa do local AMJuIzffrEb={Fundo=kMbWXtlHvTq(10,10,14),Card=kMbWXtlHvTq(20,20,28),Borda=kMbWXtlHvTq(0,220,255),Texto=kMbWXtlHvTq(240,240,250),Verde=kMbWXtlHvTq(0,190,110),Vermelho=kMbWXtlHvTq(220,50,70),Amarelo=kMbWXtlHvTq(255,200,0),Cinza=kMbWXtlHvTq(80,80,95)};local ZToaTDOd=os.clock()xSrLFluw:SetAttribute(oJqLpWawh("UFTVmh",21),ZToaTDOd)local function yNiAyCmSR()return xSrLFluw:GetAttribute(oJqLpWawh("XIWYpk",24))==ZToaTDOd end local function zMeWToTx(AZJDAUQC,TZFeHrAF,par)local TZVCvKIX=hjbxMbANcpf(AZJDAUQC) for k,OHRjXRmRea in ZQkZuhjgUs(TZFeHrAF)do TZVCvKIX[k]=OHRjXRmRea end TZVCvKIX.Parent=par return TZVCvKIX end local function gsHOKrptSh(par,bCaXqBFHKWz,scIqxcoyjFv,ETstenQTg,cor,ts,fonte,al) return zMeWToTx(oJqLpWawh("RcvrJyzcj",24),{BackgroundTransparency=1,Position=bCaXqBFHKWz,Size=scIqxcoyjFv,Text=ETstenQTg,TextColor3=cor,TextSize=ts,Font=fonte,TextXAlignment=al or TluGIoWCdx},par)end local function gJyDnCvb(titulo,kmvCOFKdtLaw)local pdnzQboWJ=zMeWToTx(oJqLpWawh("Zlugy",20),{Size=xbdmcmAKGFf(1,0,0,58),BackgroundColor3=NPaCgpQkB.Card,BorderSizePixel=0,LayoutOrder=0},WGtEfxALeMQQ)AODxoZnR(pdnzQboWJ,9) htWHNHFdqYQK(pdnzQboWJ,NPaCgpQkB.StrokeLight,1)gsHOKrptSh(pdnzQboWJ,jprgZwAmxjEQ(12,7),xbdmcmAKGFf(1,-24,0,25),titulo,NPaCgpQkB.White,16,CxnLFsUbyOy)gsHOKrptSh(pdnzQboWJ,jprgZwAmxjEQ(13,34),xbdmcmAKGFf(1,-26,0,15),kmvCOFKdtLaw,NPaCgpQkB.DarkGray,9,kDvSQgYyDIIA)end local function bNVGtyau(AZJDAUQC)if not AZJDAUQC then return false end return AZJDAUQC.G>0.2 and AZJDAUQC.G>AZJDAUQC.R*1.1 and AZJDAUQC.G>AZJDAUQC.B*1.1 end local function limpar(obj) if not obj or not obj.Parent then return end if obj:IsA(oJqLpWawh("Dpykc",24))then local FFkmEBhiwDwI=obj.AbsoluteSize.X*obj.AbsoluteSize.Y;if bNVGtyau(obj.BackgroundColor3)or obj.BackgroundColor3==kMbWXtlHvTq(0,0,0)then obj.BackgroundColor3=FFkmEBhiwDwI>30000 and AMJuIzffrEb.Fundo or AMJuIzffrEb.Card end if FFkmEBhiwDwI>5000 then if not obj:FindFirstChildOfClass(oJqLpWawh("THBnqmdq",25))then hjbxMbANcpf(oJqLpWawh("PDXjmizm",21),obj).CornerRadius=LodNlYsD(0,10)end local yCOpyhBopE=obj:FindFirstChildOfClass(oJqLpWawh("THRsqnjd",25));if not yCOpyhBopE then yCOpyhBopE=hjbxMbANcpf(oJqLpWawh("QEOpnkga",22),obj)end if bNVGtyau(yCOpyhBopE.Color)or yCOpyhBopE.Transparency>0.5 then yCOpyhBopE.Color=AMJuIzffrEb.Borda yCOpyhBopE.Thickness=1 yCOpyhBopE.Transparency=0.4 end end elseif obj:IsA(oJqLpWawh("RbqnkkhmfEqzld",25))then obj.BorderSizePixel=0 obj.ScrollBarImageColor3=AMJuIzffrEb.Borda if bNVGtyau(obj.BackgroundColor3)then obj.BackgroundColor3=AMJuIzffrEb.Fundo end elseif obj:IsA(oJqLpWawh("PatpHwxah",22))then if bNVGtyau(obj.TextColor3)then obj.TextColor3=AMJuIzffrEb.Texto end elseif obj:IsA(oJqLpWawh("RcvrZsrrml",24))then if bNVGtyau(obj.BackgroundColor3)then obj.BackgroundColor3=AMJuIzffrEb.Verde end if bNVGtyau(obj.TextColor3)then obj.TextColor3=Color3.new(1,1,1)end if not obj:FindFirstChildOfClass(oJqLpWawh("THBnqmdq",25))then hjbxMbANcpf(oJqLpWawh("THBnqmdq",25),obj).CornerRadius=LodNlYsD(0,6)end elseif obj:IsA(oJqLpWawh("GkyecJyzcj",24))or obj:IsA(oJqLpWawh("CguayVonnih",20))then if bNVGtyau(obj.BackgroundColor3)then obj.BackgroundColor3=AMJuIzffrEb.Card end end end local function zGKCZrSQ(yreEmmXYq)if not yreEmmXYq or not yreEmmXYq.Parent then return end for _,obj in rWrFtxkoL(yreEmmXYq:GetDescendants())do fWiFPtZI(limpar,obj)end if not yreEmmXYq:FindFirstChild(oJqLpWawh("XhfoxJxoh",23))then zMeWToTx(oJqLpWawh("SdwsKzadk",25),{Name=oJqLpWawh("XhfoxJxoh",23),Size=xbdmcmAKGFf(1,-20,0,16),Position=xbdmcmAKGFf(0,10,1,-18),BackgroundTransparency=1,Text=oJqLpWawh("⚡ xu Wgenw",22),TextColor3=AMJuIzffrEb.Borda,Font=CxnLFsUbyOy,TextSize=11,ZIndex=200},yreEmmXYq) end end local function vlFNUjvcyHv(nome)for _,MowMcsejET in rWrFtxkoL(xSrLFluw:GetChildren())do if MowMcsejET:IsA(oJqLpWawh("RbqddmFth",25))and MowMcsejET.Name==nome then return MowMcsejET end end for _,MowMcsejET in rWrFtxkoL(xSrLFluw:GetDescendants())do if MowMcsejET:IsA(oJqLpWawh("QapcclEsg",24))and MowMcsejET.Name==nome then return MowMcsejET end end end local uDlXsNttTTW={}local function BNhIEUpwz(nome) local MowMcsejET=uDlXsNttTTW[nome]if MowMcsejET and MowMcsejET.Parent then return MowMcsejET end return vlFNUjvcyHv(nome)end task.spawn(function()while yNiAyCmSR()do task.wait(0.5)local MowMcsejET=BNhIEUpwz(oJqLpWawh("CqjOdklCqe",22)) if MowMcsejET and MowMcsejET~=uDlXsNttTTW.GunShopGui then uDlXsNttTTW.GunShopGui=MowMcsejET MowMcsejET:GetPropertyChangedSignal(oJqLpWawh("Dmzakdc",25)):Connect(function()if MowMcsejET.Enabled then task.wait(0.15)zGKCZrSQ(MowMcsejET) end end)end end end)task.spawn(function()while yNiAyCmSR()do task.wait(0.8)local MowMcsejET=BNhIEUpwz(oJqLpWawh("EslQfmnEsg",24))if MowMcsejET and MowMcsejET.Enabled then fWiFPtZI(zGKCZrSQ,MowMcsejET)end end end) local function ttedzAjCLFV()local MowMcsejET=BNhIEUpwz(oJqLpWawh("FtmRgnoFth",25))if not MowMcsejET then kRacVminFke(oJqLpWawh("DQQN",25),oJqLpWawh("Kniz cd zqlzr mãn dmbnmsqzcz mn infn.",25),oJqLpWawh("Boolo",23))return end MowMcsejET.Enabled=true;task.wait(0.15)zGKCZrSQ(MowMcsejET)fObYKgXMsKFQ()end lMWOXjmY=function()llIlFgQIY=oJqLpWawh("Ilgx",23)EgxtSHLgI()gJyDnCvb(oJqLpWawh("🔫 JMHY BC YPKYQ",24),oJqLpWawh("Zaqd z kniz cd zqlzr bnl uhrtzk czqj",25)) local HZQwYPCd=zMeWToTx(oJqLpWawh("Yktfx",19),{Size=xbdmcmAKGFf(1,0,0,55),BackgroundColor3=NPaCgpQkB.Card,BorderSizePixel=0,LayoutOrder=1},WGtEfxALeMQQ)AODxoZnR(HZQwYPCd,8)htWHNHFdqYQK(HZQwYPCd,AMJuIzffrEb.Borda,1.5);gsHOKrptSh(HZQwYPCd,jprgZwAmxjEQ(11,5),xbdmcmAKGFf(1,-100,0,20),oJqLpWawh("🔫 HKFW ZA WNIWO",22),NPaCgpQkB.White,10,Enum.Font.GothamBlack);gsHOKrptSh(HZQwYPCd,jprgZwAmxjEQ(11,26),xbdmcmAKGFf(1,-100,0,17),oJqLpWawh("Zaqd z kniz cd zqlzr cn infn.",25),NPaCgpQkB.Gray,7,kDvSQgYyDIIA);local RrrciKYHLj=zMeWToTx(oJqLpWawh("LwplTmllgf",18),{AnchorPoint=LCSjDNfdM(1,.5),Position=xbdmcmAKGFf(1,-8,.5,0),Size=jprgZwAmxjEQ(68,30),BackgroundColor3=NPaCgpQkB.Success,BorderSizePixel=0,Text=oJqLpWawh("▶ WXNEN",22),TextColor3=NPaCgpQkB.White,TextSize=8,Font=CxnLFsUbyOy,AutoButtonColor=false},HZQwYPCd);AODxoZnR(RrrciKYHLj,7)RrrciKYHLj.MouseButton1Click:Connect(ttedzAjCLFV)YnyuJLZKAA.CanvasPosition=LCSjDNfdM()end local uYyhUuSPPW,dHYwEnOe,NTcOsLQpJ,tAbXfeUNMiRN,LHnBygfnl=false,29,2,40,true;local ntagZVKTUlp,qOZDrOIvi,sYMiXyEdmL,TRjHzKlVO=0,{},0,0 local NkXfaDpq,OfVqAfYYe,VRwxrgxUiC,tAkrlVTJQjkL local function poIjRLyTg(GtYGIgzUJ) if not NkXfaDpq or not NkXfaDpq.Parent then return end if GtYGIgzUJ then NkXfaDpq.Text=oJqLpWawh("LWNWN",22)NkXfaDpq.BackgroundColor3=AMJuIzffrEb.Vermelho else NkXfaDpq.Text=oJqLpWawh("IFDXO",23)NkXfaDpq.BackgroundColor3=AMJuIzffrEb.Verde end end local function MgAyYKju(obj)if firesignal then fWiFPtZI(function() firesignal(obj.MouseButton1Down)firesignal(obj.MouseButton1Up)firesignal(obj.MouseButton1Click)end)return end fWiFPtZI(function()obj.MouseButton1Down:Fire() obj.MouseButton1Up:Fire()obj.MouseButton1Click:Fire()end)end local function ehBolha(obj)if obj.ClassName~=oJqLpWawh("HlzfdAtssnm",25)then return false end if obj.Name~=oJqLpWawh("GlnsrRcknjyrc",24)then return false end if not obj.Visible then return false end local yCOpyhBopE=obj.AbsoluteSize;if yCOpyhBopE.X<20 or yCOpyhBopE.Y<20 or yCOpyhBopE.X>200 or yCOpyhBopE.Y>200 then return false end local TZFeHrAF=obj.AbsolutePosition if TZFeHrAF.X<=0 or TZFeHrAF.Y<=0 then return false end return true end local function XcDZhYYqw(obj)local bCaXqBFHKWz=obj.AbsolutePosition local scIqxcoyjFv=obj.AbsoluteSize local qBKNPAUT=bCaXqBFHKWz.X+scIqxcoyjFv.X/2 local HeQvirSsV=bCaXqBFHKWz.Y+scIqxcoyjFv.Y/2;return math.floor(qBKNPAUT/40)..oJqLpWawh("_",1)..math.floor(HeQvirSsV/40)end task.spawn(function()while yNiAyCmSR()do if not uYyhUuSPPW then task.wait(0.1)continue end if LHnBygfnl and ntagZVKTUlp>=tAbXfeUNMiRN then uYyhUuSPPW=false poIjRLyTg(false)task.wait(0.1)continue end local nAQbTMdtamMZ=dHYwEnOe/100 local vyOWuKPc=tick();for PfezsPWMY,CjWBJdUS in ZQkZuhjgUs(qOZDrOIvi)do if vyOWuKPc-CjWBJdUS.t>2.5 then qOZDrOIvi[PfezsPWMY]=nil end end local omyalrZV=false for _,yreEmmXYq in rWrFtxkoL(xSrLFluw:GetChildren())do if yreEmmXYq:IsA(oJqLpWawh("PzobbkDrf",23))and yreEmmXYq~=sFtZACYbLnc then for _,obj in rWrFtxkoL(yreEmmXYq:GetDescendants())do if ehBolha(obj)then TRjHzKlVO=tick()local PfezsPWMY=XcDZhYYqw(obj);local CjWBJdUS=qOZDrOIvi[PfezsPWMY]if not CjWBJdUS then qOZDrOIvi[PfezsPWMY]={count=0,t=tick()}CjWBJdUS=qOZDrOIvi[PfezsPWMY]end CjWBJdUS.t=tick()if CjWBJdUS.count<NTcOsLQpJ then MgAyYKju(obj)CjWBJdUS.count=CjWBJdUS.count+1 sYMiXyEdmL=sYMiXyEdmL+1 omyalrZV=true if CjWBJdUS.count==1 then ntagZVKTUlp=ntagZVKTUlp+1 end break end end end end if omyalrZV then break end end if LHnBygfnl and ntagZVKTUlp==tAbXfeUNMiRN-1 and(tick()-TRjHzKlVO>2)then uYyhUuSPPW=false poIjRLyTg(false)task.wait(0.1)continue end if omyalrZV then task.wait(nAQbTMdtamMZ)else task.wait(0.02)end end end)task.spawn(function()while yNiAyCmSR()do task.wait(0.3)if OfVqAfYYe and OfVqAfYYe.Parent then OfVqAfYYe.Text=string.format(oJqLpWawh("EEn: %y/%y",21),ntagZVKTUlp,tAbXfeUNMiRN)OfVqAfYYe.TextColor3=(ntagZVKTUlp>=tAbXfeUNMiRN and LHnBygfnl)and AMJuIzffrEb.Verde or AMJuIzffrEb.Amarelo end end end);local function TREJvzAuTerr()if tAkrlVTJQjkL and tAkrlVTJQjkL.Parent then tAkrlVTJQjkL.Text=fikJRJQgQpPy(dHYwEnOe)end if VRwxrgxUiC and VRwxrgxUiC.Parent then VRwxrgxUiC.Size=xbdmcmAKGFf((dHYwEnOe-1)/39,0,1,0)end end local function LBjWsIdxQKy(OHRjXRmRea)dHYwEnOe=math.clamp(OHRjXRmRea,1,40)TREJvzAuTerr()end local function HYtQiTHPyA(par,bCaXqBFHKWz,scIqxcoyjFv,ETstenQTg,gokaSRuiC,cor,ts,HsioyGlGHL) local FiZViPdy=zMeWToTx(oJqLpWawh("QbuqYrqqlk",23),{Position=bCaXqBFHKWz,Size=scIqxcoyjFv,BackgroundColor3=gokaSRuiC,Text=ETstenQTg,TextColor3=cor,Font=CxnLFsUbyOy,TextSize=ts,BorderSizePixel=0,AutoButtonColor=false},par)AODxoZnR(FiZViPdy,HsioyGlGHL);return FiZViPdy end ySsGlCmRa=function()llIlFgQIY=oJqLpWawh("UUd",11)EgxtSHLgI()if DfoUoSVDPYw then DfoUoSVDPYw(oJqLpWawh("Vpojhvçãj",21))end gJyDnCvb(oJqLpWawh("🤸 UONI DDm",20),oJqLpWawh("Bkhbz rnyhmgn mzr ankgzr cnr IIr",25)) local HZQwYPCd=zMeWToTx(oJqLpWawh("Pbkwo",10),{Size=xbdmcmAKGFf(1,0,0,260),BackgroundColor3=NPaCgpQkB.Card,BorderSizePixel=0,LayoutOrder=1},WGtEfxALeMQQ)AODxoZnR(HZQwYPCd,8)htWHNHFdqYQK(HZQwYPCd,NPaCgpQkB.Stroke,1);local yxOTJmWMX,xFltdDrzRAbk,tVzrvhSNKCea=CxnLFsUbyOy,kDvSQgYyDIIA,UEyesQzOCw OfVqAfYYe=gsHOKrptSh(HZQwYPCd,jprgZwAmxjEQ(10,8),xbdmcmAKGFf(1,-20,0,26),string.format(oJqLpWawh("HHq: %b/%b",24),ntagZVKTUlp,tAbXfeUNMiRN),AMJuIzffrEb.Amarelo,12,yxOTJmWMX);gsHOKrptSh(HZQwYPCd,jprgZwAmxjEQ(10,40),xbdmcmAKGFf(0.5,0,0,16),oJqLpWawh("JBQX:",23),NPaCgpQkB.White,10,yxOTJmWMX);local sAXjilDCknl=zMeWToTx(oJqLpWawh("QbuqYlu",23),{Size=xbdmcmAKGFf(0.3,0,0,22),Position=xbdmcmAKGFf(0.65,0,0,38),BackgroundColor3=NPaCgpQkB.Panel,Text=fikJRJQgQpPy(tAbXfeUNMiRN),TextColor3=NPaCgpQkB.White,Font=yxOTJmWMX,TextSize=11,BorderSizePixel=0,ClearTextOnFocus=false},HZQwYPCd);AODxoZnR(sAXjilDCknl,5)sAXjilDCknl.FocusLost:Connect(function()local OHRjXRmRea=OmIBzVYHSzmL(sAXjilDCknl.Text)if OHRjXRmRea and OHRjXRmRea>0 then tAbXfeUNMiRN=OHRjXRmRea else sAXjilDCknl.Text=fikJRJQgQpPy(tAbXfeUNMiRN)end end) local UZdiMTalz=HYtQiTHPyA(HZQwYPCd,jprgZwAmxjEQ(10,66),xbdmcmAKGFf(1,-20,0,22),LHnBygfnl and oJqLpWawh("KCRY: ML",24)or oJqLpWawh("KCRY: MDD",24),LHnBygfnl and AMJuIzffrEb.Verde or AMJuIzffrEb.Cinza,Color3.new(1,1,1),10,5);UZdiMTalz.MouseButton1Click:Connect(function()LHnBygfnl=not LHnBygfnl UZdiMTalz.Text=LHnBygfnl and oJqLpWawh("JBQX: LK",23)or oJqLpWawh("KCRY: MDD",24) UZdiMTalz.BackgroundColor3=LHnBygfnl and AMJuIzffrEb.Verde or AMJuIzffrEb.Cinza end)gsHOKrptSh(HZQwYPCd,jprgZwAmxjEQ(10,94),xbdmcmAKGFf(1,-20,0,14),oJqLpWawh("UDKNBHCZCD",25),NPaCgpQkB.White,10,yxOTJmWMX);local gGtLnkPX=zMeWToTx(oJqLpWawh("Zlugy",20),{Size=xbdmcmAKGFf(1,-20,0,6),Position=jprgZwAmxjEQ(10,112),BackgroundColor3=NPaCgpQkB.Panel,BorderSizePixel=0},HZQwYPCd)AODxoZnR(gGtLnkPX,3);VRwxrgxUiC=zMeWToTx(oJqLpWawh("Coxjb",23),{Size=xbdmcmAKGFf((dHYwEnOe-1)/39,0,1,0),BackgroundColor3=AMJuIzffrEb.Verde,BorderSizePixel=0},gGtLnkPX)AODxoZnR(VRwxrgxUiC,3);gsHOKrptSh(HZQwYPCd,jprgZwAmxjEQ(10,120),xbdmcmAKGFf(0.35,0,0,12),oJqLpWawh("QÁOHCN",25),NPaCgpQkB.DarkGray,8,xFltdDrzRAbk)gsHOKrptSh(HZQwYPCd,xbdmcmAKGFf(0.65,0,0,120),xbdmcmAKGFf(0.35,0,0,12),oJqLpWawh("CVEKF",17),NPaCgpQkB.DarkGray,8,xFltdDrzRAbk,Enum.TextXAlignment.Right);tAkrlVTJQjkL=gsHOKrptSh(HZQwYPCd,xbdmcmAKGFf(0.35,0,0,119),xbdmcmAKGFf(0.3,0,0,14),fikJRJQgQpPy(dHYwEnOe),NPaCgpQkB.White,12,yxOTJmWMX,tVzrvhSNKCea);local tUFjAcYbta=HYtQiTHPyA(HZQwYPCd,jprgZwAmxjEQ(10,138),xbdmcmAKGFf(0.15,0,0,26),oJqLpWawh("−",1),NPaCgpQkB.Panel,NPaCgpQkB.White,18,5)gsHOKrptSh(HZQwYPCd,xbdmcmAKGFf(0.15,0,0,138),xbdmcmAKGFf(0.15,0,0,26),oJqLpWawh("-2",1),NPaCgpQkB.DarkGray,10,xFltdDrzRAbk,tVzrvhSNKCea);local XoizpMWHJGKH=HYtQiTHPyA(HZQwYPCd,xbdmcmAKGFf(0.85,0,0,138),xbdmcmAKGFf(0.15,0,0,26),oJqLpWawh("+",1),NPaCgpQkB.Panel,NPaCgpQkB.White,18,5)gsHOKrptSh(HZQwYPCd,xbdmcmAKGFf(0.7,0,0,138),xbdmcmAKGFf(0.15,0,0,26),oJqLpWawh("+2",1),NPaCgpQkB.DarkGray,10,xFltdDrzRAbk,tVzrvhSNKCea);tUFjAcYbta.MouseButton1Click:Connect(function()LBjWsIdxQKy(dHYwEnOe-1)end)XoizpMWHJGKH.MouseButton1Click:Connect(function()LBjWsIdxQKy(dHYwEnOe+1)end) gsHOKrptSh(HZQwYPCd,jprgZwAmxjEQ(10,166),xbdmcmAKGFf(1,-20,0,12),oJqLpWawh("Pcamkclbyçãm: 63",24),AMJuIzffrEb.Amarelo,9,xFltdDrzRAbk);local pthTGQYQA=HYtQiTHPyA(HZQwYPCd,jprgZwAmxjEQ(10,182),xbdmcmAKGFf(1,-20,0,36),oJqLpWawh("KHFZQ",25),AMJuIzffrEb.Verde,Color3.new(1,1,1),14,6)NkXfaDpq=pthTGQYQA poIjRLyTg(uYyhUuSPPW);pthTGQYQA.MouseButton1Click:Connect(function()if not uYyhUuSPPW and LHnBygfnl and ntagZVKTUlp>=tAbXfeUNMiRN then ntagZVKTUlp=0 sYMiXyEdmL=0 qOZDrOIvi={}end uYyhUuSPPW=not uYyhUuSPPW;poIjRLyTg(uYyhUuSPPW)if uYyhUuSPPW then TRjHzKlVO=tick()end end)local nUnhmbKRC=HYtQiTHPyA(HZQwYPCd,jprgZwAmxjEQ(10,222),xbdmcmAKGFf(1,-20,0,16),oJqLpWawh("QDRDSZQ BNMSZCNQ",25),NPaCgpQkB.Panel,NPaCgpQkB.DarkGray,9,4);nUnhmbKRC.MouseButton1Click:Connect(function()ntagZVKTUlp=0 sYMiXyEdmL=0 qOZDrOIvi={}end) gsHOKrptSh(HZQwYPCd,jprgZwAmxjEQ(10,242),xbdmcmAKGFf(1,-20,0,12),oJqLpWawh("Cdrdmunkuhcn onq Zjhqz",25),NPaCgpQkB.DarkGray,8,xFltdDrzRAbk,Enum.TextXAlignment.Right)YnyuJLZKAA.CanvasPosition=LCSjDNfdM()end mnQlzLMolBbo=ySsGlCmRa end local SiGUvpdwt do local NZYQqEgA={Ativo=false,Visual=true,Tamanho=5,Transparencia=.7,Cor=kMbWXtlHvTq(80,140,230),Material=oJqLpWawh("Mdnm",25)};local wafaSEQMdTs={};local sQkMLJYfZrD=os.clock()xSrLFluw:SetAttribute(oJqLpWawh("XIWFgrzmv",24),sQkMLJYfZrD);local iVlQsIPc={kMbWXtlHvTq(80,140,230),kMbWXtlHvTq(255,0,0),kMbWXtlHvTq(0,255,100),kMbWXtlHvTq(255,200,0),kMbWXtlHvTq(255,0,255),kMbWXtlHvTq(255,255,255),kMbWXtlHvTq(150,80,255)};local function jNgFSTjahSEy(char) if wafaSEQMdTs[char]then return end local qpPbyYvkE=char:FindFirstChild(oJqLpWawh("GtlzmnhcQnnsOzqs",25));if not qpPbyYvkE then return end wafaSEQMdTs[char]={Size=qpPbyYvkE.Size,Transparency=qpPbyYvkE.Transparency,Color=qpPbyYvkE.Color,Material=qpPbyYvkE.Material,CanCollide=qpPbyYvkE.CanCollide} end local function vZYgnDxesTy(char) if not char then return end local qpPbyYvkE=char:FindFirstChild(oJqLpWawh("GtlzmnhcQnnsOzqs",25));if not qpPbyYvkE then return end jNgFSTjahSEy(char);fWiFPtZI(function() qpPbyYvkE.Size=Vector3.new(NZYQqEgA.Tamanho,NZYQqEgA.Tamanho,NZYQqEgA.Tamanho);qpPbyYvkE.Transparency=NZYQqEgA.Visual and NZYQqEgA.Transparencia or 1;qpPbyYvkE.Color=NZYQqEgA.Cor;qpPbyYvkE.Material=Enum.Material.Neon;qpPbyYvkE.CanCollide=false end) end local function liKKPqWDTy(char) if not char then return end local aUGepAmp=wafaSEQMdTs[char];if not aUGepAmp then return end local qpPbyYvkE=char:FindFirstChild(oJqLpWawh("DqiwjkezNkkpLwnp",22));if qpPbyYvkE then fWiFPtZI(function() qpPbyYvkE.Size=aUGepAmp.Size;qpPbyYvkE.Transparency=aUGepAmp.Transparency;qpPbyYvkE.Color=aUGepAmp.Color;qpPbyYvkE.Material=aUGepAmp.Material;qpPbyYvkE.CanCollide=aUGepAmp.CanCollide end) end wafaSEQMdTs[char]=nil end local AktdGszoX;AktdGszoX=EPeVFwlFZ.Heartbeat:Connect(function() if xSrLFluw:GetAttribute(oJqLpWawh("WHVEfqylu",23))~=sQkMLJYfZrD then AktdGszoX:Disconnect();for AZJDAUQC in ZQkZuhjgUs(wafaSEQMdTs)do liKKPqWDTy(AZJDAUQC)end return end if NZYQqEgA.Ativo then for _,TZFeHrAF in rWrFtxkoL(umQERihUk:GetPlayers())do if TZFeHrAF~=iilVQzDVvl and TZFeHrAF.Character then vZYgnDxesTy(TZFeHrAF.Character) end end for char in ZQkZuhjgUs(wafaSEQMdTs)do if not char.Parent then wafaSEQMdTs[char]=nil end end else for char in ZQkZuhjgUs(wafaSEQMdTs)do liKKPqWDTy(char)end end end);local function zMeWToTx(AZJDAUQC,TZFeHrAF,par)local TZVCvKIX=hjbxMbANcpf(AZJDAUQC)for k,OHRjXRmRea in ZQkZuhjgUs(TZFeHrAF)do TZVCvKIX[k]=OHRjXRmRea end TZVCvKIX.Parent=par return TZVCvKIX end local function ymfUtpqIMDL(pdnzQboWJ,ordem) local AZJDAUQC=zMeWToTx(oJqLpWawh("Wirdv",17),{Size=xbdmcmAKGFf(1,0,0,pdnzQboWJ),BackgroundColor3=NPaCgpQkB.Card,BorderSizePixel=0,LayoutOrder=ordem},WGtEfxALeMQQ);AODxoZnR(AZJDAUQC,8)htWHNHFdqYQK(AZJDAUQC,NPaCgpQkB.Stroke,1);return AZJDAUQC end local function oWvCWeLvLU(par,bCaXqBFHKWz,scIqxcoyjFv,ETstenQTg,cor,ts,fonte,al) return zMeWToTx(oJqLpWawh("RcvrJyzcj",24),{BackgroundTransparency=1,Position=bCaXqBFHKWz,Size=scIqxcoyjFv,Text=ETstenQTg,TextColor3=cor,TextSize=ts,Font=fonte,TextXAlignment=al or TluGIoWCdx},par) end local function cndeyHWwm(ordem,eALyjyykniV,inicial,callback) local HZQwYPCd=ymfUtpqIMDL(45,ordem);oWvCWeLvLU(HZQwYPCd,jprgZwAmxjEQ(10,0),xbdmcmAKGFf(1,-70,1,0),eALyjyykniV,NPaCgpQkB.White,12,CxnLFsUbyOy);local MEbqvWbs=zMeWToTx(oJqLpWawh("RcvrZsrrml",24),{AnchorPoint=LCSjDNfdM(1,.5),Position=xbdmcmAKGFf(1,-10,.5,0),Size=jprgZwAmxjEQ(38,20),BackgroundColor3=NPaCgpQkB.Panel,Text=oJqLpWawh("",1),BorderSizePixel=0,AutoButtonColor=false},HZQwYPCd);AODxoZnR(MEbqvWbs,10)htWHNHFdqYQK(MEbqvWbs,NPaCgpQkB.Stroke,1);local iVFpcUcPLnj=zMeWToTx(oJqLpWawh("Coxjb",23),{Position=jprgZwAmxjEQ(3,3),Size=jprgZwAmxjEQ(14,14),BackgroundColor3=NPaCgpQkB.DarkGray,BorderSizePixel=0},MEbqvWbs);AODxoZnR(iVFpcUcPLnj,7);local YovTHHEgDgQ=inicial;local function HhuKRYOV(OHRjXRmRea) YovTHHEgDgQ=OHRjXRmRea;MEbqvWbs.BackgroundColor3=OHRjXRmRea and NPaCgpQkB.Success or NPaCgpQkB.Panel;iVFpcUcPLnj.Position=OHRjXRmRea and jprgZwAmxjEQ(21,3)or jprgZwAmxjEQ(3,3);iVFpcUcPLnj.BackgroundColor3=OHRjXRmRea and Color3.new(1,1,1)or NPaCgpQkB.DarkGray end HhuKRYOV(YovTHHEgDgQ);MEbqvWbs.MouseButton1Click:Connect(function()HhuKRYOV(not YovTHHEgDgQ)callback(YovTHHEgDgQ)end) end local function kIElvzscwun(ordem,titulo,valor,min,max,callback) local HZQwYPCd=ymfUtpqIMDL(60,ordem);oWvCWeLvLU(HZQwYPCd,jprgZwAmxjEQ(10,7),xbdmcmAKGFf(1,-70,0,16),titulo,NPaCgpQkB.White,12,CxnLFsUbyOy);local nLALXqhsQDY=oWvCWeLvLU(HZQwYPCd,jprgZwAmxjEQ(0,7),jprgZwAmxjEQ(50,16),fikJRJQgQpPy(valor),NPaCgpQkB.Orange,12,CxnLFsUbyOy,Enum.TextXAlignment.Right);nLALXqhsQDY.AnchorPoint=LCSjDNfdM(1,0)nLALXqhsQDY.Position=xbdmcmAKGFf(1,-10,0,7);local JKjCkzDvsQhU=zMeWToTx(oJqLpWawh("Vhqcu",16),{Position=jprgZwAmxjEQ(10,38),Size=xbdmcmAKGFf(1,-20,0,8),BackgroundColor3=NPaCgpQkB.Panel,BorderSizePixel=0},HZQwYPCd)AODxoZnR(JKjCkzDvsQhU,4);local YGwKxNMXwSQj=(valor-min)/(max-min);local SeucZSeAb=zMeWToTx(oJqLpWawh("Zlugy",20),{Size=xbdmcmAKGFf(YGwKxNMXwSQj,0,1,0),BackgroundColor3=NPaCgpQkB.Success,BorderSizePixel=0},JKjCkzDvsQhU)AODxoZnR(SeucZSeAb,4);local OqgqgLoKD=zMeWToTx(oJqLpWawh("Wirdv",17),{AnchorPoint=LCSjDNfdM(.5,.5),Position=xbdmcmAKGFf(YGwKxNMXwSQj,0,.5,0),Size=jprgZwAmxjEQ(14,14),BackgroundColor3=Color3.new(1,1,1),BorderSizePixel=0,ZIndex=2},JKjCkzDvsQhU)AODxoZnR(OqgqgLoKD,7);local KtXdAosnG=zMeWToTx(oJqLpWawh("SdwsAtssnm",25),{Position=jprgZwAmxjEQ(10,28),Size=xbdmcmAKGFf(1,-20,0,28),BackgroundTransparency=1,Text=oJqLpWawh("",1),AutoButtonColor=false,ZIndex=3},HZQwYPCd);local function wBMQgTOvrycp(EpsxZkSeBBVx) local haBVenNlNZMz=math.clamp((EpsxZkSeBBVx-JKjCkzDvsQhU.AbsolutePosition.X)/math.max(JKjCkzDvsQhU.AbsoluteSize.X,1),0,1);local OHRjXRmRea=math.floor(min+(max-min)*haBVenNlNZMz+.5);local TZFeHrAF=(OHRjXRmRea-min)/(max-min);nLALXqhsQDY.Text=fikJRJQgQpPy(OHRjXRmRea)SeucZSeAb.Size=xbdmcmAKGFf(TZFeHrAF,0,1,0)OqgqgLoKD.Position=xbdmcmAKGFf(TZFeHrAF,0,.5,0);callback(OHRjXRmRea) end KtXdAosnG.InputBegan:Connect(function(atCAZSEysGym) if atCAZSEysGym.UserInputType==Enum.UserInputType.MouseButton1 or atCAZSEysGym.UserInputType==Enum.UserInputType.Touch then YnyuJLZKAA.ScrollingEnabled=false;wBMQgTOvrycp(atCAZSEysGym.Position.X);local WJgLHaTg,KwqibSXkrS;WJgLHaTg=PDyUaVjKDFf.InputChanged:Connect(function(m) if m==atCAZSEysGym or m.UserInputType==Enum.UserInputType.MouseMovement then wBMQgTOvrycp(m.Position.X)end end);KwqibSXkrS=atCAZSEysGym.Changed:Connect(function() if atCAZSEysGym.UserInputState==Enum.UserInputState.End then WJgLHaTg:Disconnect()KwqibSXkrS:Disconnect()YnyuJLZKAA.ScrollingEnabled=true end end) end end) end local function BKdYlyyjx(ordem) local HZQwYPCd=ymfUtpqIMDL(98,ordem);oWvCWeLvLU(HZQwYPCd,jprgZwAmxjEQ(10,7),xbdmcmAKGFf(1,-20,0,16),oJqLpWawh("Amp by Fgrzmv",24),NPaCgpQkB.White,12,CxnLFsUbyOy);local uQQscjGRLH=zMeWToTx(oJqLpWawh("Coxjb",23),{Position=jprgZwAmxjEQ(10,30),Size=xbdmcmAKGFf(1,-20,0,26),BackgroundTransparency=1},HZQwYPCd);zMeWToTx(oJqLpWawh("QEHeopHwukqp",22),{FillDirection=Enum.FillDirection.Horizontal,Padding=LodNlYsD(0,5)},uQQscjGRLH);local FqiAkChUnU=zMeWToTx(oJqLpWawh("Eqzld",25),{Position=jprgZwAmxjEQ(10,64),Size=xbdmcmAKGFf(1,-20,0,26),BackgroundColor3=NPaCgpQkB.Panel,BorderSizePixel=0},HZQwYPCd);AODxoZnR(FqiAkChUnU,6)htWHNHFdqYQK(FqiAkChUnU,NPaCgpQkB.Stroke,1);local function vaRKlRrn(AZJDAUQC)return string.format(oJqLpWawh("%x,%x,%x",20),math.floor(AZJDAUQC.R*255+.5),math.floor(AZJDAUQC.G*255+.5),math.floor(AZJDAUQC.B*255+.5))end local xIGHCuJHXCk=zMeWToTx(oJqLpWawh("KvokSfo",17),{Position=jprgZwAmxjEQ(6,0),Size=xbdmcmAKGFf(1,-12,1,0),BackgroundTransparency=1,Text=vaRKlRrn(NZYQqEgA.Cor),PlaceholderText=oJqLpWawh("K,Z,U",19),PlaceholderColor3=NPaCgpQkB.DarkGray,TextColor3=NPaCgpQkB.White,Font=Enum.Font.Code,TextSize=11,TextXAlignment=TluGIoWCdx,ClearTextOnFocus=false},FqiAkChUnU);local dCEeaYuPIro={};local function VNFqeicLpc() for _,PxtbtrzQilO in rWrFtxkoL(dCEeaYuPIro)do PxtbtrzQilO.stroke.Enabled=(PxtbtrzQilO.cor==NZYQqEgA.Cor)end end for _,cor in rWrFtxkoL(iVlQsIPc)do local FiZViPdy=zMeWToTx(oJqLpWawh("SdwsAtssnm",25),{Size=jprgZwAmxjEQ(26,26),BackgroundColor3=cor,Text=oJqLpWawh("",1),BorderSizePixel=0,AutoButtonColor=false},uQQscjGRLH);AODxoZnR(FiZViPdy,6);local yCOpyhBopE=htWHNHFdqYQK(FiZViPdy,NPaCgpQkB.White,1.5)yCOpyhBopE.Enabled=(cor==NZYQqEgA.Cor);table.insert(dCEeaYuPIro,{stroke=yCOpyhBopE,cor=cor});FiZViPdy.MouseButton1Click:Connect(function() NZYQqEgA.Cor=cor xIGHCuJHXCk.Text=vaRKlRrn(cor)VNFqeicLpc() end) end if 69*0+69==69 then xIGHCuJHXCk.FocusLost:Connect(function() local HsioyGlGHL,MowMcsejET,FiZViPdy=xIGHCuJHXCk.Text:match(oJqLpWawh("(%x+)%m*,%m*(%x+)%m*,%m*(%x+)",20));if HsioyGlGHL and MowMcsejET and FiZViPdy then HsioyGlGHL,MowMcsejET,FiZViPdy=OmIBzVYHSzmL(HsioyGlGHL),OmIBzVYHSzmL(MowMcsejET),OmIBzVYHSzmL(FiZViPdy);if HsioyGlGHL and MowMcsejET and FiZViPdy and HsioyGlGHL<=255 and MowMcsejET<=255 and FiZViPdy<=255 then NZYQqEgA.Cor=kMbWXtlHvTq(HsioyGlGHL,MowMcsejET,FiZViPdy)VNFqeicLpc() end end xIGHCuJHXCk.Text=vaRKlRrn(NZYQqEgA.Cor) end) elseif false then end end if 26%26==0 then SiGUvpdwt=function() llIlFgQIY=oJqLpWawh("Fgrzmv",24)EgxtSHLgI()YnyuJLZKAA.ScrollingEnabled=true end local pdnzQboWJ=zMeWToTx(oJqLpWawh("Dpykc",24),{Size=xbdmcmAKGFf(1,0,0,58),BackgroundColor3=NPaCgpQkB.Card,BorderSizePixel=0,LayoutOrder=0},WGtEfxALeMQQ)AODxoZnR(pdnzQboWJ,9)htWHNHFdqYQK(pdnzQboWJ,NPaCgpQkB.StrokeLight,1);if 29-29==0 then oWvCWeLvLU(pdnzQboWJ,jprgZwAmxjEQ(12,7),xbdmcmAKGFf(1,-24,0,25),oJqLpWawh("🎯 EFQYLU",23),NPaCgpQkB.White,16,CxnLFsUbyOy);oWvCWeLvLU(pdnzQboWJ,jprgZwAmxjEQ(13,34),xbdmcmAKGFf(1,-26,0,15),oJqLpWawh("Ghsanw dwozmchcz • szlzmgn, bnq d sqzmrozqêmbhz",25),NPaCgpQkB.DarkGray,9,kDvSQgYyDIIA) end if 25*0+25==25 then cndeyHWwm(1,oJqLpWawh("Yrgtyp Pcyaf",24),NZYQqEgA.Ativo,function(OHRjXRmRea) NZYQqEgA.Ativo=OHRjXRmRea;kRacVminFke(oJqLpWawh("YZKSFO",17),OHRjXRmRea and oJqLpWawh("Obxze xqfsxal.",23)or oJqLpWawh("Qdzbg cdrzshuzcn.",25),OHRjXRmRea and oJqLpWawh("Mowwymm",20)or oJqLpWawh("Dqqnq",25)) end) elseif 85%85~=0 then end if 14%14==0 then cndeyHWwm(2,oJqLpWawh("Lnrsqzq Uhrtzk",25),NZYQqEgA.Visual,function(OHRjXRmRea)NZYQqEgA.Visual=OHRjXRmRea end) kIElvzscwun(3,oJqLpWawh("Szlzmgn (Qdzbg)",25),NZYQqEgA.Tamanho,1,50,function(OHRjXRmRea)NZYQqEgA.Tamanho=OHRjXRmRea end) end if not(80~=80)then kIElvzscwun(4,oJqLpWawh("Sqzmrozqêmbhz",25),math.floor(NZYQqEgA.Transparencia*10+.5),0,10,function(OHRjXRmRea)NZYQqEgA.Transparencia=OHRjXRmRea/10 end) BKdYlyyjx(5) end local NTRTKVAnfEiz=oWvCWeLvLU(WGtEfxALeMQQ,jprgZwAmxjEQ(0,0),xbdmcmAKGFf(1,0,0,16),oJqLpWawh("⚡ Cdrdmunkuhcn onq Zjhqz",25),NPaCgpQkB.DarkGray,8,kDvSQgYyDIIA,Enum.TextXAlignment.Right);if 11>=11 then NTRTKVAnfEiz.LayoutOrder=6;YnyuJLZKAA.CanvasPosition=LCSjDNfdM() elseif(not(48<59))==(48>=59)then end end end local aFrJwwEh=jwxGnHkMhdgc(oJqLpWawh("🎯 FGRZMV",24),false)aFrJwwEh.MouseButton1Click:Connect(function()TwumXwRDLc(aFrJwwEh)SiGUvpdwt()end) if not(67~=67)then task.defer(function()local OUwVJVsis=0;for _,bXhLqIEKqs in rWrFtxkoL(xkcFYdfnWu)do if MNHSPTmJYo(bXhLqIEKqs)then OUwVJVsis+=1 end end local aXbDXIxRDI=NfekxIVLDqRI(oJqLpWawh("Idggt 6",15),oJqLpWawh("Úkfzx",23))local MKBpLiPak=0;for _,KhGPSuytyY in rWrFtxkoL(uWRGIwAnfXiE)do if NfekxIVLDqRI(oJqLpWawh("Qloob 5",23),KhGPSuytyY)then MKBpLiPak+=1 end end for atCAZSEysGym=1,4 do qmWAwYug[atCAZSEysGym]=oJqLpWawh("Hajpk",22)end DVdoELbgxaM();kRacVminFke(oJqLpWawh("ZJHQZ LDMT",25),OUwVJVsis..oJqLpWawh("/9 ozqjntqr • Snqqd 6: ",25)..(aXbDXIxRDI and oJqLpWawh("HD",19)or oJqLpWawh("ANNK",22))..oJqLpWawh(" • Rmppc 6: ",24)..MKBpLiPak..oJqLpWawh("/5",1),OUwVJVsis==4 and aXbDXIxRDI and MKBpLiPak==4 and oJqLpWawh("Przzbpp",23)or oJqLpWawh("Zmmjm",21))end) end if 48>=48 then hCCvURmNJAlC(oJqLpWawh("ZJHQZ LDMT U8.5 bzqqdfzcn bnl rtbdrrn!",25)) end end break end end
+-- ==========================================================
+-- INÍCIO DO SCRIPT PRINCIPAL — ESTRUTURA REORGANIZADA
+-- ==========================================================
+
+local _I,_U2,_UO,_UD,_RGB,_V2,_GB,_GM,_XL,_XC = Instance.new,UDim2.new,UDim2.fromOffset,UDim.new,Color3.fromRGB,Vector2.new,Enum.Font.GothamBold,Enum.Font.GothamMedium,Enum.TextXAlignment.Left,Enum.TextXAlignment.Center
+local P = game:GetService("Players")
+local T = game:GetService("TweenService")
+local U = game:GetService("UserInputService")
+local R = game:GetService("RunService")
+local HS = game:GetService("HttpService")
+local TCS = game:GetService("TextChatService")
+local Pl = P.LocalPlayer
+local PG = Pl:WaitForChild("PlayerGui")
+local character, humanoid, rootPart
+
+-- ==========================================================
+-- CONFIGURAÇÕES GERAIS
+-- ==========================================================
+local CONFIG = {
+    LineThickness = .15,
+    LineTransparency = .2,
+    LineColor = _RGB(255, 145, 45),
+    JumpCooldown = .28,
+    PlaybackSpeed = 1,
+    WalkToSpeed = 16,
+    GroundOffset = 1.66
+}
+
+-- MODO DE EXECUÇÃO GLOBAL — COMPARTILHADO ENTRE TORRES E PARKOUR
+local ExecutionMode = { Modo = "Dummy" } -- "Dummy" ou "Direto"
+
+-- ==========================================================
+-- ROTAS — PASTEBINS
+-- ==========================================================
+local Pastebins = {
+    Lento = "https://pastebin.com/raw/M7DvRgTc",
+    ["Rápido"] = "https://pastebin.com/raw/pBk8vYXE",
+    ["Mais Rápido"] = "https://pastebin.com/raw/yz7gZmYr",
+    ["Sem Burla"] = "https://pastebin.com/raw/N1j0iRDA"
+}
+local CategoryOrder = {"Lento", "Rápido", "Mais Rápido", "Sem Burla"}
+
+local TowerPastebins = {
+    ["Torres"] = {
+        ["Única"] = "https://pastebin.com/raw/HxXb4Mr3"
+    },
+    ["Torre 2"] = {
+        Frente = "https://pastebin.com/raw/Y2arCYHb",
+        ["Atrás"] = "https://pastebin.com/raw/rXxZX7CQ",
+        Esquerda = "https://pastebin.com/raw/FtpTHhGt",
+        Direita = "https://pastebin.com/raw/4u5Wjtkg"
+    }
+}
+local Tower2RouteOrder = {"Frente", "Atrás", "Esquerda", "Direita"}
+
+local routes = {Lento = {}, ["Rápido"] = {}, ["Mais Rápido"] = {}, ["Sem Burla"] = {}}
+local towerRoutes = {
+    ["Torres"] = {},
+    ["Torre 2"] = {Frente = {}, ["Atrás"] = {}, Esquerda = {}, Direita = {}}
+}
+
+local selectedCategory, expandedParkour = {}, {}
+local selectedTower2Route = "Frente"
+local expandedTower2 = false
+local CurrentPage = "EB DELTA"
+local lineFolder
+local linesVisible = true
+
+-- ==========================================================
+-- SISTEMA DE REPRODUÇÃO
+-- ==========================================================
+local Playback = {
+    Running = false,
+    Connection = nil,
+    Route = nil,
+    StartClock = 0,
+    CurrentIndex = 1,
+    LastJump = -math.huge,
+    Category = nil,
+    Parkour = nil,
+    Tower = nil,
+    TowerRoute = nil,
+    WalkingToStart = false,
+    WalkConnection = nil
+}
+local SavedDirection = nil
+local Turning = false
+
+-- ==========================================================
+-- PALETA DE CORES
+-- ==========================================================
+local _K = {
+    Background = _RGB(18, 18, 20),
+    Panel = _RGB(24, 24, 27),
+    Card = _RGB(31, 31, 35),
+    CardHover = _RGB(39, 39, 43),
+    Selected = _RGB(55, 55, 60),
+    Stroke = _RGB(65, 65, 70),
+    StrokeLight = _RGB(85, 85, 90),
+    White = _RGB(245, 245, 245),
+    Gray = _RGB(175, 175, 180),
+    DarkGray = _RGB(115, 115, 120),
+    Success = _RGB(80, 210, 125),
+    Error = _RGB(230, 85, 85),
+    Orange = _RGB(255, 145, 45),
+    SelectionRed = _RGB(225, 70, 70),
+    SelectionRedDark = _RGB(75, 32, 32),
+    Primary = _RGB(185, 185, 185)
+}
+
+local function Corner(o, r)
+    local c = _I("UICorner")
+    c.CornerRadius = _UD(0, r)
+    c.Parent = o
+end
+local function Stroke(o, c, t)
+    local s = _I("UIStroke")
+    s.Color = c
+    s.Thickness = t or 1
+    s.Parent = o
+    return s
+end
+local function Padding(o, t, b, l, rr)
+    local p = _I("UIPadding")
+    p.PaddingTop = _UD(0, t or 0)
+    p.PaddingBottom = _UD(0, b or 0)
+    p.PaddingLeft = _UD(0, l or 0)
+    p.PaddingRight = _UD(0, rr or 0)
+    p.Parent = o
+end
+
+-- ==========================================================
+-- NOTIFICAÇÕES
+-- ==========================================================
+local NH = _I("Frame")
+NH.Name = "Notifications"
+NH.AnchorPoint = _V2(1, 1)
+NH.Position = _U2(1, -15, 1, -15)
+NH.Size = _UO(270, 300)
+NH.BackgroundTransparency = 1
+NH.ZIndex = 200
+NH.Parent = PG
+local NL = _I("UIListLayout")
+NL.VerticalAlignment = Enum.VerticalAlignment.Bottom
+NL.HorizontalAlignment = Enum.HorizontalAlignment.Right
+NL.Padding = _UD(0, 7)
+NL.Parent = NH
+
+local function Notify(tt, msg, nt)
+    local c = _K.Gray
+    if nt == "Success" then c = _K.Success
+    elseif nt == "Error" then c = _K.Error
+    elseif nt == "Orange" then c = _K.Orange end
+    local n = _I("Frame")
+    n.Size = _UO(250, 64)
+    n.BackgroundColor3 = _K.Panel
+    n.BorderSizePixel = 0
+    n.BackgroundTransparency = 1
+    n.ZIndex = 201
+    n.Parent = NH
+    Corner(n, 10)
+    local ns = Stroke(n, c)
+    ns.Transparency = 1
+    local a = _I("Frame")
+    a.Size = _UO(3, 38)
+    a.AnchorPoint = _V2(0, .5)
+    a.Position = _U2(0, 7, .5, 0)
+    a.BackgroundColor3 = c
+    a.BorderSizePixel = 0
+    a.BackgroundTransparency = 1
+    a.ZIndex = 202
+    a.Parent = n
+    Corner(a, 5)
+    local ttl = _I("TextLabel")
+    ttl.BackgroundTransparency = 1
+    ttl.Position = _UO(18, 9)
+    ttl.Size = _U2(1, -28, 0, 18)
+    ttl.Text = tt
+    ttl.TextColor3 = _K.White
+    ttl.TextSize = 12
+    ttl.Font = _GB
+    ttl.TextXAlignment = _XL
+    ttl.ZIndex = 203
+    ttl.Parent = n
+    local msgL = _I("TextLabel")
+    msgL.BackgroundTransparency = 1
+    msgL.Position = _UO(18, 30)
+    msgL.Size = _U2(1, -28, 0, 25)
+    msgL.Text = msg
+    msgL.TextColor3 = _K.Gray
+    msgL.TextSize = 9
+    msgL.Font = _GM
+    msgL.TextWrapped = true
+    msgL.TextXAlignment = _XL
+    msgL.TextYAlignment = Enum.TextYAlignment.Center
+    msgL.ZIndex = 203
+    msgL.Parent = n
+    n.Position = _U2(1, 270, 0, 0)
+    T:Create(n, TweenInfo.new(.35, Enum.EasingStyle.Quart, Enum.EasingDirection.Out), {Position = _U2(), BackgroundTransparency = 0}):Play()
+    T:Create(ns, TweenInfo.new(.25), {Transparency = 0}):Play()
+    T:Create(a, TweenInfo.new(.25), {BackgroundTransparency = 0}):Play()
+    task.delay(2.8, function()
+        if not n.Parent then return end
+        local o = T:Create(n, TweenInfo.new(.3, Enum.EasingStyle.Quart, Enum.EasingDirection.In), {Position = _U2(1, 270), BackgroundTransparency = 1})
+        o:Play()
+        T:Create(ns, TweenInfo.new(.2), {Transparency = 1}):Play()
+        T:Create(a, TweenInfo.new(.2), {BackgroundTransparency = 1}):Play()
+        o.Completed:Wait()
+        if n.Parent then n:Destroy() end
+    end)
+end
+
+-- ==========================================================
+-- ATUALIZAR PERSONAGEM
+-- ==========================================================
+local function RefreshCharacter()
+    character = Pl.Character
+    if not character or not character.Parent then return false end
+    humanoid = character:FindFirstChildOfClass("Humanoid")
+    rootPart = character:FindFirstChild("HumanoidRootPart")
+    return humanoid ~= nil and rootPart ~= nil
+end
+Pl.CharacterAdded:Connect(function() task.wait(.2); RefreshCharacter() end)
+RefreshCharacter()
+
+local function Number(v) return v and tonumber(v) end
+
+-- ==========================================================
+-- CARREGAR E PARSEAR ROTAS
+-- ==========================================================
+local function ParseRoutes(raw)
+    local parsed, blocks = {}, {}
+    local sp = 1
+    while true do
+        local s = string.find(raw, "local Rota = {", sp)
+        if not s then break end
+        local b, e = 0
+        for i = s, #raw do
+            local ch = string.sub(raw, i, i)
+            if ch == "{" then b = b + 1
+            elseif ch == "}" then
+                b = b - 1
+                if b == 0 then e = i; break end
+            end
+        end
+        if not e then break end
+        table.insert(blocks, string.sub(raw, s, e))
+        sp = e + 1
+    end
+    for _, block in ipairs(blocks) do
+        local frames, fs = {}, 1
+        while true do
+            local p1, p2 = string.find(block, "{(.-)}", fs)
+            if not p1 then break end
+            local f = string.sub(block, p1, p2)
+            local t = string.match(f, "t%s*=%s*([%d%.%-]+)")
+            local x = string.match(f, "x%s*=%s*([%d%.%-]+)")
+            local y = string.match(f, "y%s*=%s*([%d%.%-]+)")
+            local z = string.match(f, "z%s*=%s*([%d%.%-]+)")
+            local j = string.match(f, "j%s*=%s*([%w]+)")
+            local rx = string.match(f, "rx%s*=%s*([%d%.%-]+)")
+            local ry = string.match(f, "ry%s*=%s*([%d%.%-]+)")
+            local rz = string.match(f, "rz%s*=%s*([%d%.%-]+)")
+            if t and x and y and z then
+                local q = {
+                    t = Number(t), x = Number(x), y = Number(y), z = Number(z),
+                    j = j == "true", position = Vector3.new(Number(x), Number(y), Number(z)),
+                    rx = Number(rx), ry = Number(ry), rz = Number(rz)
+                }
+                if q.rx and q.ry and q.rz then
+                    q.rotation = CFrame.Angles(q.rx, q.ry, q.rz)
+                    q.hasRotation = true
+                else
+                    q.hasRotation = false
+                end
+                table.insert(frames, q)
+            end
+            fs = p2 + 1
+        end
+        if #frames >= 2 then
+            table.sort(frames, function(a, b) return a.t < b.t end)
+            table.insert(parsed, frames)
+        end
+    end
+    return parsed
+end
+
+local function LoadCategory(cat)
+    local url = Pastebins[cat]
+    if not url then return false end
+    local ok, raw = pcall(function() return game:HttpGet(url) end)
+    if not ok or not raw then return false end
+    local p = ParseRoutes(raw)
+    if #p == 0 then return false end
+    routes[cat] = p
+    return true
+end
+
+local function LoadTowerRoute(tower, route)
+    local d = TowerPastebins[tower]
+    if not d then return false end
+    local url = d[route]
+    if not url then return false end
+    local ok, raw = pcall(function() return game:HttpGet(url) end)
+    if not ok or not raw then return false end
+    local p = ParseRoutes(raw)
+    if #p == 0 then return false end
+    towerRoutes[tower][route] = p[1]
+    return true
+end
+
+-- ==========================================================
+-- LINHAS DA ROTA
+-- ==========================================================
+local function CreateLine(a, b)
+    if not a or not b then return end
+    local d = b - a
+    local dist = d.Magnitude
+    if dist < .01 then return end
+    if not lineFolder then
+        lineFolder = _I("Folder")
+        lineFolder.Name = "ZKY_RouteLines"
+        lineFolder.Parent = workspace
+    end
+    local l = _I("Part")
+    l.Name = "RouteSegment"
+    l.Anchored = true
+    l.CanCollide = false
+    l.CanTouch = false
+    l.CanQuery = false
+    l.CastShadow = false
+    l.Material = Enum.Material.Neon
+    l.Color = CONFIG.LineColor
+    l.Transparency = linesVisible and CONFIG.LineTransparency or 1
+    l.Size = Vector3.new(CONFIG.LineThickness, CONFIG.LineThickness, dist)
+    l.CFrame = CFrame.lookAt((a + b) / 2, b)
+    l.Parent = lineFolder
+end
+
+local function ClearLines()
+    if not lineFolder then return end
+    for _, o in ipairs(lineFolder:GetChildren()) do o:Destroy() end
+end
+
+local function ShowRouteLines(data)
+    ClearLines()
+    local last
+    for _, f in ipairs(data) do
+        local p = f.position
+        if last then CreateLine(last, p) end
+        last = p
+    end
+end
+
+-- ==========================================================
+-- POSIÇÃO E ROTAÇÃO
+-- ==========================================================
+local function GetPosition(f)
+    if not f then return end
+    if f.position then return f.position end
+    if f.x and f.y and f.z then return Vector3.new(f.x, f.y, f.z) end
+end
+
+local function GetRotation(f)
+    if not f then return end
+    if f.rotation then return f.rotation end
+    if f.rx and f.ry and f.rz then
+        return CFrame.Angles(f.rx, f.ry, f.rz)
+    end
+end
+
+local function ApplyPosition(pos, rot)
+    if not pos or not RefreshCharacter() then return false end
+    local corrected = pos + Vector3.new(0, CONFIG.GroundOffset, 0)
+    local target
+    if rot then
+        target = CFrame.new(corrected) * rot
+    else
+        local look = rootPart.CFrame.LookVector
+        local flat = Vector3.new(look.X, 0, look.Z)
+        if flat.Magnitude < .01 then
+            flat = Vector3.new(0, 0, -1)
+        else
+            flat = flat.Unit
+        end
+        target = CFrame.lookAt(corrected, corrected + flat)
+    end
+    pcall(function() character:PivotTo(target) end)
+    return true
+end
+
+-- ==========================================================
+-- INTERPOLAÇÃO DE FRAMES
+-- ==========================================================
+local function GetFrames(frames, elapsed)
+    local count = #frames
+    if count < 2 then return end
+    if elapsed <= frames[1].t then
+        Playback.CurrentIndex = 1
+        return frames[1], frames[2], 0
+    end
+    if elapsed >= frames[count].t then
+        return frames[count], frames[count], 1
+    end
+    local i = math.clamp(Playback.CurrentIndex, 1, count - 1)
+    while i < count - 1 and elapsed > frames[i + 1].t do i = i + 1 end
+    while i > 1 and elapsed < frames[i].t do i = i - 1 end
+    Playback.CurrentIndex = i
+    local a, b = frames[i], frames[i + 1]
+    local d = b.t - a.t
+    local alpha = d > 0 and math.clamp((elapsed - a.t) / d, 0, 1) or 0
+    return a, b, alpha
+end
+
+local function HandleJump(f, e)
+    if not f or not f.j or e - Playback.LastJump < CONFIG.JumpCooldown or not RefreshCharacter() then return end
+    Playback.LastJump = e
+    humanoid.Jump = true
+    pcall(function() humanoid:ChangeState(Enum.HumanoidStateType.Jumping) end)
+end
+
+-- ==========================================================
+-- CAMINHAR ATÉ O INÍCIO DA ROTA
+-- ==========================================================
+local function AndarAte(destino, estaCancelado, aoTerminar)
+    if not RefreshCharacter() then aoTerminar(false) return end
+    if ExecutionMode.Modo == "Direto" then
+        -- No modo Direto: não caminha, teletransporta suavemente
+        local startPos = rootPart.Position
+        local dist = (destino - startPos).Magnitude
+        if dist > 2 then
+            local steps = math.ceil(dist / 2)
+            for i = 1, steps do
+                if estaCancelado() then aoTerminar(false) return end
+                local alpha = i / steps
+                local interp = startPos:Lerp(destino, alpha)
+                ApplyPosition(interp, nil)
+                task.wait(0.03)
+            end
+        end
+        aoTerminar(true)
+        return
+    end
+    -- Modo Dummy: caminha normalmente
+    humanoid.WalkSpeed = CONFIG.WalkToSpeed
+    humanoid:MoveTo(destino)
+    local started = os.clock()
+    local sucesso = false
+    while not estaCancelado() do
+        if not RefreshCharacter() then break end
+        if (rootPart.Position - destino).Magnitude <= 4 then sucesso = true break end
+        if os.clock() - started > 60 then break end
+        task.wait()
+    end
+    if RefreshCharacter() then humanoid:Move(Vector3.zero, false) end
+    aoTerminar(sucesso and not estaCancelado())
+end
+
+-- ==========================================================
+-- DUMMY / MARCADOR VISUAL
+-- ==========================================================
+local DummyObj, RemoverDummy
+local function CriarDummy(pos, rot)
+    RemoverDummy()
+    local alvo = rot and (CFrame.new(pos) * (rot - rot.Position)) or CFrame.new(pos)
+    local ok = false
+    if RefreshCharacter() then
+        local salvos = {}
+        for _, d in ipairs(character:GetDescendants()) do
+            salvos[d] = d.Archivable
+            pcall(function() d.Archivable = true end)
+        end
+        local cok, clone = pcall(function() return character:Clone() end)
+        for inst, valor in pairs(salvos) do
+            pcall(function() inst.Archivable = valor end)
+        end
+        if cok and clone then
+            for _, d in ipairs(clone:GetDescendants()) do
+                if d:IsA("Script") or d:IsA("LocalScript") then pcall(function() d:Destroy() end)
+                elseif d:IsA("Shirt") or d:IsA("Pants") or d:IsA("ShirtGraphic") or d:IsA("Decal") then pcall(function() d:Destroy() end)
+                elseif d:IsA("BasePart") then
+                    d.CanCollide = false
+                    d.CanQuery = false
+                    d.CanTouch = false
+                    d.Massless = true
+                    d.Material = Enum.Material.ForceField
+                    d.Color = _RGB(0, 255, 140)
+                    d.Transparency = .35
+                end
+            end
+            local hum = clone:FindFirstChildOfClass("Humanoid")
+            if hum then pcall(function() hum.WalkSpeed = 0; hum.JumpPower = 0; hum.PlatformStand = true end) end
+            clone.PrimaryPart = clone.PrimaryPart or clone:FindFirstChild("HumanoidRootPart")
+            if clone.PrimaryPart then
+                clone.Parent = workspace
+                local pok = pcall(function() clone:PivotTo(alvo) end)
+                if pok then
+                    for _, d in ipairs(clone:GetDescendants()) do
+                        if d:IsA("BasePart") then d.Anchored = true end
+                    end
+                    local hl = _I("Highlight")
+                    hl.FillColor = _RGB(0, 255, 140)
+                    hl.OutlineColor = _RGB(150, 255, 195)
+                    hl.FillTransparency = .55
+                    hl.OutlineTransparency = 0
+                    hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                    hl.Parent = clone
+                    clone.Name = "ZKY_Dummy"
+                    DummyObj = clone
+                    ok = true
+                else clone:Destroy() end
+            else clone:Destroy() end
+        end
+    end
+    if not ok then
+        local marcador = _I("Part")
+        marcador.Name = "ZKY_Dummy"
+        marcador.Shape = Enum.PartType.Cylinder
+        marcador.Size = Vector3.new(.4, 6, 6)
+        marcador.CFrame = alvo * CFrame.Angles(0, 0, math.rad(90))
+        marcador.Color = _RGB(0, 255, 130)
+        marcador.Material = Enum.Material.Neon
+        marcador.Transparency = .35
+        marcador.Anchored = true
+        marcador.CanCollide = false
+        marcador.CanQuery = false
+        marcador.CanTouch = false
+        marcador.Parent = workspace
+        DummyObj = marcador
+    end
+end
+RemoverDummy = function() if DummyObj then pcall(function() DummyObj:Destroy() end); DummyObj = nil end end
+
+-- ==========================================================
+-- PARAR REPRODUÇÃO
+-- ==========================================================
+local function StopPlayback(reason)
+    if Playback.Connection then Playback.Connection:Disconnect(); Playback.Connection = nil end
+    if Playback.WalkConnection then Playback.WalkConnection:Disconnect(); Playback.WalkConnection = nil end
+    RemoverDummy()
+    Playback.Running = false
+    Playback.Route = nil
+    Playback.CurrentIndex = 1
+    Playback.LastJump = -math.huge
+    Playback.Category = nil
+    Playback.Parkour = nil
+    Playback.Tower = nil
+    Playback.TowerRoute = nil
+    Playback.WalkingToStart = false
+    if RefreshCharacter() then
+        humanoid:Move(Vector3.zero, false)
+        humanoid.Jump = false
+        pcall(function() humanoid.AutoRotate = true end)
+    end
+    ClearLines()
+    if reason == "completed" then
+        Notify("CONCLUÍDO", "Rota finalizada!", "Success")
+    elseif reason == "cancelled" then
+        Notify("PARADO", "Reprodução interrompida.", "Error")
+    elseif reason == "error" then
+        Notify("ERRO", "Não foi possível continuar.", "Error")
+    end
+end
+
+-- ==========================================================
+-- EXECUÇÃO DA ROTA
+-- ==========================================================
+local function IniciarExecucao(name)
+    if not Playback.Running then return end
+    Playback.WalkingToStart = false
+    if RefreshCharacter() then
+        humanoid:Move(Vector3.zero, false)
+        pcall(function() humanoid.AutoRotate = false end)
+    end
+    Playback.StartClock = os.clock()
+    Playback.CurrentIndex = 1
+    Playback.LastJump = -math.huge
+    Notify("EXECUTANDO", name, "Success")
+    task.spawn(function()
+        while Playback.Running and not Playback.WalkingToStart do
+            if not RefreshCharacter() then StopPlayback("error"); break end
+            local frames = Playback.Route
+            if not frames or #frames < 2 then StopPlayback("error"); break end
+            local elapsed = (os.clock() - Playback.StartClock) * CONFIG.PlaybackSpeed
+            local final = frames[#frames]
+            if elapsed >= final.t then
+                ApplyPosition(GetPosition(final), GetRotation(final))
+                StopPlayback("completed")
+                break
+            end
+            local a, b, alpha = GetFrames(frames, elapsed)
+            if not a or not b then break end
+            local pa, pb = GetPosition(a), GetPosition(b)
+            if not pa or not pb then StopPlayback("error"); break end
+            local pos = pa:Lerp(pb, alpha)
+            local ra, rb = GetRotation(a), GetRotation(b)
+            local rot
+            if ra and rb then rot = ra:Lerp(rb, alpha)
+            elseif ra then rot = ra
+            elseif rb then rot = rb end
+            ApplyPosition(pos, rot)
+            HandleJump(a, elapsed)
+            task.wait()
+        end
+    end)
+end
+
+-- ==========================================================
+-- INICIAR ROTA
+-- ==========================================================
+local function StartPlayback(data, cat, num, tower, towerRoute)
+    if Playback.Running then
+        Notify("EM EXECUÇÃO", "Pare a rota atual antes de iniciar outra.", "Error")
+        return
+    end
+    if not data or #data < 2 then
+        Notify("ROTA INVÁLIDA", "Essa rota não possui frames suficientes.", "Error")
+        return
+    end
+    if not RefreshCharacter() then
+        Notify("PERSONAGEM", "Personagem não encontrado.", "Error")
+        return
+    end
+    local first = data[1]
+    local fp = GetPosition(first)
+    if not fp then
+        Notify("ERRO", "Primeiro ponto da rota inválido.", "Error")
+        return
+    end
+    local target = fp + Vector3.new(0, CONFIG.GroundOffset, 0)
+    Playback.Running = true
+    Playback.WalkingToStart = true
+    Playback.Route = data
+    Playback.Category = cat
+    Playback.Parkour = num
+    Playback.Tower = tower
+    Playback.TowerRoute = towerRoute
+    Playback.CurrentIndex = 1
+    ShowRouteLines(data)
+    local name
+    if tower then
+        name = tower == "Torres" and "Torres" or "Torre 2 • " .. towerRoute
+    else
+        name = "Parkour " .. num .. " • " .. cat
+    end
+    local usarDummy = ExecutionMode.Modo == "Dummy"
+    if usarDummy then
+        Notify("MARCADOR CRIADO", "Ande até o marcador verde para iniciar: " .. name, "Orange")
+        CriarDummy(target, GetRotation(first))
+        Playback.WalkConnection = R.Heartbeat:Connect(function()
+            if not Playback.Running or not Playback.WalkingToStart then return end
+            if not RefreshCharacter() then StopPlayback("error"); return end
+            if (rootPart.Position - target).Magnitude <= 5 then
+                if Playback.WalkConnection then Playback.WalkConnection:Disconnect(); Playback.WalkConnection = nil end
+                RemoverDummy()
+                IniciarExecucao(name)
+            end
+        end)
+    else
+        Notify("INDO PARA O INÍCIO", "Ajustando posição inicial...", "Orange")
+        AndarAte(target, function() return not Playback.Running end, function(sucesso)
+            if not Playback.Running then return end
+            if not sucesso then
+                StopPlayback("error")
+                return
+            end
+            IniciarExecucao(name)
+        end)
+    end
+end
+
+-- ==========================================================
+-- INTERFACE PRINCIPAL
+-- ==========================================================
+local Old = PG:FindFirstChild("ZKY_PARKOUR")
+if Old then Old:Destroy() end
+
+local sg = _I("ScreenGui")
+sg.Name = "ZKY_PARKOUR"
+sg.ResetOnSpawn = false
+sg.DisplayOrder = 100
+sg.IgnoreGuiInset = true
+sg.Parent = PG
+
+-- LOGO ARRASTÁVEL
+local logo = _I("TextButton", sg)
+logo.Size = _UO(54, 54)
+logo.Position = _UO(18, 200)
+logo.BackgroundColor3 = _K.Background
+logo.Text = "⚡"
+logo.TextSize = 26
+logo.Font = _GB
+logo.BorderSizePixel = 0
+logo.AutoButtonColor = false
+logo.Active = true
+logo.TextColor3 = _K.White
+logo.ZIndex = 2
+Corner(logo, 27)
+Stroke(logo, _K.Orange, 1.8, 0.2)
+
+-- MENU PRINCIPAL
+local menu = _I("Frame", sg)
+menu.Size = _UO(720, 440)
+menu.Position = UDim2.fromScale(0.5, 0.5)
+menu.AnchorPoint = Vector2.new(0.5, 0.5)
+menu.BackgroundColor3 = _K.Background
+menu.BorderSizePixel = 0
+menu.Visible = false
+menu.Active = true
+Corner(menu, 12)
+Stroke(menu, _K.Stroke, 1, 0.5)
+
+-- HEADER
+local header = _I("Frame", menu)
+header.Size = _U2(1, 0, 0, 52)
+header.BackgroundColor3 = _K.Panel
+header.BorderSizePixel = 0
+Corner(header, 12)
+local hMask = _I("Frame", header)
+hMask.Size = _U2(1, 0, 0.5, 0)
+hMask.Position = _U2(0, 0, 0.5, 0)
+hMask.BackgroundColor3 = _K.Panel
+hMask.BorderSizePixel = 0
+local titulo = _I("TextLabel", header)
+titulo.Size = _U2(1, -60, 0, 22)
+titulo.Position = _UO(16, 8)
+titulo.BackgroundTransparency = 1
+titulo.Text = "⚡ EB DELTA — EXECUTOR"
+titulo.TextColor3 = _K.White
+titulo.Font = _GB
+titulo.TextSize = 16
+titulo.TextXAlignment = _XL
+local subtitulo = _I("TextLabel", header)
+subtitulo.Size = _U2(1, -60, 0, 14)
+subtitulo.Position = _UO(16, 30)
+subtitulo.BackgroundTransparency = 1
+subtitulo.Text = "Parkour • Torres • Combate • IA"
+subtitulo.TextColor3 = _K.DarkGray
+subtitulo.Font = _GM
+subtitulo.TextSize = 11
+subtitulo.TextXAlignment = _XL
+local btnX = _I("TextButton", header)
+btnX.Size = _UO(32, 32)
+btnX.Position = _U2(1, -44, 0.5, -16)
+btnX.BackgroundColor3 = _K.Card
+btnX.Text = "×"
+btnX.TextColor3 = _K.Gray
+btnX.Font = _GB
+btnX.TextSize = 16
+btnX.BorderSizePixel = 0
+btnX.AutoButtonColor = false
+Corner(btnX, 8)
+btnX.MouseButton1Click:Connect(function() menu.Visible = false end)
+
+-- BARRA LATERAL DE ABAS
+local SideBar = _I("Frame", menu)
+SideBar.Size = _U2(0, 160, 1, -52)
+SideBar.Position = _UO(0, 52)
+SideBar.BackgroundColor3 = _K.Panel
+SideBar.BorderSizePixel = 0
+local SideLayout = _I("UIListLayout")
+SideLayout.Padding = _UD(0, 4)
+SideLayout.SortOrder = Enum.SortOrder.LayoutOrder
+SideLayout.Parent = SideBar
+
+local Content = _I("ScrollingFrame", menu)
+Content.Size = _U2(1, -160, 1, -52)
+Content.Position = _UO(160, 52)
+Content.BackgroundTransparency = 1
+Content.BorderSizePixel = 0
+Content.ScrollBarThickness = 4
+Content.ScrollBarImageColor3 = _K.Orange
+Content.AutomaticCanvasSize = Enum.AutomaticSize.Y
+local ContentLayout = _I("UIListLayout")
+ContentLayout.Padding = _UD(0, 12)
+ContentLayout.SortOrder = Enum.SortOrder.LayoutOrder
+ContentLayout.Parent = Content
+
+local function ClearContent()
+    for _, c in ipairs(Content:GetChildren()) do
+        if c ~= ContentLayout then c:Destroy() end
+    end
+end
+
+local SelectedButton = nil
+local function SelectButton(btn)
+    if SelectedButton then
+        SelectedButton.BackgroundColor3 = _K.Panel
+    end
+    SelectedButton = btn
+    btn.BackgroundColor3 = _K.Selected
+end
+
+local function SideButton(texto, selecionado)
+    local btn = _I("TextButton", SideBar)
+    btn.Size = _U2(1, -16, 0, 44)
+    btn.Position = _UO(8, 8)
+    btn.BackgroundColor3 = selecionado and _K.Selected or _K.Panel
+    btn.Text = texto
+    btn.TextColor3 = _K.White
+    btn.Font = _GB
+    btn.TextSize = 12
+    btn.BorderSizePixel = 0
+    btn.AutoButtonColor = false
+    Corner(btn, 8)
+    return btn
+end
+
+-- ==========================================================
+-- ABA: EB DELTA (PARKOUR + TORRES + CONFIGURAÇÕES)
+-- ==========================================================
+local ebDeltaButton = SideButton("🏋️ EB DELTA", true)
+ebDeltaButton.MouseButton1Click:Connect(function()
+    SelectButton(ebDeltaButton)
+    ClearContent()
+
+    -- BOTÕES SUPERIORES INTERNOS
+    local topBar = _I("Frame", Content)
+    topBar.Size = _U2(1, 0, 0, 48)
+    topBar.BackgroundColor3 = _K.Card
+    topBar.BorderSizePixel = 0
+    Corner(topBar, 10)
+    Stroke(topBar, _K.StrokeLight, 1)
+    local topLayout = _I("UIListLayout")
+    topLayout.FillDirection = Enum.FillDirection.Horizontal
+    topLayout.Padding = _UD(0, 8)
+    topLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    topLayout.Parent = topBar
+    Padding(topBar, 8, 8, 8, 8)
+
+    local function SubBotao(texto, ativo)
+        local btn = _I("TextButton", topBar)
+        btn.Size = _U2(0.33, -8, 1, 0)
+        btn.BackgroundColor3 = ativo and _K.Selected or _K.Panel
+        btn.Text = texto
+        btn.TextColor3 = ativo and _K.White or _K.Gray
+        btn.Font = _GB
+        btn.TextSize = 11
+        btn.BorderSizePixel = 0
+        btn.AutoButtonColor = false
+        Corner(btn, 6)
+        return btn
+    end
+
+    local btnParkour = SubBotao("🏃 PARKOUR", true)
+    local btnTorres = SubBotao("🗼 TORRES", false)
+    local btnAutomacao = SubBotao("🤖 AUTOMAÇÃO", false)
+    local btnConfig = SubBotao("⚙️ CONFIG", false)
+
+    -- ÁREA DE CONTEÚDO
+    local areaConteudo = _I("Frame", Content)
+    areaConteudo.Size = _U2(1, 0, 0, 0)
+    areaConteudo.AutomaticSize = Enum.AutomaticSize.Y
+    areaConteudo.BackgroundTransparency = 1
+    local areaLayout = _I("UIListLayout")
+    areaLayout.Padding = _UD(0, 10)
+    areaLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    areaLayout.Parent = areaConteudo
+
+    -- FUNÇÃO RENDERIZAR PARKOUR
+    local function RenderParkour()
+        for _, c in ipairs(areaConteudo:GetChildren()) do if c ~= areaLayout then c:Destroy() end end
+        for _, cat in ipairs(CategoryOrder) do
+            local temDados = routes[cat] and #routes[cat] > 0
+            local card = _I("Frame", areaConteudo)
+            card.Size = _U2(1, 0, 0, 0)
+            card.AutomaticSize = Enum.AutomaticSize.Y
+            card.BackgroundColor3 = _K.Card
+            card.BorderSizePixel = 0
+            Corner(card, 10)
+            Stroke(card, _K.StrokeLight, 1)
+            local cardLayout = _I("UIListLayout")
+            cardLayout.Padding = _UD(0, 10)
+            cardLayout.Parent = card
+            Padding(card, 12, 12, 12, 12)
+
+            local cab = _I("TextButton", card)
+            cab.Size = _U2(1, 0, 0, 32)
+            cab.BackgroundTransparency = 1
+            cab.Text = (temDados and "▼ " or "▶ ") .. cat
+            cab.TextColor3 = _K.White
+            cab.Font = _GB
+            cab.TextSize = 13
+            cab.TextXAlignment = _XL
+            cab.AutoButtonColor = false
+            cab.LayoutOrder = 1
+
+            local lista = _I("Frame", card)
+            lista.Size = _U2(1, 0, 0, 0)
+            lista.AutomaticSize = Enum.AutomaticSize.Y
+            lista.BackgroundTransparency = 1
+            lista.Visible = expandedParkour[cat] == true
+            lista.LayoutOrder = 2
+            local listaLayout = _I("UIListLayout")
+            listaLayout.Padding = _UD(0, 6)
+            listaLayout.Parent = lista
+
+            if not temDados then
+                local btnCarregar = _I("TextButton", lista)
+                btnCarregar.Size = _U2(1, 0, 0, 36)
+                btnCarregar.BackgroundColor3 = _K.Panel
+                btnCarregar.Text = "🔄 Carregar rotas..."
+                btnCarregar.TextColor3 = _K.Orange
+                btnCarregar.Font = _GB
+                btnCarregar.TextSize = 12
+                btnCarregar.AutoButtonColor = false
+                Corner(btnCarregar, 8)
+                btnCarregar.MouseButton1Click:Connect(function()
+                    local ok = LoadCategory(cat)
+                    if ok then
+                        Notify("SUCESSO", cat .. " carregado!", "Success")
+                        expandedParkour[cat] = true
+                        RenderParkour()
+                    else
+                        Notify("ERRO", "Falha ao carregar " .. cat, "Error")
+                    end
+                end)
+            else
+                for idx, rota in ipairs(routes[cat]) do
+                    local btnRota = _I("TextButton", lista)
+                    btnRota.Size = _U2(1, 0, 0, 36)
+                    btnRota.BackgroundColor3 = _K.Panel
+                    btnRota.Text = "▶ Rota " .. idx
+                    btnRota.TextColor3 = _K.Gray
+                    btnRota.Font = _GM
+                    btnRota.TextSize = 12
+                    btnRota.AutoButtonColor = false
+                    Corner(btnRota, 6)
+                    btnRota.MouseButton1Click:Connect(function()
+                        StartPlayback(rota, cat, idx)
+                    end)
+                end
+            end
+
+            cab.MouseButton1Click:Connect(function()
+                expandedParkour[cat] = not expandedParkour[cat]
+                RenderParkour()
+            end)
+        end
+    end
+
+    -- FUNÇÃO RENDERIZAR TORRES
+    local function RenderTorres()
+        for _, c in ipairs(areaConteudo:GetChildren()) do if c ~= areaLayout then c:Destroy() end end
+        for torre, rotas in pairs(TowerPastebins) do
+            local card = _I("Frame", areaConteudo)
+            card.Size = _U2(1, 0, 0, 0)
+            card.AutomaticSize = Enum.AutomaticSize.Y
+            card.BackgroundColor3 = _K.Card
+            card.BorderSizePixel = 0
+            Corner(card, 10)
+            Stroke(card, _K.StrokeLight, 1)
+            local cardLayout = _I("UIListLayout")
+            cardLayout.Padding = _UD(0, 10)
+            cardLayout.Parent = card
+            Padding(card, 12, 12, 12, 12)
+
+            local cab = _I("TextLabel", card)
+            cab.Size = _U2(1, 0, 0, 32)
+            cab.BackgroundTransparency = 1
+            cab.Text = "🗼 " .. torre
+            cab.TextColor3 = _K.White
+            cab.Font = _GB
+            cab.TextSize = 13
+            cab.TextXAlignment = _XL
+
+            local lista = _I("Frame", card)
+            lista.Size = _U2(1, 0, 0, 0)
+            lista.AutomaticSize = Enum.AutomaticSize.Y
+            lista.BackgroundTransparency = 1
+            lista.LayoutOrder = 2
+            local listaLayout = _I("UIListLayout")
+            listaLayout.Padding = _UD(0, 6)
+            listaLayout.Parent = lista
+
+            for rota, link in pairs(rotas) do
+                local temDados = towerRoutes[torre] and towerRoutes[torre][rota] and #towerRoutes[torre][rota] > 0
+                local btnRota = _I("TextButton", lista)
+                btnRota.Size = _U2(1, 0, 0, 36)
+                btnRota.BackgroundColor3 = _K.Panel
+                btnRota.Text = (temDados and "▶ " or "🔄 ") .. rota
+                btnRota.TextColor3 = temDados and _K.Gray or _K.Orange
+                btnRota.Font = _GM
+                btnRota.TextSize = 12
+                btnRota.AutoButtonColor = false
+                Corner(btnRota, 6)
+                btnRota.MouseButton1Click:Connect(function()
+                    if not temDados then
+                        local ok = LoadTowerRoute(torre, rota)
+                        if ok then
+                            Notify("SUCESSO", torre .. " — " .. rota .. " carregado!", "Success")
+                            RenderTorres()
