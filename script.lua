@@ -105,7 +105,6 @@ local R = game:GetService("RunService")
 local HS = game:GetService("HttpService")
 local TCS = game:GetService("TextChatService")
 local RS = game:GetService("ReplicatedStorage")
-local VIM = game:GetService("VirtualInputManager")
 local Pl = P.LocalPlayer
 local PG = Pl:WaitForChild("PlayerGui")
 local character,humanoid,rootPart
@@ -259,11 +258,10 @@ end
 Pl.CharacterAdded:Connect(function() task.wait(.2); RefreshCharacter() end)
 RefreshCharacter()
 
--- ===== Animação de andar =====
+-- ✅ Animação de andar durante a rota (via Animator manual — visual local, seguro)
 local walkTrack
 local function iniciarAnimacaoAndar()
     if not RefreshCharacter() then return end
-    if walkTrack and walkTrack.IsPlaying then return end
     local animator = humanoid:FindFirstChildOfClass("Animator")
     if not animator then
         animator = _I("Animator")
@@ -283,6 +281,7 @@ local function iniciarAnimacaoAndar()
         animationId = isR15 and "rbxassetid://507777826" or "rbxassetid://180426354"
     end
     pcall(function()
+        if walkTrack then walkTrack:Stop() end
         local anim = _I("Animation")
         anim.AnimationId = animationId
         walkTrack = animator:LoadAnimation(anim)
@@ -298,31 +297,6 @@ local function pararAnimacaoAndar()
         walkTrack = nil
     end
 end
-
--- ✅ Animação natural: só toca quando está REALMENTE andando no chão
-R.RenderStepped:Connect(function()
-    if not Playback.Running then
-        if walkTrack and walkTrack.IsPlaying then pararAnimacaoAndar() end
-        return
-    end
-    if not RefreshCharacter() then return end
-    local st = humanoid:GetState()
-    local vel = rootPart.AssemblyLinearVelocity
-    local horizSpeed = Vector3.new(vel.X, 0, vel.Z).Magnitude
-    local noChao = (st == Enum.HumanoidStateType.Running
-                 or st == Enum.HumanoidStateType.Walking
-                 or st == Enum.HumanoidStateType.RunningNoPhysics)
-    local andando = noChao and horizSpeed > 3
-    if andando then
-        if not walkTrack or not walkTrack.IsPlaying then
-            iniciarAnimacaoAndar()
-        end
-    else
-        if walkTrack and walkTrack.IsPlaying then
-            pararAnimacaoAndar()
-        end
-    end
-end)
 
 local function Number(v) return v and tonumber(v) end
 
@@ -429,6 +403,7 @@ local function GetRotation(f)
     if f.rx and f.ry and f.rz then return CFrame.Angles(f.rx,f.ry,f.rz) end
 end
 
+-- ApplyPosition — modo pivot (original, seguro)
 local function ApplyPosition(pos,rot)
     if not pos or not RefreshCharacter() then return false end
     local corrected=pos+Vector3.new(0,CONFIG.GroundOffset,0)
@@ -562,6 +537,7 @@ local function IniciarExecucao(name)
         humanoid:Move(Vector3.zero, false)
         pcall(function() humanoid.AutoRotate = false end)
     end
+    iniciarAnimacaoAndar()
     Playback.StartClock = os.clock()
     Playback.CurrentIndex = 1
     Playback.LastJump = -math.huge
@@ -994,6 +970,7 @@ function UI.Toggle(parent, ordem, texto, inicial, callback)
     return row
 end
 
+-- Dropdown inline (empurra o conteúdo de baixo, fecha ao escolher)
 function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     local wrap = _I("Frame", parent)
     wrap.Size = _U2(1,0,0,0)
@@ -2355,79 +2332,19 @@ end
 -- =========================================================================
 -- COMBATE
 -- =========================================================================
-local Cam = workspace.CurrentCamera
-
--- ===== HITBOX: FOV-based camera lock =====
-local HB_CONFIG = {
-    Ativo=false,
-    Tamanho=5,
-    Transparencia=0.5,
-    Cor=_RGB(255,0,0)
-}
-
-local HB_FOVring
-pcall(function()
-    HB_FOVring = Drawing.new("Circle")
-    HB_FOVring.Visible = false
-    HB_FOVring.Thickness = 2
-    HB_FOVring.Color = HB_CONFIG.Cor
-    HB_FOVring.Filled = false
-    HB_FOVring.Radius = HB_CONFIG.Tamanho * 8
-    HB_FOVring.Position = Cam.ViewportSize / 2
-    HB_FOVring.Transparency = HB_CONFIG.Transparencia
-end)
-
-local function HB_getClosest()
-    local nearest, last = nil, math.huge
-    local centro = Cam.ViewportSize / 2
-    local raio = HB_CONFIG.Tamanho * 8
-    for _, p in ipairs(P:GetPlayers()) do
-        if p ~= Pl then
-            local ch = p.Character
-            if ch then
-                local head = ch:FindFirstChild("Head")
-                if head then
-                    local ePos, vis = Cam:WorldToViewportPoint(head.Position)
-                    if vis then
-                        local d = (Vector2.new(ePos.X, ePos.Y) - centro).Magnitude
-                        if d < last and d <= raio then
-                            last = d
-                            nearest = p
-                        end
-                    end
-                end
-            end
-        end
-    end
-    return nearest
-end
-
-R.RenderStepped:Connect(function()
-    if HB_FOVring then
-        HB_FOVring.Visible = HB_CONFIG.Ativo
-        HB_FOVring.Radius = HB_CONFIG.Tamanho * 8
-        HB_FOVring.Color = HB_CONFIG.Cor
-        HB_FOVring.Transparency = HB_CONFIG.Transparencia
-        HB_FOVring.Position = Cam.ViewportSize / 2
-    end
-    if not HB_CONFIG.Ativo then return end
-    local closest = HB_getClosest()
-    if closest and closest.Character then
-        local head = closest.Character:FindFirstChild("Head")
-        if head then
-            local lookVector = (head.Position - Cam.CFrame.Position).unit
-            local newCFrame = CFrame.new(Cam.CFrame.Position, Cam.CFrame.Position + lookVector)
-            Cam.CFrame = newCFrame
-        end
-    end
-end)
-
--- ===== AIM: mira + dano automático =====
 local AIM_CONFIG = {
     Ativo=false, MostrarFOV=false, FOV=43, RingTransparency=0.3,
     Cor=Color3.fromRGB(150,80,255), Thickness=2,
     OffsetX=0, OffsetY=-47, ParteAlvo="Cabeça"
 }
+local HB_CONFIG = {
+    Ativo=false, Visual=true, Tamanho=2, Transparencia=0.5,
+    Cor=_RGB(255,0,0), Material="Neon"
+}
+local HB_Original = {}
+local HB_Tok = os.clock()
+PG:SetAttribute("ZKYHitbox", HB_Tok)
+
 local AimFOVring
 pcall(function()
     AimFOVring = Drawing.new("Circle")
@@ -2437,6 +2354,7 @@ pcall(function()
     AimFOVring.Filled=false
     AimFOVring.Radius=AIM_CONFIG.FOV
 end)
+local Cam = workspace.CurrentCamera
 
 local function AIM_getCentro()
     return Vector2.new(
@@ -2492,32 +2410,6 @@ local function AIM_lookAtComOffset(target)
     Cam.CFrame = cf
 end
 
--- ✅ Função de ataque: usa vários métodos em cadeia
-local function AIM_atacar()
-    if not RefreshCharacter() then return end
-
-    -- 1) VirtualInputManager (clique real simulado)
-    pcall(function()
-        VIM:SendMouseButtonEvent(0, 0, 0, true, game, 1)
-        VIM:SendMouseButtonEvent(0, 0, 0, false, game, 1)
-    end)
-
-    -- 2) Ativar Tool equipada
-    local tool = character:FindFirstChildOfClass("Tool")
-    if tool then
-        pcall(function() tool:Activate() end)
-    end
-
-    -- 3) mouse1click (função nativa de executores)
-    if mouse1click then
-        pcall(mouse1click)
-    end
-    if mouse1press and mouse1release then
-        pcall(function() mouse1press() mouse1release() end)
-    end
-end
-
-local ultimoAtaque = 0
 R.RenderStepped:Connect(function()
     if AimFOVring then
         AimFOVring.Visible = AIM_CONFIG.MostrarFOV or AIM_CONFIG.Ativo
@@ -2531,13 +2423,61 @@ R.RenderStepped:Connect(function()
     local closest = AIM_getClosest()
     if closest then
         local part = AIM_pegarParteAlvo(closest.Character)
-        if part then
-            AIM_lookAtComOffset(part.Position)
-            if tick() - ultimoAtaque > 0.08 then
-                AIM_atacar()
-                ultimoAtaque = tick()
-            end
+        if part then AIM_lookAtComOffset(part.Position) end
+    end
+end)
+
+local function HB_Salvar(char)
+    if HB_Original[char] then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    HB_Original[char] = {Size=hrp.Size, Transparency=hrp.Transparency,
+        Color=hrp.Color, Material=hrp.Material, CanCollide=hrp.CanCollide}
+end
+local function HB_Aplicar(char)
+    if not char then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    HB_Salvar(char)
+    pcall(function()
+        hrp.Size = Vector3.new(HB_CONFIG.Tamanho,HB_CONFIG.Tamanho,HB_CONFIG.Tamanho)
+        hrp.Transparency = HB_CONFIG.Visual and HB_CONFIG.Transparencia or 1
+        hrp.Color = HB_CONFIG.Cor
+        hrp.Material = Enum.Material.Neon
+        hrp.CanCollide = false
+    end)
+end
+local function HB_Restaurar(char)
+    if not char then return end
+    local orig = HB_Original[char]
+    if not orig then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if hrp then
+        pcall(function()
+            hrp.Size = orig.Size hrp.Transparency = orig.Transparency
+            hrp.Color = orig.Color hrp.Material = orig.Material
+            hrp.CanCollide = orig.CanCollide
+        end)
+    end
+    HB_Original[char] = nil
+end
+
+local HB_Conn
+HB_Conn = R.Heartbeat:Connect(function()
+    if PG:GetAttribute("ZKYHitbox") ~= HB_Tok then
+        HB_Conn:Disconnect()
+        for c in pairs(HB_Original) do HB_Restaurar(c) end
+        return
+    end
+    if HB_CONFIG.Ativo then
+        for _,p in ipairs(P:GetPlayers()) do
+            if p ~= Pl and p.Character then HB_Aplicar(p.Character) end
         end
+        for char in pairs(HB_Original) do
+            if not char.Parent then HB_Original[char] = nil end
+        end
+    else
+        for char in pairs(HB_Original) do HB_Restaurar(char) end
     end
 end)
 
@@ -2951,7 +2891,7 @@ task.defer(function()
         if LoadTowerRoute("Torre 2",rn) then lt2+=1 end
     end
     ShowEBDelta()
-    Notify("AKIRA MENU",loaded.."/4 parkours • Torre 1: "..(lt1 and "OK" or "ERRO").." • Torre 2: "..lt2.."/4",
+    Notify("ZKY PARKOUR",loaded.."/4 parkours • Torre 1: "..(lt1 and "OK" or "ERRO").." • Torre 2: "..lt2.."/4",
         loaded==4 and lt1 and lt2==4 and "Success" or "Error")
 end)
 
