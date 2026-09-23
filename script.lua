@@ -113,36 +113,42 @@ local character,humanoid,rootPart
 -- CONFIGURAÇÃO
 -- =========================================================================
 local CONFIG = {
-    LineThickness=.15, LineTransparency=.2, LineColor=_RGB(255,145,45),
-    JumpCooldown=.28, PlaybackSpeed=1, WalkToSpeed=16, GroundOffset=1.66
+    LineThickness = .15,
+    LineTransparency = .2,
+    LineColor = _RGB(255,145,45),
+    JumpCooldown = .28,
+    PlaybackSpeed = 1,
+    WalkToSpeed = 16,
+    GroundOffset = 1.66
 }
 
--- ✅ Config única — vale para Parkour E Torres
+-- Configuração única — vale para Parkour E Torres
 local MovementConfig = { Modo = "Dummy" } -- "Dummy" ou "Direto"
 
 local IA_CONFIG = {
-    ApiKey="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",
-    Endpoint="https://api.groq.com/openai/v1/chat/completions",
-    Modelo="openai/gpt-oss-120b", Timeout=10,
-    SystemPrompt="Você é um corretor gramatical extremamente rigoroso de português do Brasil. Corrija TODOS os erros da mensagem do usuário, sem deixar passar nenhum, incluindo: letras maiúsculas no início de frases e em nomes próprios; todos os acentos gráficos (agudo, circunflexo, til, crase) e a cedilha; toda a pontuação, como vírgulas, pontos finais, pontos de interrogação e de exclamação; concordância verbal e nominal; ortografia e separação de palavras. Não deixe nenhuma palavra sem acento ou sem maiúscula onde for necessário, nem nenhuma frase sem pontuação final. Não resuma, não reescreva o estilo, não mude o significado, o tom nem o tamanho da mensagem: apenas corrija a gramática, a ortografia e a pontuação, mantendo as mesmas palavras sempre que possível. Responda APENAS com a mensagem corrigida, sem explicações, aspas, comentários extras ou qualquer texto adicional."
+    ApiKey = "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",
+    Endpoint = "https://api.groq.com/openai/v1/chat/completions",
+    Modelo = "openai/gpt-oss-120b",
+    Timeout = 10,
+    SystemPrompt = "Você é um corretor gramatical extremamente rigoroso de português do Brasil. Corrija TODOS os erros da mensagem do usuário, sem deixar passar nenhum, incluindo: letras maiúsculas no início de frases e em nomes próprios; todos os acentos gráficos (agudo, circunflexo, til, crase) e a cedilha; toda a pontuação, como vírgulas, pontos finais, pontos de interrogação e de exclamação; concordância verbal e nominal; ortografia e separação de palavras. Não deixe nenhuma palavra sem acento ou sem maiúscula onde for necessário, nem nenhuma frase sem pontuação final. Não resuma, não reescreva o estilo, não mude o significado, o tom nem o tamanho da mensagem: apenas corrija a gramática, a ortografia e a pontuação, mantendo as mesmas palavras sempre que possível. Responda APENAS com a mensagem corrigida, sem explicações, aspas, comentários extras ou qualquer texto adicional."
 }
 
 local httpRequest = request or (syn and syn.request) or (http and http.request) or http_request
 
 local Pastebins = {
-    Lento="https://pastebin.com/raw/M7DvRgTc",
-    ["Rápido"]="https://pastebin.com/raw/pBk8vYXE",
-    ["Mais Rápido"]="https://pastebin.com/raw/yz7gZmYr",
-    ["Sem Burla"]="https://pastebin.com/raw/N1j0iRDA"
+    Lento = "https://pastebin.com/raw/M7DvRgTc",
+    ["Rápido"] = "https://pastebin.com/raw/pBk8vYXE",
+    ["Mais Rápido"] = "https://pastebin.com/raw/yz7gZmYr",
+    ["Sem Burla"] = "https://pastebin.com/raw/N1j0iRDA"
 }
 local CategoryOrder = {"Lento","Rápido","Mais Rápido","Sem Burla"}
 local TowerPastebins = {
     ["Torre 1"] = {["Única"]="https://pastebin.com/raw/HxXb4Mr3"},
     ["Torre 2"] = {
-        Frente="https://pastebin.com/raw/Y2arCYHb",
-        ["Atrás"]="https://pastebin.com/raw/rXxZX7CQ",
-        Esquerda="https://pastebin.com/raw/FtpTHhGt",
-        Direita="https://pastebin.com/raw/4u5Wjtkg"
+        Frente = "https://pastebin.com/raw/Y2arCYHb",
+        ["Atrás"] = "https://pastebin.com/raw/rXxZX7CQ",
+        Esquerda = "https://pastebin.com/raw/FtpTHhGt",
+        Direita = "https://pastebin.com/raw/4u5Wjtkg"
     }
 }
 local Tower2RouteOrder = {"Frente","Atrás","Esquerda","Direita"}
@@ -157,9 +163,9 @@ local lineFolder
 local linesVisible = true
 
 local Playback = {
-    Running=false, Connection=nil, Route=nil, StartClock=0,
-    CurrentIndex=1, LastJump=-math.huge, Category=nil, Parkour=nil,
-    Tower=nil, TowerRoute=nil, WalkingToStart=false, WalkConnection=nil
+    Running = false, Connection = nil, Route = nil, StartClock = 0,
+    CurrentIndex = 1, LastJump = -math.huge, Category = nil, Parkour = nil,
+    Tower = nil, TowerRoute = nil, WalkingToStart = false, WalkConnection = nil
 }
 local SavedDirection = nil
 local Turning = false
@@ -168,12 +174,12 @@ local Old = PG:FindFirstChild("ZKY_PARKOUR")
 if Old then Old:Destroy() end
 
 local _K = {
-    Background=_RGB(18,18,20), Panel=_RGB(24,24,27), Card=_RGB(31,31,35),
-    CardHover=_RGB(39,39,43), Selected=_RGB(55,55,60), Stroke=_RGB(65,65,70),
-    StrokeLight=_RGB(85,85,90), White=_RGB(245,245,245), Gray=_RGB(175,175,180),
-    DarkGray=_RGB(115,115,120), Success=_RGB(80,210,125), Error=_RGB(230,85,85),
-    Orange=_RGB(255,145,45), SelectionRed=_RGB(225,70,70), SelectionRedDark=_RGB(75,32,32),
-    Primary=_RGB(185,185,185)
+    Background = _RGB(18,18,20), Panel = _RGB(24,24,27), Card = _RGB(31,31,35),
+    CardHover = _RGB(39,39,43), Selected = _RGB(55,55,60), Stroke = _RGB(65,65,70),
+    StrokeLight = _RGB(85,85,90), White = _RGB(245,245,245), Gray = _RGB(175,175,180),
+    DarkGray = _RGB(115,115,120), Success = _RGB(80,210,125), Error = _RGB(230,85,85),
+    Orange = _RGB(255,145,45), SelectionRed = _RGB(225,70,70), SelectionRedDark = _RGB(75,32,32),
+    Primary = _RGB(185,185,185)
 }
 
 local function Corner(o,r) local c=_I("UICorner") c.CornerRadius=_UD(0,r) c.Parent=o end
@@ -384,7 +390,7 @@ local function HandleJump(f,e)
 end
 
 -- =========================================================================
--- ANDAR ATÉ O INÍCIO DA ROTA (walk normal do Roblox)
+-- ANDAR ATÉ (usado apenas no modo Direto para chegar ao início da rota)
 -- =========================================================================
 local function AndarAte(destino,estaCancelado,aoTerminar)
     if not RefreshCharacter() then aoTerminar(false) return end
@@ -479,54 +485,54 @@ local function StopPlayback(reason)
 end
 
 -- =========================================================================
--- EXECUÇÃO DA ROTA (idêntico ao original — pivot com interpolação)
+-- PLAYBACK (execução por pivot — IDÊNTICO ao original)
 -- =========================================================================
 local function IniciarExecucao(name)
     if not Playback.Running then return end
-    Playback.WalkingToStart=false
+    Playback.WalkingToStart = false
     if RefreshCharacter() then
-        humanoid:Move(Vector3.zero,false)
-        pcall(function() humanoid.AutoRotate=false end)
+        humanoid:Move(Vector3.zero, false)
+        pcall(function() humanoid.AutoRotate = false end)
     end
-    Playback.StartClock=os.clock()
-    Playback.CurrentIndex=1
-    Playback.LastJump=-math.huge
-    Notify("EXECUTANDO",name,"Success")
+    Playback.StartClock = os.clock()
+    Playback.CurrentIndex = 1
+    Playback.LastJump = -math.huge
+    Notify("EXECUTANDO", name, "Success")
     task.spawn(function()
         while Playback.Running and not Playback.WalkingToStart do
             if not RefreshCharacter() then StopPlayback("error"); break end
-            local frames=Playback.Route
-            if not frames or #frames<2 then StopPlayback("error"); break end
-            local elapsed=(os.clock()-Playback.StartClock)*CONFIG.PlaybackSpeed
-            local final=frames[#frames]
-            if elapsed>=final.t then
-                ApplyPosition(GetPosition(final),GetRotation(final))
+            local frames = Playback.Route
+            if not frames or #frames < 2 then StopPlayback("error"); break end
+            local elapsed = (os.clock() - Playback.StartClock) * CONFIG.PlaybackSpeed
+            local final = frames[#frames]
+            if elapsed >= final.t then
+                ApplyPosition(GetPosition(final), GetRotation(final))
                 StopPlayback("completed")
                 break
             end
-            local a,b,alpha=GetFrames(frames,elapsed)
+            local a, b, alpha = GetFrames(frames, elapsed)
             if not a or not b then break end
-            local pa,pb=GetPosition(a),GetPosition(b)
+            local pa, pb = GetPosition(a), GetPosition(b)
             if not pa or not pb then StopPlayback("error"); break end
-            local pos=pa:Lerp(pb,alpha)
-            local ra,rb=GetRotation(a),GetRotation(b)
+            local pos = pa:Lerp(pb, alpha)
+            local ra, rb = GetRotation(a), GetRotation(b)
             local rot
-            if ra and rb then rot=ra:Lerp(rb,alpha)
-            elseif ra then rot=ra
-            elseif rb then rot=rb end
-            ApplyPosition(pos,rot)
-            HandleJump(a,elapsed)
+            if ra and rb then rot = ra:Lerp(rb, alpha)
+            elseif ra then rot = ra
+            elseif rb then rot = rb end
+            ApplyPosition(pos, rot)
+            HandleJump(a, elapsed)
             task.wait()
         end
     end)
 end
 
-local function StartPlayback(data,cat,num,tower,towerRoute)
+local function StartPlayback(data, cat, num, tower, towerRoute)
     if Playback.Running then
         Notify("EM EXECUÇÃO","Pare a rota atual antes de iniciar outra.","Error")
         return
     end
-    if not data or #data<2 then
+    if not data or #data < 2 then
         Notify("ROTA INVÁLIDA","Essa rota não possui frames suficientes.","Error")
         return
     end
@@ -534,48 +540,49 @@ local function StartPlayback(data,cat,num,tower,towerRoute)
         Notify("PERSONAGEM","Personagem não encontrado.","Error")
         return
     end
-    local first=data[1]
-    local fp=GetPosition(first)
+    local first = data[1]
+    local fp = GetPosition(first)
     if not fp then Notify("ERRO","Primeiro ponto da rota inválido.","Error"); return end
-    local target=fp+Vector3.new(0,CONFIG.GroundOffset,0)
-    Playback.Running=true
-    Playback.WalkingToStart=true
-    Playback.Route=data
-    Playback.Category=cat
-    Playback.Parkour=num
-    Playback.Tower=tower
-    Playback.TowerRoute=towerRoute
-    Playback.CurrentIndex=1
+    local target = fp + Vector3.new(0, CONFIG.GroundOffset, 0)
+    Playback.Running = true
+    Playback.WalkingToStart = true
+    Playback.Route = data
+    Playback.Category = cat
+    Playback.Parkour = num
+    Playback.Tower = tower
+    Playback.TowerRoute = towerRoute
+    Playback.CurrentIndex = 1
     ShowRouteLines(data)
 
     local name
     if tower then
-        name = tower=="Torre 1" and "Torre 1" or "Torre 2 • "..towerRoute
+        name = tower == "Torre 1" and "Torre 1" or "Torre 2 • " .. towerRoute
     else
-        name = "Parkour "..num.." • "..cat
+        name = "Parkour " .. num .. " • " .. cat
     end
 
-    -- ✅ A Configuração vale para TORRES E PARKOURS
+    -- Configuração vale para TORRES e PARKOURS
     local usarDummy = MovementConfig.Modo == "Dummy"
 
     if usarDummy then
-        Notify("MARCADOR CRIADO","Ande até o marcador verde para iniciar: "..name,"Orange")
+        Notify("MARCADOR CRIADO", "Ande até o marcador verde para iniciar: " .. name, "Orange")
         CriarDummy(target, GetRotation(first))
         Playback.WalkConnection = R.Heartbeat:Connect(function()
             if not Playback.Running or not Playback.WalkingToStart then return end
             if not RefreshCharacter() then StopPlayback("error"); return end
-            if (rootPart.Position-target).Magnitude<=5 then
+            if (rootPart.Position - target).Magnitude <= 5 then
                 if Playback.WalkConnection then
-                    Playback.WalkConnection:Disconnect(); Playback.WalkConnection=nil
+                    Playback.WalkConnection:Disconnect()
+                    Playback.WalkConnection = nil
                 end
                 RemoverDummy()
                 IniciarExecucao(name)
             end
         end)
     else
-        Notify("INDO PARA O INÍCIO",name,"Orange")
+        Notify("INDO PARA O INÍCIO", name, "Orange")
         task.spawn(function()
-            AndarAte(target,function() return not Playback.Running end,function(sucesso)
+            AndarAte(target, function() return not Playback.Running end, function(sucesso)
                 if not Playback.Running then return end
                 if not sucesso then StopPlayback("error") return end
                 IniciarExecucao(name)
@@ -753,7 +760,7 @@ local iaButton       = SideButton("🤖 IA CHAT", false)
 local combateButton  = SideButton("🎯 COMBATE", false)
 local textosButton   = SideButton("📚 TEXTOS PRONTOS", false)
 local lojaButton     = SideButton("🔫 LOJA", false)
-local hitboxButton   = SideButton("🎯 HITBOX", false)
+local jjButton       = SideButton("🤸 AUTO JJs", false)
 local selectedButton = ebDeltaButton
 
 local Content=_I("ScrollingFrame")
@@ -961,7 +968,7 @@ local function ShowTAFFS()
 end
 
 -- =========================================================================
--- EB DELTA (hotbar: Torres / Parkour / Automação / Configuração)
+-- EB DELTA
 -- =========================================================================
 local EBDeltaSubPage = "Parkour"
 
@@ -973,9 +980,7 @@ local function GetCategoryColor(c)
     return _K.Gray
 end
 
--- -------------------------------------------------------------------------
--- SUB-ABA: PARKOUR
--- -------------------------------------------------------------------------
+-- Conteúdo: PARKOUR
 local function ShowParkoursContent()
     local tf=_I("Frame")
     tf.Size=_U2(1,0,0,48) tf.BackgroundColor3=_K.Card tf.BorderSizePixel=0
@@ -1063,9 +1068,7 @@ local function ShowParkoursContent()
     end
 end
 
--- -------------------------------------------------------------------------
--- SUB-ABA: TORRES
--- -------------------------------------------------------------------------
+-- Conteúdo: TORRES
 local function ShowTowersContent()
     local tf=_I("Frame")
     tf.Size=_U2(1,0,0,48) tf.BackgroundColor3=_K.Card tf.BorderSizePixel=0
@@ -1164,9 +1167,7 @@ local function ShowTowersContent()
     end)
 end
 
--- -------------------------------------------------------------------------
--- SUB-ABA: AUTOMAÇÃO (Auto JJs)
--- -------------------------------------------------------------------------
+-- Conteúdo: AUTOMAÇÃO (Auto JJs)
 local ShowAutomacaoContent
 do
     local AC={Fundo=_RGB(10,10,14),Card=_RGB(20,20,28),Borda=_RGB(0,220,255),
@@ -1351,9 +1352,7 @@ do
     end
 end
 
--- -------------------------------------------------------------------------
--- SUB-ABA: CONFIGURAÇÃO (Dummy / Direto) — vale para TORRES e PARKOURS
--- -------------------------------------------------------------------------
+-- Conteúdo: CONFIGURAÇÃO
 local function ShowConfiguracaoContent()
     local h=_I("Frame")
     h.Size=_U2(1,0,0,58) h.BackgroundColor3=_K.Card h.BorderSizePixel=0
@@ -1377,7 +1376,7 @@ local function ShowConfiguracaoContent()
 
     local desc=_I("TextLabel")
     desc.BackgroundTransparency=1 desc.Position=_UO(12,32) desc.Size=_U2(1,-24,0,40)
-    desc.Text="🧍 DUMMY: cria um boneco fantasma no início da rota e você anda até ele.\n➡ DIRETO: anda automaticamente até o início da rota e executa."
+    desc.Text="🧍 DUMMY: cria um boneco fantasma no início da rota e você anda até ele.\n➡ DIRETO: anda automaticamente até o início e segue a rota."
     desc.TextColor3=_K.Gray desc.TextSize=10 desc.Font=_GM
     desc.TextWrapped=true desc.TextXAlignment=_XL
     desc.TextYAlignment=Enum.TextYAlignment.Top desc.Parent=card
@@ -1396,13 +1395,14 @@ local function ShowConfiguracaoContent()
         b.Text=icon.." "..label b.TextColor3=sel and _K.SelectionRed or _K.Gray
         b.TextSize=11 b.Font=_GB b.BorderSizePixel=0 b.AutoButtonColor=false
         b.Parent=btnFrame Corner(b,8)
-        Stroke(b, sel and _K.SelectionRed or _K.Stroke, sel and 1.6 or 1)
+        local st=Stroke(b, sel and _K.SelectionRed or _K.Stroke, sel and 1.6 or 1)
         b.MouseButton1Click:Connect(function()
             if MovementConfig.Modo==id then return end
             MovementConfig.Modo=id
             Notify("CONFIGURAÇÃO", "Modo "..label.." ativado para todas as rotas.", "Success")
             ShowEBDelta()
         end)
+        return b
     end
     makeOpt("Dummy", "DUMMY", "🧍")
     makeOpt("Direto", "IR DIRETO", "➡")
@@ -1414,9 +1414,7 @@ local function ShowConfiguracaoContent()
     footer.TextXAlignment=_XL footer.Parent=card
 end
 
--- -------------------------------------------------------------------------
--- Mostrar EB DELTA com hotbar superior
--- -------------------------------------------------------------------------
+-- Mostrar EB DELTA
 function ShowEBDelta()
     CurrentPage = "EBDelta"
     ClearContent()
@@ -1433,7 +1431,6 @@ function ShowEBDelta()
     s.Text="Central de automação do Exército Brasileiro" s.TextColor3=_K.DarkGray
     s.TextSize=9 s.Font=_GM s.TextXAlignment=_XL s.Parent=h
 
-    -- Hotbar superior
     local hotbar=_I("Frame")
     hotbar.Size=_U2(1,0,0,46) hotbar.BackgroundColor3=_K.Panel
     hotbar.BorderSizePixel=0 hotbar.LayoutOrder=1 hotbar.Parent=_CH
@@ -1459,7 +1456,7 @@ function ShowEBDelta()
         b.TextColor3 = sel and _K.White or _K.Gray
         b.TextSize=10 b.Font=_GB b.BorderSizePixel=0 b.AutoButtonColor=false
         b.Parent=hotbar Corner(b,7)
-        Stroke(b, sel and _K.StrokeLight or _K.Stroke, sel and 1.3 or 1)
+        local st=Stroke(b, sel and _K.StrokeLight or _K.Stroke, sel and 1.3 or 1)
         b.MouseButton1Click:Connect(function()
             EBDeltaSubPage=tab.Id
             ShowEBDelta()
@@ -1480,7 +1477,7 @@ function ShowEBDelta()
 end
 
 -- =========================================================================
--- VOLVERS (conteúdo)
+-- VOLVERS
 -- =========================================================================
 local function ShowVolvers()
     CurrentPage="Volvers"
@@ -1574,7 +1571,7 @@ local function ShowVolvers()
 end
 
 -- =========================================================================
--- IA CHAT (correção)
+-- IA CHAT
 -- =========================================================================
 local iaOcupado=false
 local function ShowAutoCorrecao()
@@ -1734,12 +1731,16 @@ do
     }
 
     local C = {
-        Fundo=_RGB(25,25,25), Painel=_RGB(35,35,35), Borda=_RGB(50,50,50),
-        Texto=_RGB(255,255,255), TextoDim=_RGB(160,160,160),
-        Verde=_RGB(16,185,129), VerdeHover=_RGB(52,211,153),
+        Fundo      = _RGB(25, 25, 25),
+        Painel     = _RGB(35, 35, 35),
+        Borda      = _RGB(50, 50, 50),
+        Texto      = _RGB(255, 255, 255),
+        TextoDim   = _RGB(160, 160, 160),
+        Verde      = _RGB(16, 185, 129),
+        VerdeHover = _RGB(52, 211, 153),
     }
 
-    local IA_TEXTOS_CONFIG = {
+    local IA_CONFIG_TEXTOS = {
         ApiKey = "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",
         Endpoint = "https://api.groq.com/openai/v1/chat/completions",
         Modelo = "openai/gpt-oss-120b",
@@ -1859,9 +1860,9 @@ do
         end
 
         local corpo = HS:JSONEncode({
-            model = IA_TEXTOS_CONFIG.Modelo,
+            model = IA_CONFIG_TEXTOS.Modelo,
             messages = {
-                { role = "system", content = IA_TEXTOS_CONFIG.SystemPrompt },
+                { role = "system", content = IA_CONFIG_TEXTOS.SystemPrompt },
                 { role = "user", content = "Escreva um texto sobre: " .. tema }
             },
             temperature = 0.7,
@@ -1872,11 +1873,11 @@ do
         task.spawn(function()
             local ok, res = pcall(function()
                 return httpRequest({
-                    Url = IA_TEXTOS_CONFIG.Endpoint,
+                    Url = IA_CONFIG_TEXTOS.Endpoint,
                     Method = "POST",
                     Headers = {
                         ["Content-Type"] = "application/json",
-                        ["Authorization"] = "Bearer " .. IA_TEXTOS_CONFIG.ApiKey
+                        ["Authorization"] = "Bearer " .. IA_CONFIG_TEXTOS.ApiKey
                     },
                     Body = corpo
                 })
@@ -1886,7 +1887,7 @@ do
         end)
 
         local inicio = tick()
-        while not terminou and (tick() - inicio) < IA_TEXTOS_CONFIG.Timeout do
+        while not terminou and (tick() - inicio) < IA_CONFIG_TEXTOS.Timeout do
             task.wait(0.1)
         end
 
@@ -1905,11 +1906,15 @@ do
         if not msg then return nil, "Resposta vazia" end
 
         local txt = msg.content or ""
-        if txt == "" and msg.reasoning then txt = msg.reasoning end
+        if txt == "" and msg.reasoning then
+            txt = msg.reasoning
+        end
         if txt == "" then return nil, "Resposta vazia" end
 
         local extraido = txt:match("<<<(.-)>>>")
-        if extraido and extraido ~= "" then txt = extraido end
+        if extraido and extraido ~= "" then
+            txt = extraido
+        end
 
         txt = txt:gsub("^%s+", ""):gsub("%s+$", "")
         txt = txt:gsub('^["\']+', ""):gsub('["\']+$', "")
@@ -2114,28 +2119,36 @@ do
 end
 
 -- =========================================================================
--- COMBATE (Aimbot — bloco novo)
+-- COMBATE (Aimbot + Hitbox integrados)
 -- =========================================================================
 local AIM_CONFIG = {
     Ativo=false, MostrarFOV=false, FOV=43, RingTransparency=0.3,
     Cor=Color3.fromRGB(150,80,255), Thickness=2,
     OffsetX=0, OffsetY=-47, ParteAlvo="Cabeça"
 }
+local HB_CONFIG = {
+    Ativo=false, Visual=true, Tamanho=2, Transparencia=.7,
+    Cor=_RGB(255,0,0), Material="Neon"
+}
+local HB_Original = {}
+local HB_Tok = os.clock()
+PG:SetAttribute("ZKYHitbox", HB_Tok)
+
 local AimFOVring
 pcall(function()
-    AimFOVring=Drawing.new("Circle")
+    AimFOVring = Drawing.new("Circle")
     AimFOVring.Visible=false
     AimFOVring.Thickness=AIM_CONFIG.Thickness
     AimFOVring.Color=AIM_CONFIG.Cor
     AimFOVring.Filled=false
     AimFOVring.Radius=AIM_CONFIG.FOV
 end)
-local Cam=workspace.CurrentCamera
+local Cam = workspace.CurrentCamera
 
 local function AIM_getCentro()
     return Vector2.new(
-        Cam.ViewportSize.X/2+AIM_CONFIG.OffsetX,
-        Cam.ViewportSize.Y/2+AIM_CONFIG.OffsetY
+        Cam.ViewportSize.X/2 + AIM_CONFIG.OffsetX,
+        Cam.ViewportSize.Y/2 + AIM_CONFIG.OffsetY
     )
 end
 local function AIM_pegarTronco(char)
@@ -2155,17 +2168,18 @@ local function AIM_pegarParteAlvo(char)
     return char:FindFirstChild("Head")
 end
 local function AIM_getClosest()
-    local nearest,last=nil,math.huge
-    local centro=AIM_getCentro()
+    local nearest,last = nil, math.huge
+    local centro = AIM_getCentro()
     for _,p in ipairs(P:GetPlayers()) do
-        if p~=Pl then
-            local part=AIM_pegarParteAlvo(p.Character)
+        if p ~= Pl then
+            local part = AIM_pegarParteAlvo(p.Character)
             if part then
-                local ePos,vis=Cam:WorldToViewportPoint(part.Position)
+                local ePos,vis = Cam:WorldToViewportPoint(part.Position)
                 if vis then
-                    local d=(Vector2.new(ePos.X,ePos.Y)-centro).Magnitude
-                    if d<last and d<=AIM_CONFIG.FOV then
-                        last=d nearest=p
+                    local d = (Vector2.new(ePos.X,ePos.Y) - centro).Magnitude
+                    if d < last and d <= AIM_CONFIG.FOV then
+                        last = d
+                        nearest = p
                     end
                 end
             end
@@ -2174,99 +2188,182 @@ local function AIM_getClosest()
     return nearest
 end
 local function AIM_lookAtComOffset(target)
-    local camPos=Cam.CFrame.Position
-    local dirAlvo=(target-camPos).Unit
-    local fovRad=math.rad(Cam.FieldOfView)
-    local vx=Cam.ViewportSize.X local vy=Cam.ViewportSize.Y
-    local offX=-math.atan((AIM_CONFIG.OffsetX/vx)*2*math.tan(fovRad/2))
-    local offY=math.atan((AIM_CONFIG.OffsetY/vy)*2*math.tan(fovRad/2))
-    local cf=CFrame.new(camPos,camPos+dirAlvo)
-    cf=cf*CFrame.Angles(offY,offX,0)
-    Cam.CFrame=cf
+    local camPos = Cam.CFrame.Position
+    local dirAlvo = (target - camPos).Unit
+    local fovRad = math.rad(Cam.FieldOfView)
+    local vx, vy = Cam.ViewportSize.X, Cam.ViewportSize.Y
+    local offX = -math.atan((AIM_CONFIG.OffsetX/vx)*2*math.tan(fovRad/2))
+    local offY = math.atan((AIM_CONFIG.OffsetY/vy)*2*math.tan(fovRad/2))
+    local cf = CFrame.new(camPos, camPos + dirAlvo)
+    cf = cf * CFrame.Angles(offY, offX, 0)
+    Cam.CFrame = cf
 end
 
 R.RenderStepped:Connect(function()
     if AimFOVring then
-        AimFOVring.Visible=AIM_CONFIG.MostrarFOV or AIM_CONFIG.Ativo
-        AimFOVring.Radius=AIM_CONFIG.FOV
-        AimFOVring.Color=AIM_CONFIG.Cor
-        AimFOVring.Thickness=AIM_CONFIG.Thickness
-        AimFOVring.Position=AIM_getCentro()
-        AimFOVring.Transparency=AIM_CONFIG.RingTransparency
+        AimFOVring.Visible = AIM_CONFIG.MostrarFOV or AIM_CONFIG.Ativo
+        AimFOVring.Radius = AIM_CONFIG.FOV
+        AimFOVring.Color = AIM_CONFIG.Cor
+        AimFOVring.Thickness = AIM_CONFIG.Thickness
+        AimFOVring.Position = AIM_getCentro()
+        AimFOVring.Transparency = AIM_CONFIG.RingTransparency
     end
     if not AIM_CONFIG.Ativo then return end
-    local closest=AIM_getClosest()
+    local closest = AIM_getClosest()
     if closest then
-        local part=AIM_pegarParteAlvo(closest.Character)
+        local part = AIM_pegarParteAlvo(closest.Character)
         if part then AIM_lookAtComOffset(part.Position) end
     end
 end)
 
+-- Hitbox logic
+local function HB_Salvar(char)
+    if HB_Original[char] then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    HB_Original[char] = {Size=hrp.Size, Transparency=hrp.Transparency,
+        Color=hrp.Color, Material=hrp.Material, CanCollide=hrp.CanCollide}
+end
+local function HB_Aplicar(char)
+    if not char then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    HB_Salvar(char)
+    pcall(function()
+        hrp.Size = Vector3.new(HB_CONFIG.Tamanho,HB_CONFIG.Tamanho,HB_CONFIG.Tamanho)
+        hrp.Transparency = HB_CONFIG.Visual and HB_CONFIG.Transparencia or 1
+        hrp.Color = HB_CONFIG.Cor
+        hrp.Material = Enum.Material.Neon
+        hrp.CanCollide = false
+    end)
+end
+local function HB_Restaurar(char)
+    if not char then return end
+    local orig = HB_Original[char]
+    if not orig then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if hrp then
+        pcall(function()
+            hrp.Size = orig.Size
+            hrp.Transparency = orig.Transparency
+            hrp.Color = orig.Color
+            hrp.Material = orig.Material
+            hrp.CanCollide = orig.CanCollide
+        end)
+    end
+    HB_Original[char] = nil
+end
+
+local HB_Conn
+HB_Conn = R.Heartbeat:Connect(function()
+    if PG:GetAttribute("ZKYHitbox") ~= HB_Tok then
+        HB_Conn:Disconnect()
+        for c in pairs(HB_Original) do HB_Restaurar(c) end
+        return
+    end
+    if HB_CONFIG.Ativo then
+        for _,p in ipairs(P:GetPlayers()) do
+            if p ~= Pl and p.Character then HB_Aplicar(p.Character) end
+        end
+        for char in pairs(HB_Original) do
+            if not char.Parent then HB_Original[char] = nil end
+        end
+    else
+        for char in pairs(HB_Original) do HB_Restaurar(char) end
+    end
+end)
+
+-- UI do Combate
 do
-    local C={
-        Fundo=_RGB(18,18,26), Painel=_RGB(26,26,36), Card=_RGB(34,34,46),
-        Borda=_RGB(55,55,75), Roxo=_RGB(150,80,255), RoxoClaro=_RGB(190,130,255),
-        Texto=_RGB(235,235,245), TextoDim=_RGB(120,120,145),
+    local C = {
+        Fundo=_RGB(18,18,26), Painel=_RGB(26,26,36), Card=_RGB(26,26,36),
+        Borda=_RGB(48,48,62), Roxo=_RGB(150,80,255), RoxoClaro=_RGB(190,130,255),
+        Texto=_RGB(235,235,245), TextoDim=_RGB(140,140,160),
         Verde=_RGB(0,190,110), Vermelho=_RGB(220,50,70), Selecionado=_RGB(75,40,130)
     }
     local function NC(c,p,par) local o=_I(c) for k,v in pairs(p)do o[k]=v end o.Parent=par return o end
-    local function LB(par,pos,size,txt,cor,ts,fonte,al)
-        return NC("TextLabel",{BackgroundTransparency=1,Position=pos,Size=size,Text=txt,
-            TextColor3=cor,TextSize=ts,Font=fonte,TextXAlignment=al or _XL},par)
+
+    local function makeCard(parent, ordem)
+        local card = NC("Frame",{Size=_U2(1,0,0,0),AutomaticSize=Enum.AutomaticSize.Y,
+            BackgroundColor3=C.Card,BorderSizePixel=0,LayoutOrder=ordem},parent)
+        Corner(card,10) Stroke(card,C.Borda,1)
+        NC("UIPadding",{PaddingTop=_UD(0,12),PaddingBottom=_UD(0,12),
+            PaddingLeft=_UD(0,12),PaddingRight=_UD(0,12)},card)
+        NC("UIListLayout",{Padding=_UD(0,10),SortOrder=Enum.SortOrder.LayoutOrder},card)
+        return card
     end
-    local function Toggle(ordem,texto,inicial,callback)
-        local card=NC("Frame",{Size=_U2(1,0,0,45),BackgroundColor3=C.Card,
-            BorderSizePixel=0,LayoutOrder=ordem},_CH)
-        Corner(card,8) Stroke(card,C.Borda,1)
-        LB(card,_UO(10,0),_U2(1,-70,1,0),texto,C.Texto,12,_GB)
-        local sw=NC("TextButton",{AnchorPoint=_V2(1,.5),Position=_U2(1,-10,.5,0),
-            Size=_UO(38,20),BackgroundColor3=C.Card,Text="",BorderSizePixel=0,
-            AutoButtonColor=false},card)
-        Corner(sw,10) Stroke(sw,C.Borda,1)
-        local bol=NC("Frame",{Position=_UO(3,3),Size=_UO(14,14),
+
+    local function makeTitle(parent, ordem, texto)
+        local wrap = NC("Frame",{Size=_U2(1,0,0,22),BackgroundTransparency=1,LayoutOrder=ordem},parent)
+        NC("TextLabel",{Size=_U2(1,0,0,18),BackgroundTransparency=1,
+            Text=texto,TextColor3=C.RoxoClaro,Font=_GB,TextSize=12,TextXAlignment=_XL},wrap)
+        local line = NC("Frame",{Size=_U2(0,40,0,2),Position=_U2(0,0,0,20),
+            BackgroundColor3=C.Roxo,BorderSizePixel=0},wrap)
+        Corner(line,1)
+    end
+
+    local function makeRow(parent, ordem, labelText)
+        local row = NC("Frame",{Size=_U2(1,0,0,26),BackgroundTransparency=1,LayoutOrder=ordem},parent)
+        NC("TextLabel",{Size=_U2(1,-80,1,0),BackgroundTransparency=1,
+            Text=labelText,TextColor3=C.Texto,Font=_GM,TextSize=10,
+            TextXAlignment=_XL,TextYAlignment=Enum.TextYAlignment.Center},row)
+        return row
+    end
+
+    local function Toggle(parent, ordem, texto, inicial, callback)
+        local row = makeRow(parent, ordem, texto)
+        local sw = NC("TextButton",{AnchorPoint=_V2(1,.5),Position=_U2(1,0,.5,0),
+            Size=_UO(36,18),BackgroundColor3=C.Painel,Text="",BorderSizePixel=0,
+            AutoButtonColor=false},row)
+        Corner(sw,9) Stroke(sw,C.Borda,1)
+        local bol = NC("Frame",{Position=_UO(3,3),Size=_UO(12,12),
             BackgroundColor3=C.TextoDim,BorderSizePixel=0},sw)
-        Corner(bol,7)
-        local est=inicial
+        Corner(bol,6)
+        local est = inicial
         local function aplicar(v)
-            est=v
-            sw.BackgroundColor3=v and C.Roxo or C.Card
-            bol.Position=v and _UO(21,3) or _UO(3,3)
-            bol.BackgroundColor3=v and Color3.new(1,1,1) or C.TextoDim
+            est = v
+            sw.BackgroundColor3 = v and C.Roxo or C.Painel
+            bol.Position = v and _UO(21,3) or _UO(3,3)
+            bol.BackgroundColor3 = v and Color3.new(1,1,1) or C.TextoDim
         end
         aplicar(est)
         sw.MouseButton1Click:Connect(function() aplicar(not est) callback(est) end)
     end
-    local function Slider(ordem,titulo,valor,min,max,isDec,callback)
-        local card=NC("Frame",{Size=_U2(1,0,0,60),BackgroundColor3=C.Card,
-            BorderSizePixel=0,LayoutOrder=ordem},_CH)
-        Corner(card,8) Stroke(card,C.Borda,1)
-        LB(card,_UO(10,7),_U2(1,-70,0,16),titulo,C.Texto,12,_GB)
-        local val=LB(card,_UO(0,7),_UO(50,16),
-            isDec and string.format("%.2f",valor) or tostring(valor),
-            C.RoxoClaro,12,_GB,Enum.TextXAlignment.Right)
-        val.AnchorPoint=_V2(1,0) val.Position=_U2(1,-10,0,7)
-        local barBg=NC("Frame",{Position=_UO(10,38),Size=_U2(1,-20,0,8),
-            BackgroundColor3=C.Card,BorderSizePixel=0},card)
-        Corner(barBg,4)
-        local pct0=(valor-min)/(max-min)
-        local fill=NC("Frame",{Size=_U2(pct0,0,1,0),BackgroundColor3=C.Roxo,
+
+    local function Slider(parent, ordem, titulo, valor, min, max, isDec, callback)
+        local wrap = NC("Frame",{Size=_U2(1,0,0,40),BackgroundTransparency=1,LayoutOrder=ordem},parent)
+        NC("TextLabel",{Size=_U2(1,-60,0,14),BackgroundTransparency=1,Text=titulo,
+            TextColor3=C.Texto,Font=_GM,TextSize=10,TextXAlignment=_XL},wrap)
+        local valLbl = NC("TextLabel",{AnchorPoint=_V2(1,0),Position=_U2(1,0,0,0),
+            Size=_UO(50,14),BackgroundTransparency=1,
+            Text=isDec and string.format("%.2f",valor) or tostring(valor),
+            TextColor3=C.RoxoClaro,Font=_GB,TextSize=10,
+            TextXAlignment=Enum.TextXAlignment.Right},wrap)
+        local barBg = NC("Frame",{Position=_UO(0,20),Size=_U2(1,0,0,6),
+            BackgroundColor3=C.Painel,BorderSizePixel=0},wrap)
+        Corner(barBg,3)
+        local pct0 = (valor-min)/(max-min)
+        local fill = NC("Frame",{Size=_U2(pct0,0,1,0),BackgroundColor3=C.Roxo,
             BorderSizePixel=0},barBg)
-        Corner(fill,4)
-        local hit=NC("TextButton",{Position=_UO(10,28),Size=_U2(1,-20,0,28),
-            BackgroundTransparency=1,Text="",AutoButtonColor=false},card)
-        local dragging=false
+        Corner(fill,3)
+        local knob = NC("Frame",{AnchorPoint=_V2(.5,.5),Position=_U2(pct0,0,.5,0),
+            Size=_UO(10,10),BackgroundColor3=Color3.new(1,1,1),BorderSizePixel=0,ZIndex=2},barBg)
+        Corner(knob,5)
+        local hit = NC("TextButton",{Position=_UO(0,12),Size=_U2(1,0,0,20),
+            BackgroundTransparency=1,Text="",AutoButtonColor=false},wrap)
+        local dragging = false
         local function atualizar(x)
-            local pct=math.clamp((x-barBg.AbsolutePosition.X)/math.max(barBg.AbsoluteSize.X,1),0,1)
+            local pct = math.clamp((x-barBg.AbsolutePosition.X)/math.max(barBg.AbsoluteSize.X,1),0,1)
             local v
-            if isDec then v=min+(max-min)*pct val.Text=string.format("%.2f",v)
-            else v=math.floor(min+(max-min)*pct+.5) val.Text=tostring(v) end
-            fill.Size=_U2(pct,0,1,0)
+            if isDec then v = min+(max-min)*pct valLbl.Text = string.format("%.2f",v)
+            else v = math.floor(min+(max-min)*pct+.5) valLbl.Text = tostring(v) end
+            fill.Size = _U2(pct,0,1,0) knob.Position = _U2(pct,0,.5,0)
             callback(v)
         end
         hit.InputBegan:Connect(function(i)
             if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
-                Content.ScrollingEnabled=false
-                dragging=true atualizar(i.Position.X)
+                Content.ScrollingEnabled = false dragging = true
+                atualizar(i.Position.X)
             end
         end)
         U.InputChanged:Connect(function(i)
@@ -2281,102 +2378,137 @@ do
         end)
     end
 
-    function ShowCombate()
-        CurrentPage="Combate"
-        ClearContent()
-        Content.ScrollingEnabled=true
-        local h=_I("Frame")
-        h.Size=_U2(1,0,0,58) h.BackgroundColor3=_K.Card h.BorderSizePixel=0
-        h.LayoutOrder=0 h.Parent=_CH Corner(h,9) Stroke(h,_K.StrokeLight,1)
-        LB(h,_UO(12,7),_U2(1,-24,0,25),"🎯 COMBATE • AIMBOT",_K.White,16,_GB)
-        LB(h,_UO(13,34),_U2(1,-26,0,15),"Seletor Cabeça / Tronco • FOV ajustável",_K.DarkGray,9,_GM)
+    local function ColorBtn(parent, ordem, titulo, corInicial, callback)
+        local row = makeRow(parent, ordem, titulo)
+        local btn = NC("TextButton",{AnchorPoint=_V2(1,.5),Position=_U2(1,0,.5,0),
+            Size=_UO(40,20),BackgroundColor3=corInicial,Text="",BorderSizePixel=0,
+            AutoButtonColor=false},row)
+        Corner(btn,5) Stroke(btn,C.Borda,1)
+        btn.MouseButton1Click:Connect(function()
+            local cor = Color3.fromRGB(math.random(0,255), math.random(0,255), math.random(0,255))
+            btn.BackgroundColor3 = cor
+            callback(cor)
+        end)
+    end
 
-        local btnToggle=_I("TextButton")
-        btnToggle.Size=_U2(1,0,0,42) btnToggle.LayoutOrder=1 btnToggle.Parent=_CH
-        btnToggle.BackgroundColor3=C.Verde btnToggle.Text="LIGAR"
-        btnToggle.TextColor3=Color3.new(1,1,1) btnToggle.Font=_GB
-        btnToggle.TextSize=14 btnToggle.BorderSizePixel=0
-        btnToggle.AutoButtonColor=false
-        Corner(btnToggle,8) Stroke(btnToggle,C.Borda,1)
-        btnToggle.MouseButton1Click:Connect(function()
-            AIM_CONFIG.Ativo=not AIM_CONFIG.Ativo
-            if AIM_CONFIG.Ativo then
-                btnToggle.Text="PARAR" btnToggle.BackgroundColor3=C.Vermelho
-            else
-                btnToggle.Text="LIGAR" btnToggle.BackgroundColor3=C.Verde
-            end
+    function ShowCombate()
+        CurrentPage = "Combate"
+        ClearContent()
+        Content.ScrollingEnabled = true
+
+        local h = NC("Frame",{Size=_U2(1,0,0,58),BackgroundColor3=C.Card,
+            BorderSizePixel=0,LayoutOrder=0},_CH)
+        Corner(h,10) Stroke(h,C.Borda,1)
+        NC("TextLabel",{BackgroundTransparency=1,Position=_UO(14,8),Size=_U2(1,-28,0,25),
+            Text="🎯 HITBOX & AIM",TextColor3=C.Texto,Font=_GB,TextSize=16,
+            TextXAlignment=_XL},h)
+        NC("TextLabel",{BackgroundTransparency=1,Position=_UO(15,34),Size=_U2(1,-30,0,15),
+            Text="Modificador de hitbox e mira automática",TextColor3=C.TextoDim,
+            Font=_GM,TextSize=9,TextXAlignment=_XL},h)
+
+        local row = NC("Frame",{Size=_U2(1,0,0,0),AutomaticSize=Enum.AutomaticSize.Y,
+            BackgroundTransparency=1,LayoutOrder=1},_CH)
+        NC("UIListLayout",{FillDirection=Enum.FillDirection.Horizontal,
+            Padding=_UD(0,8),SortOrder=Enum.SortOrder.LayoutOrder},row)
+
+        -- LEFT: AIMBOT
+        local aimCard = makeCard(row, 1)
+        aimCard.Size = _U2(0.5,-4,0,0)
+
+        makeTitle(aimCard, 0, "🎯 Aim (PC)")
+
+        Toggle(aimCard, 1, "Ativar Aimbot", AIM_CONFIG.Ativo, function(v)
+            AIM_CONFIG.Ativo = v
+            Notify("AIM", v and "Ativado." or "Desativado.", v and "Success" or "Error")
+        end)
+        Toggle(aimCard, 2, "Mostrar FOV", AIM_CONFIG.MostrarFOV, function(v)
+            AIM_CONFIG.MostrarFOV = v
         end)
 
-        Toggle(2,"Mostrar FOV",AIM_CONFIG.MostrarFOV,function(v) AIM_CONFIG.MostrarFOV=v end)
-
-        local alvoLbl=_I("TextLabel")
-        alvoLbl.Size=_U2(1,0,0,14) alvoLbl.LayoutOrder=3 alvoLbl.BackgroundTransparency=1
-        alvoLbl.Text="Parte do Alvo" alvoLbl.TextColor3=C.TextoDim
-        alvoLbl.Font=_GM alvoLbl.TextSize=10 alvoLbl.TextXAlignment=_XL alvoLbl.Parent=_CH
-        local alvoFrame=_I("Frame")
-        alvoFrame.Size=_U2(1,0,0,28) alvoFrame.LayoutOrder=4
-        alvoFrame.BackgroundTransparency=1 alvoFrame.Parent=_CH
-        local opcoes={"Cabeça","Tronco"}
-        local btnAlvos={}
+        local alvoRow = NC("Frame",{Size=_U2(1,0,0,24),BackgroundTransparency=1,
+            LayoutOrder=3},aimCard)
+        NC("UIListLayout",{FillDirection=Enum.FillDirection.Horizontal,
+            Padding=_UD(0,4)},alvoRow)
+        local opcoes = {"Cabeça","Tronco"}
+        local btnAlvos = {}
         local function atualizarAlvos()
             for _,item in ipairs(btnAlvos) do
-                if item.Nome==AIM_CONFIG.ParteAlvo then
-                    item.Btn.BackgroundColor3=C.Selecionado
-                    item.Btn.TextColor3=C.RoxoClaro
-                    item.Btn.UIStroke.Color=C.Roxo
-                    item.Btn.UIStroke.Thickness=1.5
+                if item.Nome == AIM_CONFIG.ParteAlvo then
+                    item.Btn.BackgroundColor3 = C.Selecionado
+                    item.Btn.TextColor3 = C.RoxoClaro
+                    item.Stroke.Color = C.Roxo
                 else
-                    item.Btn.BackgroundColor3=C.Card
-                    item.Btn.TextColor3=C.TextoDim
-                    item.Btn.UIStroke.Color=C.Borda
-                    item.Btn.UIStroke.Thickness=1
+                    item.Btn.BackgroundColor3 = C.Painel
+                    item.Btn.TextColor3 = C.TextoDim
+                    item.Stroke.Color = C.Borda
                 end
             end
         end
         for i,nome in ipairs(opcoes) do
-            local b=_I("TextButton")
-            b.Size=_U2(0.5,-4,1,0) b.Position=_U2((i-1)*0.5,0,0,0)
-            b.BackgroundColor3=C.Card b.Text=nome b.TextColor3=C.TextoDim
-            b.Font=_GB b.TextSize=11 b.BorderSizePixel=0
-            b.AutoButtonColor=false b.Parent=alvoFrame
-            Corner(b,6) Stroke(b,C.Borda,1)
-            table.insert(btnAlvos,{Btn=b,Nome=nome})
+            local b = NC("TextButton",{Size=_U2(0.5,-2,1,0),
+                BackgroundColor3=C.Painel,Text=nome,TextColor3=C.TextoDim,
+                Font=_GB,TextSize=10,BorderSizePixel=0,AutoButtonColor=false},alvoRow)
+            Corner(b,6)
+            local s = Stroke(b,C.Borda,1)
+            table.insert(btnAlvos,{Btn=b, Nome=nome, Stroke=s})
             b.MouseButton1Click:Connect(function()
-                AIM_CONFIG.ParteAlvo=nome atualizarAlvos()
+                AIM_CONFIG.ParteAlvo = nome
+                atualizarAlvos()
             end)
         end
         atualizarAlvos()
 
-        Slider(5,"Tamanho FOV",AIM_CONFIG.FOV,20,200,false,function(v) AIM_CONFIG.FOV=v end)
-        Slider(6,"Transparência",AIM_CONFIG.RingTransparency,0,1,true,function(v) AIM_CONFIG.RingTransparency=v end)
+        Slider(aimCard, 4, "Tamanho FOV", AIM_CONFIG.FOV, 20, 200, false,
+            function(v) AIM_CONFIG.FOV = v end)
+        Slider(aimCard, 5, "Transparência", AIM_CONFIG.RingTransparency, 0, 1, true,
+            function(v) AIM_CONFIG.RingTransparency = v end)
 
-        local coresLista={
+        local corWrap = NC("Frame",{Size=_U2(1,0,0,34),BackgroundTransparency=1,
+            LayoutOrder=6},aimCard)
+        NC("TextLabel",{Size=_U2(1,0,0,14),BackgroundTransparency=1,Text="Cor do FOV",
+            TextColor3=C.Texto,Font=_GM,TextSize=10,TextXAlignment=_XL},corWrap)
+        local coresInner = NC("Frame",{Position=_UO(0,18),Size=_U2(1,0,0,16),
+            BackgroundTransparency=1},corWrap)
+        NC("UIListLayout",{FillDirection=Enum.FillDirection.Horizontal,
+            Padding=_UD(0,4)},coresInner)
+        local coresLista = {
             _RGB(150,80,255),_RGB(255,0,0),_RGB(0,255,100),
             _RGB(255,200,0),_RGB(0,200,255),_RGB(255,0,255),_RGB(255,255,255)
         }
-        local corFrame=_I("Frame")
-        corFrame.Size=_U2(1,0,0,42) corFrame.LayoutOrder=7
-        corFrame.BackgroundColor3=C.Card corFrame.Parent=_CH
-        Corner(corFrame,8) Stroke(corFrame,C.Borda,1)
-        local corLbl=_I("TextLabel")
-        corLbl.Size=_U2(1,-20,0,16) corLbl.Position=_UO(10,4)
-        corLbl.BackgroundTransparency=1 corLbl.Text="Cor do FOV"
-        corLbl.TextColor3=C.Texto corLbl.Font=_GB
-        corLbl.TextSize=11 corLbl.TextXAlignment=_XL corLbl.Parent=corFrame
-        local corInner=_I("Frame")
-        corInner.Size=_U2(1,-20,0,20) corInner.Position=_UO(10,20)
-        corInner.BackgroundTransparency=1 corInner.Parent=corFrame
-        local ciLayout=_I("UIListLayout")
-        ciLayout.FillDirection=Enum.FillDirection.Horizontal
-        ciLayout.Padding=_UD(0,5) ciLayout.Parent=corInner
         for _,cor in ipairs(coresLista) do
-            local b=_I("TextButton")
-            b.Size=_UO(20,20) b.BackgroundColor3=cor b.Text=""
-            b.BorderSizePixel=0 b.AutoButtonColor=false b.Parent=corInner
-            Corner(b,5) Stroke(b,C.Borda,1)
-            b.MouseButton1Click:Connect(function() AIM_CONFIG.Cor=cor end)
+            local b = NC("TextButton",{Size=_UO(16,16),BackgroundColor3=cor,
+                Text="",BorderSizePixel=0,AutoButtonColor=false},coresInner)
+            Corner(b,4) Stroke(b,C.Borda,1)
+            b.MouseButton1Click:Connect(function() AIM_CONFIG.Cor = cor end)
         end
-        Content.CanvasPosition=_V2()
+
+        -- RIGHT: HITBOX
+        local hbCard = makeCard(row, 2)
+        hbCard.Size = _U2(0.5,-4,0,0)
+
+        makeTitle(hbCard, 0, "🎯 Hitbox Modificador")
+
+        Toggle(hbCard, 1, "Ativar Hitbox", HB_CONFIG.Ativo, function(v)
+            HB_CONFIG.Ativo = v
+            Notify("HITBOX", v and "Ativado." or "Desativado.", v and "Success" or "Error")
+        end)
+        Slider(hbCard, 2, "Tamanho", HB_CONFIG.Tamanho, 1, 20, false,
+            function(v) HB_CONFIG.Tamanho = v end)
+        Slider(hbCard, 3, "Transparência", math.floor(HB_CONFIG.Transparencia*10+.5),
+            0, 10, false, function(v) HB_CONFIG.Transparencia = v/10 end)
+
+        local fmtRow = makeRow(hbCard, 4, "Formato")
+        local fmtBtn = NC("TextButton",{AnchorPoint=_V2(1,.5),Position=_U2(1,0,.5,0),
+            Size=_UO(80,20),BackgroundColor3=C.Painel,Text="Quadrado ▼",
+            TextColor3=C.Texto,Font=_GB,TextSize=9,BorderSizePixel=0,
+            AutoButtonColor=false},fmtRow)
+        Corner(fmtBtn,5) Stroke(fmtBtn,C.Borda,1)
+
+        ColorBtn(hbCard, 5, "Cor da Hitbox", HB_CONFIG.Cor, function(cor)
+            HB_CONFIG.Cor = cor
+        end)
+
+        Content.CanvasPosition = _V2()
     end
 end
 
@@ -2502,213 +2634,6 @@ do
 end
 
 -- =========================================================================
--- HITBOX
--- =========================================================================
-local ShowHitbox
-do
-    local HB_CONFIG={ Ativo=false,Visual=true,Tamanho=5,Transparencia=.7,
-        Cor=_RGB(80,140,230),Material="Neon" }
-    local HB_Original={}
-    local HB_Tok=os.clock() PG:SetAttribute("ZKYHitbox",HB_Tok)
-    local HB_Presets={_RGB(80,140,230),_RGB(255,0,0),_RGB(0,255,100),
-        _RGB(255,200,0),_RGB(255,0,255),_RGB(255,255,255),_RGB(150,80,255)}
-
-    local function HB_Salvar(char)
-        if HB_Original[char] then return end
-        local hrp=char:FindFirstChild("HumanoidRootPart")
-        if not hrp then return end
-        HB_Original[char]={Size=hrp.Size,Transparency=hrp.Transparency,
-            Color=hrp.Color,Material=hrp.Material,CanCollide=hrp.CanCollide}
-    end
-    local function HB_Aplicar(char)
-        if not char then return end
-        local hrp=char:FindFirstChild("HumanoidRootPart")
-        if not hrp then return end
-        HB_Salvar(char)
-        pcall(function()
-            hrp.Size=Vector3.new(HB_CONFIG.Tamanho,HB_CONFIG.Tamanho,HB_CONFIG.Tamanho)
-            hrp.Transparency=HB_CONFIG.Visual and HB_CONFIG.Transparencia or 1
-            hrp.Color=HB_CONFIG.Cor
-            hrp.Material=Enum.Material.Neon
-            hrp.CanCollide=false
-        end)
-    end
-    local function HB_Restaurar(char)
-        if not char then return end
-        local orig=HB_Original[char]
-        if not orig then return end
-        local hrp=char:FindFirstChild("HumanoidRootPart")
-        if hrp then
-            pcall(function()
-                hrp.Size=orig.Size hrp.Transparency=orig.Transparency
-                hrp.Color=orig.Color hrp.Material=orig.Material
-                hrp.CanCollide=orig.CanCollide
-            end)
-        end
-        HB_Original[char]=nil
-    end
-
-    local HB_Conn
-    HB_Conn=R.Heartbeat:Connect(function()
-        if PG:GetAttribute("ZKYHitbox")~=HB_Tok then
-            HB_Conn:Disconnect()
-            for c in pairs(HB_Original) do HB_Restaurar(c) end
-            return
-        end
-        if HB_CONFIG.Ativo then
-            for _,p in ipairs(P:GetPlayers()) do
-                if p~=Pl and p.Character then HB_Aplicar(p.Character) end
-            end
-            for char in pairs(HB_Original) do
-                if not char.Parent then HB_Original[char]=nil end
-            end
-        else
-            for char in pairs(HB_Original) do HB_Restaurar(char) end
-        end
-    end)
-
-    local function N(c,p,par) local o=_I(c) for k,v in pairs(p)do o[k]=v end o.Parent=par return o end
-    local function HB_Card(h,ordem)
-        local c=N("Frame",{Size=_U2(1,0,0,h),BackgroundColor3=_K.Card,
-            BorderSizePixel=0,LayoutOrder=ordem},_CH)
-        Corner(c,8) Stroke(c,_K.Stroke,1) return c
-    end
-    local function HB_Label(par,pos,size,txt,cor,ts,fonte,al)
-        return N("TextLabel",{BackgroundTransparency=1,Position=pos,Size=size,Text=txt,
-            TextColor3=cor,TextSize=ts,Font=fonte,TextXAlignment=al or _XL},par)
-    end
-    local function HB_Toggle(ordem,texto,inicial,callback)
-        local card=HB_Card(45,ordem)
-        HB_Label(card,_UO(10,0),_U2(1,-70,1,0),texto,_K.White,12,_GB)
-        local sw=N("TextButton",{AnchorPoint=_V2(1,.5),Position=_U2(1,-10,.5,0),
-            Size=_UO(38,20),BackgroundColor3=_K.Panel,Text="",BorderSizePixel=0,
-            AutoButtonColor=false},card)
-        Corner(sw,10) Stroke(sw,_K.Stroke,1)
-        local bol=N("Frame",{Position=_UO(3,3),Size=_UO(14,14),
-            BackgroundColor3=_K.DarkGray,BorderSizePixel=0},sw)
-        Corner(bol,7)
-        local estado=inicial
-        local function aplicar(v)
-            estado=v
-            sw.BackgroundColor3=v and _K.Success or _K.Panel
-            bol.Position=v and _UO(21,3) or _UO(3,3)
-            bol.BackgroundColor3=v and Color3.new(1,1,1) or _K.DarkGray
-        end
-        aplicar(estado)
-        sw.MouseButton1Click:Connect(function() aplicar(not estado) callback(estado) end)
-    end
-    local function HB_Slider(ordem,titulo,valor,min,max,callback)
-        local card=HB_Card(60,ordem)
-        HB_Label(card,_UO(10,7),_U2(1,-70,0,16),titulo,_K.White,12,_GB)
-        local val=HB_Label(card,_UO(0,7),_UO(50,16),tostring(valor),_K.Orange,12,_GB,Enum.TextXAlignment.Right)
-        val.AnchorPoint=_V2(1,0) val.Position=_U2(1,-10,0,7)
-        local barBg=N("Frame",{Position=_UO(10,38),Size=_U2(1,-20,0,8),
-            BackgroundColor3=_K.Panel,BorderSizePixel=0},card)
-        Corner(barBg,4)
-        local pct0=(valor-min)/(max-min)
-        local fill=N("Frame",{Size=_U2(pct0,0,1,0),BackgroundColor3=_K.Success,
-            BorderSizePixel=0},barBg)
-        Corner(fill,4)
-        local knob=N("Frame",{AnchorPoint=_V2(.5,.5),Position=_U2(pct0,0,.5,0),
-            Size=_UO(14,14),BackgroundColor3=Color3.new(1,1,1),
-            BorderSizePixel=0,ZIndex=2},barBg)
-        Corner(knob,7)
-        local hit=N("TextButton",{Position=_UO(10,28),Size=_U2(1,-20,0,28),
-            BackgroundTransparency=1,Text="",AutoButtonColor=false,ZIndex=3},card)
-        local function atualizar(x)
-            local pct=math.clamp((x-barBg.AbsolutePosition.X)/math.max(barBg.AbsoluteSize.X,1),0,1)
-            local v=math.floor(min+(max-min)*pct+.5)
-            local p=(v-min)/(max-min)
-            val.Text=tostring(v) fill.Size=_U2(p,0,1,0) knob.Position=_U2(p,0,.5,0)
-            callback(v)
-        end
-        hit.InputBegan:Connect(function(i)
-            if i.UserInputType==Enum.UserInputType.MouseButton1 or i.UserInputType==Enum.UserInputType.Touch then
-                Content.ScrollingEnabled=false atualizar(i.Position.X)
-                local mov,fim
-                mov=U.InputChanged:Connect(function(m)
-                    if m==i or m.UserInputType==Enum.UserInputType.MouseMovement then
-                        atualizar(m.Position.X)
-                    end
-                end)
-                fim=i.Changed:Connect(function()
-                    if i.UserInputState==Enum.UserInputState.End then
-                        mov:Disconnect() fim:Disconnect() Content.ScrollingEnabled=true
-                    end
-                end)
-            end
-        end)
-    end
-    local function HB_Cores(ordem)
-        local card=HB_Card(98,ordem)
-        HB_Label(card,_UO(10,7),_U2(1,-20,0,16),"Cor da Hitbox",_K.White,12,_GB)
-        local fila=N("Frame",{Position=_UO(10,30),Size=_U2(1,-20,0,26),
-            BackgroundTransparency=1},card)
-        N("UIListLayout",{FillDirection=Enum.FillDirection.Horizontal,
-            Padding=_UD(0,5)},fila)
-        local rgbFrame=N("Frame",{Position=_UO(10,64),Size=_U2(1,-20,0,26),
-            BackgroundColor3=_K.Panel,BorderSizePixel=0},card)
-        Corner(rgbFrame,6) Stroke(rgbFrame,_K.Stroke,1)
-        local function txtCor(c)
-            return string.format("%d,%d,%d",math.floor(c.R*255+.5),
-                math.floor(c.G*255+.5),math.floor(c.B*255+.5))
-        end
-        local rgbBox=N("TextBox",{Position=_UO(6,0),Size=_U2(1,-12,1,0),
-            BackgroundTransparency=1,Text=txtCor(HB_CONFIG.Cor),
-            PlaceholderText="R,G,B",PlaceholderColor3=_K.DarkGray,
-            TextColor3=_K.White,Font=Enum.Font.Code,TextSize=11,
-            TextXAlignment=_XL,ClearTextOnFocus=false},rgbFrame)
-        local amostras={}
-        local function marcar()
-            for _,a in ipairs(amostras) do a.stroke.Enabled=(a.cor==HB_CONFIG.Cor) end
-        end
-        for _,cor in ipairs(HB_Presets) do
-            local b=N("TextButton",{Size=_UO(26,26),BackgroundColor3=cor,
-                Text="",BorderSizePixel=0,AutoButtonColor=false},fila)
-            Corner(b,6)
-            local s=Stroke(b,_K.White,1.5) s.Enabled=(cor==HB_CONFIG.Cor)
-            table.insert(amostras,{stroke=s,cor=cor})
-            b.MouseButton1Click:Connect(function()
-                HB_CONFIG.Cor=cor rgbBox.Text=txtCor(cor) marcar()
-            end)
-        end
-        rgbBox.FocusLost:Connect(function()
-            local r,g,b=rgbBox.Text:match("(%d+)%s*,%s*(%d+)%s*,%s*(%d+)")
-            if r and g and b then
-                r,g,b=tonumber(r),tonumber(g),tonumber(b)
-                if r and g and b and r<=255 and g<=255 and b<=255 then
-                    HB_CONFIG.Cor=_RGB(r,g,b) marcar()
-                end
-            end
-            rgbBox.Text=txtCor(HB_CONFIG.Cor)
-        end)
-    end
-
-    ShowHitbox=function()
-        CurrentPage="Hitbox"
-        ClearContent() Content.ScrollingEnabled=true
-        local h=N("Frame",{Size=_U2(1,0,0,58),BackgroundColor3=_K.Card,
-            BorderSizePixel=0,LayoutOrder=0},_CH)
-        Corner(h,9) Stroke(h,_K.StrokeLight,1)
-        HB_Label(h,_UO(12,7),_U2(1,-24,0,25),"🎯 HITBOX",_K.White,16,_GB)
-        HB_Label(h,_UO(13,34),_U2(1,-26,0,15),"Hitbox expandida • tamanho, cor e transparência",_K.DarkGray,9,_GM)
-        HB_Toggle(1,"Ativar Reach",HB_CONFIG.Ativo,function(v)
-            HB_CONFIG.Ativo=v
-            Notify("HITBOX",v and "Reach ativado." or "Reach desativado.",v and "Success" or "Error")
-        end)
-        HB_Toggle(2,"Mostrar Visual",HB_CONFIG.Visual,function(v) HB_CONFIG.Visual=v end)
-        HB_Slider(3,"Tamanho (Reach)",HB_CONFIG.Tamanho,1,50,function(v) HB_CONFIG.Tamanho=v end)
-        HB_Slider(4,"Transparência",math.floor(HB_CONFIG.Transparencia*10+.5),0,10,
-            function(v) HB_CONFIG.Transparencia=v/10 end)
-        HB_Cores(5)
-        local rod=HB_Label(_CH,_UO(0,0),_U2(1,0,0,16),"⚡ Desenvolvido por Akira",
-            _K.DarkGray,8,_GM,Enum.TextXAlignment.Right)
-        rod.LayoutOrder=6
-        Content.CanvasPosition=_V2()
-    end
-end
-
--- =========================================================================
 -- SELEÇÃO DE ABA
 -- =========================================================================
 local function SelectButton(b)
@@ -2745,8 +2670,10 @@ end)
 lojaButton.MouseButton1Click:Connect(function()
     SelectButton(lojaButton) ShowLoja()
 end)
-hitboxButton.MouseButton1Click:Connect(function()
-    SelectButton(hitboxButton) ShowHitbox()
+jjButton.MouseButton1Click:Connect(function()
+    SelectButton(jjButton)
+    EBDeltaSubPage="Automacao"
+    ShowEBDelta()
 end)
 
 -- =========================================================================
