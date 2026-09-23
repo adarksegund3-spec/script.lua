@@ -2527,7 +2527,7 @@ function ShowCombate()
         end)
     end
 
-    local aimCard = UI.Card(col2, 1, "🎯 Aim (PC)")
+    local aimCard = UI.Card(col2, 1, "🎯 Aim")
     UI.Toggle(aimCard, 1, "Ativar Aimbot", AIM_CONFIG.Ativo, function(v)
         AIM_CONFIG.Ativo = v
     end)
