@@ -113,50 +113,36 @@ local character,humanoid,rootPart
 -- CONFIGURAÇÃO
 -- =========================================================================
 local CONFIG = {
-    LineThickness = .15,
-    LineTransparency = .2,
-    LineColor = _RGB(255,145,45),
-    JumpCooldown = .28,
-    PlaybackSpeed = 1,
-    WalkToSpeed = 16,
-    GroundOffset = 1.66
+    LineThickness=.15, LineTransparency=.2, LineColor=_RGB(255,145,45),
+    JumpCooldown=.28, PlaybackSpeed=1, WalkToSpeed=16, GroundOffset=1.66
 }
 
 -- ✅ Config única — vale para Parkour E Torres
 local MovementConfig = { Modo = "Dummy" } -- "Dummy" ou "Direto"
 
 local IA_CONFIG = {
-    ApiKey = "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",
-    Endpoint = "https://api.groq.com/openai/v1/chat/completions",
-    Modelo = "openai/gpt-oss-120b",
-    Timeout = 10,
-    SystemPrompt = "Você é um corretor gramatical extremamente rigoroso de português do Brasil. Corrija TODOS os erros da mensagem do usuário, sem deixar passar nenhum, incluindo: letras maiúsculas no início de frases e em nomes próprios; todos os acentos gráficos (agudo, circunflexo, til, crase) e a cedilha; toda a pontuação, como vírgulas, pontos finais, pontos de interrogação e de exclamação; concordância verbal e nominal; ortografia e separação de palavras. Não deixe nenhuma palavra sem acento ou sem maiúscula onde for necessário, nem nenhuma frase sem pontuação final. Não resuma, não reescreva o estilo, não mude o significado, o tom nem o tamanho da mensagem: apenas corrija a gramática, a ortografia e a pontuação, mantendo as mesmas palavras sempre que possível. Responda APENAS com a mensagem corrigida, sem explicações, aspas, comentários extras ou qualquer texto adicional."
-}
-
-local IA_TEXTOS = {
-    ApiKey = "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",
-    Endpoint = "https://api.groq.com/openai/v1/chat/completions",
-    Modelo = "openai/gpt-oss-120b",
-    Timeout = 15,
-    SystemPrompt = "Você é um militar do Exército Brasileiro (EB) em um jogo de Roblox (Roleplay). Gere um texto CURTO, gramatical, humanizado, ético e patriótico sobre o tema fornecido. O texto deve ter entre 150 e 250 caracteres (2 a 3 frases). REGRA OBRIGATÓRIA: envolva a resposta final EXATAMENTE entre os marcadores <<< e >>>, assim: <<<seu texto aqui>>>. Você pode pensar o quanto quiser antes, mas o texto final DEVE estar APENAS entre <<< e >>>, sem aspas, sem saudações, sem nada fora dos marcadores."
+    ApiKey="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",
+    Endpoint="https://api.groq.com/openai/v1/chat/completions",
+    Modelo="openai/gpt-oss-120b", Timeout=10,
+    SystemPrompt="Você é um corretor gramatical extremamente rigoroso de português do Brasil. Corrija TODOS os erros da mensagem do usuário, sem deixar passar nenhum, incluindo: letras maiúsculas no início de frases e em nomes próprios; todos os acentos gráficos (agudo, circunflexo, til, crase) e a cedilha; toda a pontuação, como vírgulas, pontos finais, pontos de interrogação e de exclamação; concordância verbal e nominal; ortografia e separação de palavras. Não deixe nenhuma palavra sem acento ou sem maiúscula onde for necessário, nem nenhuma frase sem pontuação final. Não resuma, não reescreva o estilo, não mude o significado, o tom nem o tamanho da mensagem: apenas corrija a gramática, a ortografia e a pontuação, mantendo as mesmas palavras sempre que possível. Responda APENAS com a mensagem corrigida, sem explicações, aspas, comentários extras ou qualquer texto adicional."
 }
 
 local httpRequest = request or (syn and syn.request) or (http and http.request) or http_request
 
 local Pastebins = {
-    Lento = "https://pastebin.com/raw/M7DvRgTc",
-    ["Rápido"] = "https://pastebin.com/raw/pBk8vYXE",
-    ["Mais Rápido"] = "https://pastebin.com/raw/yz7gZmYr",
-    ["Sem Burla"] = "https://pastebin.com/raw/N1j0iRDA"
+    Lento="https://pastebin.com/raw/M7DvRgTc",
+    ["Rápido"]="https://pastebin.com/raw/pBk8vYXE",
+    ["Mais Rápido"]="https://pastebin.com/raw/yz7gZmYr",
+    ["Sem Burla"]="https://pastebin.com/raw/N1j0iRDA"
 }
 local CategoryOrder = {"Lento","Rápido","Mais Rápido","Sem Burla"}
 local TowerPastebins = {
     ["Torre 1"] = {["Única"]="https://pastebin.com/raw/HxXb4Mr3"},
     ["Torre 2"] = {
-        Frente = "https://pastebin.com/raw/Y2arCYHb",
-        ["Atrás"] = "https://pastebin.com/raw/rXxZX7CQ",
-        Esquerda = "https://pastebin.com/raw/FtpTHhGt",
-        Direita = "https://pastebin.com/raw/4u5Wjtkg"
+        Frente="https://pastebin.com/raw/Y2arCYHb",
+        ["Atrás"]="https://pastebin.com/raw/rXxZX7CQ",
+        Esquerda="https://pastebin.com/raw/FtpTHhGt",
+        Direita="https://pastebin.com/raw/4u5Wjtkg"
     }
 }
 local Tower2RouteOrder = {"Frente","Atrás","Esquerda","Direita"}
@@ -171,9 +157,9 @@ local lineFolder
 local linesVisible = true
 
 local Playback = {
-    Running = false, Connection = nil, Route = nil, StartClock = 0,
-    CurrentIndex = 1, LastJump = -math.huge, Category = nil, Parkour = nil,
-    Tower = nil, TowerRoute = nil, WalkingToStart = false, WalkConnection = nil
+    Running=false, Connection=nil, Route=nil, StartClock=0,
+    CurrentIndex=1, LastJump=-math.huge, Category=nil, Parkour=nil,
+    Tower=nil, TowerRoute=nil, WalkingToStart=false, WalkConnection=nil
 }
 local SavedDirection = nil
 local Turning = false
@@ -182,12 +168,12 @@ local Old = PG:FindFirstChild("ZKY_PARKOUR")
 if Old then Old:Destroy() end
 
 local _K = {
-    Background = _RGB(18,18,20), Panel = _RGB(24,24,27), Card = _RGB(31,31,35),
-    CardHover = _RGB(39,39,43), Selected = _RGB(55,55,60), Stroke = _RGB(65,65,70),
-    StrokeLight = _RGB(85,85,90), White = _RGB(245,245,245), Gray = _RGB(175,175,180),
-    DarkGray = _RGB(115,115,120), Success = _RGB(80,210,125), Error = _RGB(230,85,85),
-    Orange = _RGB(255,145,45), SelectionRed = _RGB(225,70,70), SelectionRedDark = _RGB(75,32,32),
-    Primary = _RGB(185,185,185)
+    Background=_RGB(18,18,20), Panel=_RGB(24,24,27), Card=_RGB(31,31,35),
+    CardHover=_RGB(39,39,43), Selected=_RGB(55,55,60), Stroke=_RGB(65,65,70),
+    StrokeLight=_RGB(85,85,90), White=_RGB(245,245,245), Gray=_RGB(175,175,180),
+    DarkGray=_RGB(115,115,120), Success=_RGB(80,210,125), Error=_RGB(230,85,85),
+    Orange=_RGB(255,145,45), SelectionRed=_RGB(225,70,70), SelectionRedDark=_RGB(75,32,32),
+    Primary=_RGB(185,185,185)
 }
 
 local function Corner(o,r) local c=_I("UICorner") c.CornerRadius=_UD(0,r) c.Parent=o end
@@ -398,7 +384,7 @@ local function HandleJump(f,e)
 end
 
 -- =========================================================================
--- ANDAR NORMAL (usado como "ir até o início" E no modo Direto)
+-- ANDAR ATÉ O INÍCIO DA ROTA (walk normal do Roblox)
 -- =========================================================================
 local function AndarAte(destino,estaCancelado,aoTerminar)
     if not RefreshCharacter() then aoTerminar(false) return end
@@ -493,72 +479,19 @@ local function StopPlayback(reason)
 end
 
 -- =========================================================================
--- MODO DIRETO — andar naturalmente pelo trajeto (sem pivotTo rígido)
--- =========================================================================
-local function IniciarExecucaoCaminhando(name)
-    if not Playback.Running then return end
-    Playback.WalkingToStart=false
-    if RefreshCharacter() then
-        humanoid:Move(Vector3.zero,false)
-        pcall(function() humanoid.AutoRotate=true end)
-    end
-    Notify("EXECUTANDO (DIRETO)", name, "Success")
-    task.spawn(function()
-        local frames=Playback.Route
-        if not frames or #frames<2 then StopPlayback("error") return end
-        local i=1
-        while Playback.Running and i<=#frames do
-            if not RefreshCharacter() then StopPlayback("error"); break end
-            local f=frames[i]
-            local pos=GetPosition(f)
-            if not pos then i+=1 continue end
-            local target=pos+Vector3.new(0,CONFIG.GroundOffset,0)
-            -- anda normalmente usando humanoid:MoveTo
-            humanoid.WalkSpeed=CONFIG.WalkToSpeed
-            humanoid:MoveTo(target)
-            local start=os.clock()
-            local pulou=false
-            while Playback.Running do
-                if not RefreshCharacter() then break end
-                local dist=(rootPart.Position-target).Magnitude
-                -- pula se o frame pedir salto
-                if f.j and not pulou and dist<8 then
-                    humanoid.Jump=true
-                    pcall(function() humanoid:ChangeState(Enum.HumanoidStateType.Jumping) end)
-                    pulou=true
-                end
-                if dist<=3 then break end
-                if os.clock()-start>15 then break end
-                task.wait()
-            end
-            i+=1
-        end
-        if Playback.Running then StopPlayback("completed") end
-    end)
-end
-
--- =========================================================================
--- PLAYBACK (pivot para modo Dummy, walking para modo Direto)
+-- EXECUÇÃO DA ROTA (idêntico ao original — pivot com interpolação)
 -- =========================================================================
 local function IniciarExecucao(name)
     if not Playback.Running then return end
     Playback.WalkingToStart=false
     if RefreshCharacter() then
         humanoid:Move(Vector3.zero,false)
-        pcall(function() humanoid.AutoRotate=true end)
+        pcall(function() humanoid.AutoRotate=false end)
     end
-
-    -- ✅ A escolha de Configuração vale para Torres E Parkour
-    if MovementConfig.Modo == "Direto" then
-        return IniciarExecucaoCaminhando(name)
-    end
-
-    -- Modo Dummy (comportamento antigo, pivot-based)
-    pcall(function() humanoid.AutoRotate=false end)
     Playback.StartClock=os.clock()
     Playback.CurrentIndex=1
     Playback.LastJump=-math.huge
-    Notify("EXECUTANDO (DUMMY)", name, "Success")
+    Notify("EXECUTANDO",name,"Success")
     task.spawn(function()
         while Playback.Running and not Playback.WalkingToStart do
             if not RefreshCharacter() then StopPlayback("error"); break end
@@ -622,7 +555,8 @@ local function StartPlayback(data,cat,num,tower,towerRoute)
         name = "Parkour "..num.." • "..cat
     end
 
-    local usarDummy = MovementConfig.Modo=="Dummy"
+    -- ✅ A Configuração vale para TORRES E PARKOURS
+    local usarDummy = MovementConfig.Modo == "Dummy"
 
     if usarDummy then
         Notify("MARCADOR CRIADO","Ande até o marcador verde para iniciar: "..name,"Orange")
@@ -742,52 +676,6 @@ local function CorrigirTexto(texto)
     return txt
 end
 
--- IA de TEXTOS PRONTOS
-local function GerarTextoIA(tema)
-    if not httpRequest then return nil,"Executor sem suporte a HTTP" end
-    local corpo=HS:JSONEncode({
-        model=IA_TEXTOS.Modelo,
-        messages={
-            {role="system",content=IA_TEXTOS.SystemPrompt},
-            {role="user",content="Escreva um texto sobre: "..tema}
-        },
-        temperature=0.7,
-        max_tokens=800
-    })
-    local resposta,terminou=nil,false
-    task.spawn(function()
-        local ok,res=pcall(function()
-            return httpRequest({
-                Url=IA_TEXTOS.Endpoint, Method="POST",
-                Headers={["Content-Type"]="application/json",["Authorization"]="Bearer "..IA_TEXTOS.ApiKey},
-                Body=corpo
-            })
-        end)
-        if ok then resposta=res end
-        terminou=true
-    end)
-    local inicio=tick()
-    while not terminou and (tick()-inicio)<IA_TEXTOS.Timeout do task.wait(.1) end
-    if not terminou then return nil,"Tempo esgotado" end
-    if not resposta then return nil,"Falha na requisição" end
-    if resposta.StatusCode~=200 then return nil,"HTTP "..tostring(resposta.StatusCode) end
-    local okJson,dados=pcall(function() return HS:JSONDecode(resposta.Body) end)
-    if not okJson or not dados.choices or not dados.choices[1] then return nil,"Resposta inválida" end
-    local msg=dados.choices[1].message
-    if not msg then return nil,"Resposta vazia" end
-    local txt=msg.content or ""
-    if txt=="" and msg.reasoning then txt=msg.reasoning end
-    if txt=="" then return nil,"Resposta vazia" end
-    local extraido=txt:match("<<<(.-)>>>")
-    if extraido and extraido~="" then txt=extraido end
-    txt=txt:gsub("^%s+",""):gsub("%s+$","")
-    txt=txt:gsub('^["\']+',""):gsub('["\']+$',"")
-    if #txt>500 or txt:match("^The user") or txt:match("^Let me") or txt:match("^I ") then
-        return nil,"IA não formatou corretamente. Tente novamente."
-    end
-    return txt
-end
-
 -- =========================================================================
 -- GUI
 -- =========================================================================
@@ -865,7 +753,6 @@ local iaButton       = SideButton("🤖 IA CHAT", false)
 local combateButton  = SideButton("🎯 COMBATE", false)
 local textosButton   = SideButton("📚 TEXTOS PRONTOS", false)
 local lojaButton     = SideButton("🔫 LOJA", false)
-local jjButton       = SideButton("🤸 AUTO JJs", false)
 local hitboxButton   = SideButton("🎯 HITBOX", false)
 local selectedButton = ebDeltaButton
 
@@ -1074,7 +961,7 @@ local function ShowTAFFS()
 end
 
 -- =========================================================================
--- EB DELTA (sub-abas: Torres, Parkour, Automação, Configuração)
+-- EB DELTA (hotbar: Torres / Parkour / Automação / Configuração)
 -- =========================================================================
 local EBDeltaSubPage = "Parkour"
 
@@ -1087,7 +974,7 @@ local function GetCategoryColor(c)
 end
 
 -- -------------------------------------------------------------------------
--- CONTEÚDO: PARKOUR
+-- SUB-ABA: PARKOUR
 -- -------------------------------------------------------------------------
 local function ShowParkoursContent()
     local tf=_I("Frame")
@@ -1177,7 +1064,7 @@ local function ShowParkoursContent()
 end
 
 -- -------------------------------------------------------------------------
--- CONTEÚDO: TORRES
+-- SUB-ABA: TORRES
 -- -------------------------------------------------------------------------
 local function ShowTowersContent()
     local tf=_I("Frame")
@@ -1278,7 +1165,7 @@ local function ShowTowersContent()
 end
 
 -- -------------------------------------------------------------------------
--- CONTEÚDO: AUTOMAÇÃO (JJs)
+-- SUB-ABA: AUTOMAÇÃO (Auto JJs)
 -- -------------------------------------------------------------------------
 local ShowAutomacaoContent
 do
@@ -1465,7 +1352,7 @@ do
 end
 
 -- -------------------------------------------------------------------------
--- CONTEÚDO: CONFIGURAÇÃO (Dummy vs Direto)
+-- SUB-ABA: CONFIGURAÇÃO (Dummy / Direto) — vale para TORRES e PARKOURS
 -- -------------------------------------------------------------------------
 local function ShowConfiguracaoContent()
     local h=_I("Frame")
@@ -1490,7 +1377,7 @@ local function ShowConfiguracaoContent()
 
     local desc=_I("TextLabel")
     desc.BackgroundTransparency=1 desc.Position=_UO(12,32) desc.Size=_U2(1,-24,0,40)
-    desc.Text="🧍 DUMMY: cria um boneco fantasma no início da rota e você anda até ele.\n➡ DIRETO: anda automaticamente até o início e segue a rota caminhando naturalmente."
+    desc.Text="🧍 DUMMY: cria um boneco fantasma no início da rota e você anda até ele.\n➡ DIRETO: anda automaticamente até o início da rota e executa."
     desc.TextColor3=_K.Gray desc.TextSize=10 desc.Font=_GM
     desc.TextWrapped=true desc.TextXAlignment=_XL
     desc.TextYAlignment=Enum.TextYAlignment.Top desc.Parent=card
@@ -1509,14 +1396,13 @@ local function ShowConfiguracaoContent()
         b.Text=icon.." "..label b.TextColor3=sel and _K.SelectionRed or _K.Gray
         b.TextSize=11 b.Font=_GB b.BorderSizePixel=0 b.AutoButtonColor=false
         b.Parent=btnFrame Corner(b,8)
-        local st=Stroke(b, sel and _K.SelectionRed or _K.Stroke, sel and 1.6 or 1)
+        Stroke(b, sel and _K.SelectionRed or _K.Stroke, sel and 1.6 or 1)
         b.MouseButton1Click:Connect(function()
             if MovementConfig.Modo==id then return end
             MovementConfig.Modo=id
             Notify("CONFIGURAÇÃO", "Modo "..label.." ativado para todas as rotas.", "Success")
             ShowEBDelta()
         end)
-        return b
     end
     makeOpt("Dummy", "DUMMY", "🧍")
     makeOpt("Direto", "IR DIRETO", "➡")
@@ -1535,7 +1421,6 @@ function ShowEBDelta()
     CurrentPage = "EBDelta"
     ClearContent()
 
-    -- Header
     local h=_I("Frame")
     h.Size=_U2(1,0,0,58) h.BackgroundColor3=_K.Card h.BorderSizePixel=0
     h.LayoutOrder=0 h.Parent=_CH Corner(h,9) Stroke(h,_K.StrokeLight,1)
@@ -1548,7 +1433,7 @@ function ShowEBDelta()
     s.Text="Central de automação do Exército Brasileiro" s.TextColor3=_K.DarkGray
     s.TextSize=9 s.Font=_GM s.TextXAlignment=_XL s.Parent=h
 
-    -- Hotbar superior (estilo profissional)
+    -- Hotbar superior
     local hotbar=_I("Frame")
     hotbar.Size=_U2(1,0,0,46) hotbar.BackgroundColor3=_K.Panel
     hotbar.BorderSizePixel=0 hotbar.LayoutOrder=1 hotbar.Parent=_CH
@@ -1574,14 +1459,13 @@ function ShowEBDelta()
         b.TextColor3 = sel and _K.White or _K.Gray
         b.TextSize=10 b.Font=_GB b.BorderSizePixel=0 b.AutoButtonColor=false
         b.Parent=hotbar Corner(b,7)
-        local st=Stroke(b, sel and _K.StrokeLight or _K.Stroke, sel and 1.3 or 1)
+        Stroke(b, sel and _K.StrokeLight or _K.Stroke, sel and 1.3 or 1)
         b.MouseButton1Click:Connect(function()
             EBDeltaSubPage=tab.Id
             ShowEBDelta()
         end)
     end
 
-    -- Conteúdo da sub-aba
     if EBDeltaSubPage=="Torres" then
         ShowTowersContent()
     elseif EBDeltaSubPage=="Parkour" then
@@ -1838,219 +1722,399 @@ local function ShowCreditos()
 end
 
 -- =========================================================================
--- TEXTOS PRONTOS (nova aba)
+-- TEXTOS PRONTOS + IA (idêntico ao arquivo base)
 -- =========================================================================
 do
     local CARD_COLORS = {
-        { Header = _RGB(59,130,246), Body = _RGB(35,35,35) },
-        { Header = _RGB(239,68,68),  Body = _RGB(45,30,30) },
-        { Header = _RGB(16,185,129), Body = _RGB(30,40,35) },
-        { Header = _RGB(245,158,11), Body = _RGB(45,40,30) },
-        { Header = _RGB(139,92,246), Body = _RGB(35,30,45) }
+        { Header = _RGB(59, 130, 246), Body = _RGB(35, 35, 35) },
+        { Header = _RGB(239, 68, 68),  Body = _RGB(45, 30, 30) },
+        { Header = _RGB(16, 185, 129), Body = _RGB(30, 40, 35) },
+        { Header = _RGB(245, 158, 11), Body = _RGB(45, 40, 30) },
+        { Header = _RGB(139, 92, 246), Body = _RGB(35, 30, 45) },
     }
+
+    local C = {
+        Fundo=_RGB(25,25,25), Painel=_RGB(35,35,35), Borda=_RGB(50,50,50),
+        Texto=_RGB(255,255,255), TextoDim=_RGB(160,160,160),
+        Verde=_RGB(16,185,129), VerdeHover=_RGB(52,211,153),
+    }
+
+    local IA_TEXTOS_CONFIG = {
+        ApiKey = "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",
+        Endpoint = "https://api.groq.com/openai/v1/chat/completions",
+        Modelo = "openai/gpt-oss-120b",
+        Timeout = 15,
+        SystemPrompt = "Você é um militar do Exército Brasileiro (EB) em um jogo de Roblox (Roleplay). Gere um texto CURTO, gramatical, humanizado, ético e patriótico sobre o tema fornecido. O texto deve ter entre 150 e 250 caracteres (2 a 3 frases). REGRA OBRIGATÓRIA: envolva a resposta final EXATAMENTE entre os marcadores <<< e >>>, assim: <<<seu texto aqui>>>. Você pode pensar o quanto quiser antes, mas o texto final DEVE estar APENAS entre <<< e >>>, sem aspas, sem saudações, sem nada fora dos marcadores."
+    }
+
     local TEXTOS = {
-        { Titulo="POR QUE O EB É IMPORTANTE PRA SOCIEDADE?", Texto="O EB não é apenas farda e arma: é o braço forte que guarda a pátria, socorre em tragédias, forma cidadãos de honra e defende a soberania. Sem ele, não há paz social nem futuro seguro pra ninguém." },
-        { Titulo="POR QUE VOCÊ QUER SUBIR DE PATENTE?", Texto="Quero subir de patente pra ajudar mais a tropa, aprender a liderar direito e fazer por merecer a confiança dos meus superiores. Não é por status, é por vontade de servir melhor." },
-        { Titulo="POR QUE SERVIR AO EXÉRCITO BRASILEIRO?", Texto="Sirvo ao Exército porque acredito no Brasil e quero fazer parte de algo maior que eu. É onde aprendo disciplina, honra e o valor de proteger quem não pode se proteger sozinho." },
-        { Titulo="COMO VOCÊ VÊ SUA JORNADA COMO MILITAR NO FUTURO?", Texto="Quero subir uma patente de cada vez, aprender com os oficiais mais experientes e um dia poder treinar os novatos. Pretendo ficar até onde conseguir, sempre honrando a farda." }
+        { Titulo = "POR QUE O EB É IMPORTANTE PRA SOCIEDADE?", Texto = "O EB não é apenas farda e arma: é o braço forte que guarda a pátria, socorre em tragédias, forma cidadãos de honra e defende a soberania. Sem ele, não há paz social nem futuro seguro pra ninguém." },
+        { Titulo = "POR QUE VOCÊ QUER SUBIR DE PATENTE?", Texto = "Quero subir de patente pra ajudar mais a tropa, aprender a liderar direito e fazer por merecer a confiança dos meus superiores. Não é por status, é por vontade de servir melhor." },
+        { Titulo = "POR QUE SERVIR AO EXÉRCITO BRASILEIRO?", Texto = "Sirvo ao Exército porque acredito no Brasil e quero fazer parte de algo maior que eu. É onde aprendo disciplina, honra e o valor de proteger quem não pode se proteger sozinho." },
+        { Titulo = "COMO VOCÊ VÊ SUA JORNADA COMO MILITAR NO FUTURO?", Texto = "Quero subir uma patente de cada vez, aprender com os oficiais mais experientes e um dia poder treinar os novatos. Pretendo ficar até onde conseguir, sempre honrando a farda." },
     }
 
     local function criarCard(tema, ordem, cor)
-        local card=_I("Frame")
-        card.Size=_U2(1,0,0,0) card.AutomaticSize=Enum.AutomaticSize.Y
-        card.BackgroundColor3=cor.Body card.BorderSizePixel=0
-        card.LayoutOrder=ordem card.Parent=_CH
-        Corner(card,8) Stroke(card,cor.Header,0.5,0.7)
-        card.ClipsDescendants=true
-        local cardLayout=_I("UIListLayout")
-        cardLayout.SortOrder=Enum.SortOrder.LayoutOrder cardLayout.Parent=card
-        local cardHeader=_I("Frame")
-        cardHeader.Size=_U2(1,0,0,0) cardHeader.AutomaticSize=Enum.AutomaticSize.Y
-        cardHeader.BackgroundColor3=cor.Header cardHeader.BorderSizePixel=0
-        cardHeader.LayoutOrder=1 cardHeader.Parent=card
-        local padHeader=_I("UIPadding")
-        padHeader.PaddingTop=_UD(0,8) padHeader.PaddingBottom=_UD(0,8)
-        padHeader.PaddingLeft=_UD(0,12) padHeader.PaddingRight=_UD(0,12)
-        padHeader.Parent=cardHeader
-        local tituloCard=_I("TextLabel")
-        tituloCard.Size=_U2(1,0,0,0) tituloCard.AutomaticSize=Enum.AutomaticSize.Y
-        tituloCard.BackgroundTransparency=1 tituloCard.Text="🤫 "..tema.Titulo
-        tituloCard.TextColor3=_RGB(255,255,255) tituloCard.Font=_GB
-        tituloCard.TextSize=12 tituloCard.TextXAlignment=_XL
-        tituloCard.TextWrapped=true tituloCard.Parent=cardHeader
-        local cardBody=_I("Frame")
-        cardBody.Size=_U2(1,0,0,0) cardBody.AutomaticSize=Enum.AutomaticSize.Y
-        cardBody.BackgroundColor3=cor.Body cardBody.BorderSizePixel=0
-        cardBody.LayoutOrder=2 cardBody.Parent=card
-        local padBody=_I("UIPadding")
-        padBody.PaddingTop=_UD(0,12) padBody.PaddingBottom=_UD(0,12)
-        padBody.PaddingLeft=_UD(0,12) padBody.PaddingRight=_UD(0,12)
-        padBody.Parent=cardBody
-        local bodyLayout=_I("UIListLayout")
-        bodyLayout.Padding=_UD(0,12) bodyLayout.SortOrder=Enum.SortOrder.LayoutOrder
-        bodyLayout.Parent=cardBody
-        local textoCard=_I("TextLabel")
-        textoCard.Size=_U2(1,0,0,0) textoCard.AutomaticSize=Enum.AutomaticSize.Y
-        textoCard.BackgroundTransparency=1 textoCard.Text=tema.Texto
-        textoCard.TextColor3=_RGB(160,160,160) textoCard.Font=_GM
-        textoCard.TextSize=11 textoCard.TextXAlignment=_XL
-        textoCard.TextWrapped=true textoCard.LineHeight=1.2 textoCard.Parent=cardBody
-        local btnContainer=_I("Frame")
-        btnContainer.Size=_U2(1,0,0,28) btnContainer.BackgroundTransparency=1
-        btnContainer.Parent=cardBody
-        local btnCopiar=_I("TextButton")
-        btnCopiar.Size=_UO(75,28) btnCopiar.Position=_U2(1,0,0,0)
-        btnCopiar.AnchorPoint=_V2(1,0)
-        btnCopiar.BackgroundColor3=_RGB(16,185,129) btnCopiar.Text="Copiar"
-        btnCopiar.TextColor3=_RGB(255,255,255) btnCopiar.Font=_GB
-        btnCopiar.TextSize=11 btnCopiar.BorderSizePixel=0
-        btnCopiar.AutoButtonColor=false btnCopiar.Parent=btnContainer
-        Corner(btnCopiar,6)
-        btnCopiar.MouseEnter:Connect(function() btnCopiar.BackgroundColor3=_RGB(52,211,153) end)
-        btnCopiar.MouseLeave:Connect(function() btnCopiar.BackgroundColor3=_RGB(16,185,129) end)
+        local card = _I("Frame", _CH)
+        card.Size = _U2(1, 0, 0, 0)
+        card.AutomaticSize = Enum.AutomaticSize.Y
+        card.BackgroundColor3 = cor.Body
+        card.BorderSizePixel = 0
+        card.LayoutOrder = ordem
+        Corner(card, 8)
+        Stroke(card, cor.Header, 0.5, 0.7)
+        card.ClipsDescendants = true
+
+        local cardLayout = _I("UIListLayout", card)
+        cardLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+        local cardHeader = _I("Frame", card)
+        cardHeader.Size = _U2(1, 0, 0, 0)
+        cardHeader.AutomaticSize = Enum.AutomaticSize.Y
+        cardHeader.BackgroundColor3 = cor.Header
+        cardHeader.BorderSizePixel = 0
+        cardHeader.LayoutOrder = 1
+
+        local padHeader = _I("UIPadding", cardHeader)
+        padHeader.PaddingTop = _UD(0, 8)
+        padHeader.PaddingBottom = _UD(0, 8)
+        padHeader.PaddingLeft = _UD(0, 12)
+        padHeader.PaddingRight = _UD(0, 12)
+
+        local tituloCard = _I("TextLabel", cardHeader)
+        tituloCard.Size = _U2(1, 0, 0, 0)
+        tituloCard.AutomaticSize = Enum.AutomaticSize.Y
+        tituloCard.BackgroundTransparency = 1
+        tituloCard.Text = "🤫 " .. tema.Titulo
+        tituloCard.TextColor3 = C.Texto
+        tituloCard.Font = _GB
+        tituloCard.TextSize = 12
+        tituloCard.TextXAlignment = _XL
+        tituloCard.TextWrapped = true
+
+        local cardBody = _I("Frame", card)
+        cardBody.Size = _U2(1, 0, 0, 0)
+        cardBody.AutomaticSize = Enum.AutomaticSize.Y
+        cardBody.BackgroundColor3 = cor.Body
+        cardBody.BorderSizePixel = 0
+        cardBody.LayoutOrder = 2
+
+        local padBody = _I("UIPadding", cardBody)
+        padBody.PaddingTop = _UD(0, 12)
+        padBody.PaddingBottom = _UD(0, 12)
+        padBody.PaddingLeft = _UD(0, 12)
+        padBody.PaddingRight = _UD(0, 12)
+
+        local bodyLayout = _I("UIListLayout", cardBody)
+        bodyLayout.Padding = _UD(0, 12)
+        bodyLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+        local textoCard = _I("TextLabel", cardBody)
+        textoCard.Size = _U2(1, 0, 0, 0)
+        textoCard.AutomaticSize = Enum.AutomaticSize.Y
+        textoCard.BackgroundTransparency = 1
+        textoCard.Text = tema.Texto
+        textoCard.TextColor3 = C.TextoDim
+        textoCard.Font = _GM
+        textoCard.TextSize = 11
+        textoCard.TextXAlignment = _XL
+        textoCard.TextWrapped = true
+        textoCard.LineHeight = 1.2
+
+        local btnContainer = _I("Frame", cardBody)
+        btnContainer.Size = _U2(1, 0, 0, 28)
+        btnContainer.BackgroundTransparency = 1
+
+        local btnCopiar = _I("TextButton", btnContainer)
+        btnCopiar.Size = _UO(75, 28)
+        btnCopiar.Position = _U2(1, 0, 0, 0)
+        btnCopiar.AnchorPoint = Vector2.new(1, 0)
+        btnCopiar.BackgroundColor3 = C.Verde
+        btnCopiar.Text = "Copiar"
+        btnCopiar.TextColor3 = C.Texto
+        btnCopiar.Font = _GB
+        btnCopiar.TextSize = 11
+        btnCopiar.BorderSizePixel = 0
+        btnCopiar.AutoButtonColor = false
+        Corner(btnCopiar, 6)
+
+        btnCopiar.MouseEnter:Connect(function() btnCopiar.BackgroundColor3 = C.VerdeHover end)
+        btnCopiar.MouseLeave:Connect(function() btnCopiar.BackgroundColor3 = C.Verde end)
+
         btnCopiar.MouseButton1Click:Connect(function()
             if setclipboard then
                 pcall(setclipboard, tema.Texto)
-                btnCopiar.Text="Copiado!"
-                btnCopiar.BackgroundColor3=_RGB(52,211,153)
+                btnCopiar.Text = "Copiado!"
+                btnCopiar.BackgroundColor3 = C.VerdeHover
                 task.wait(1.5)
-                btnCopiar.Text="Copiar"
-                btnCopiar.BackgroundColor3=_RGB(16,185,129)
+                btnCopiar.Text = "Copiar"
+                btnCopiar.BackgroundColor3 = C.Verde
             end
         end)
     end
 
-    function ShowTextosProntos()
-        CurrentPage="TextosProntos"
-        ClearContent()
-        local header=_I("Frame")
-        header.Size=_U2(1,0,0,58) header.BackgroundColor3=_K.Card
-        header.BorderSizePixel=0 header.LayoutOrder=0 header.Parent=_CH
-        Corner(header,9) Stroke(header,_K.StrokeLight,1)
-        local title=_I("TextLabel")
-        title.BackgroundTransparency=1 title.Position=_UO(12,7) title.Size=_U2(1,-24,0,25)
-        title.Text="📚 TEXTOS PRONTOS + IA" title.TextColor3=_K.White
-        title.TextSize=16 title.Font=_GB title.TextXAlignment=_XL title.Parent=header
-        local sub=_I("TextLabel")
-        sub.BackgroundTransparency=1 sub.Position=_UO(13,34) sub.Size=_U2(1,-26,0,15)
-        sub.Text="Informações militares e gerador de texto inteligente"
-        sub.TextColor3=_K.DarkGray sub.TextSize=9 sub.Font=_GM
-        sub.TextXAlignment=_XL sub.Parent=header
+    local function GerarTexto(tema)
+        if not httpRequest then
+            return nil, "Executor sem suporte a HTTP"
+        end
 
-        for i,tema in ipairs(TEXTOS) do
-            local corIndex=((i-1)%#CARD_COLORS)+1
+        local corpo = HS:JSONEncode({
+            model = IA_TEXTOS_CONFIG.Modelo,
+            messages = {
+                { role = "system", content = IA_TEXTOS_CONFIG.SystemPrompt },
+                { role = "user", content = "Escreva um texto sobre: " .. tema }
+            },
+            temperature = 0.7,
+            max_tokens = 800
+        })
+
+        local resposta, terminou = nil, false
+        task.spawn(function()
+            local ok, res = pcall(function()
+                return httpRequest({
+                    Url = IA_TEXTOS_CONFIG.Endpoint,
+                    Method = "POST",
+                    Headers = {
+                        ["Content-Type"] = "application/json",
+                        ["Authorization"] = "Bearer " .. IA_TEXTOS_CONFIG.ApiKey
+                    },
+                    Body = corpo
+                })
+            end)
+            if ok then resposta = res end
+            terminou = true
+        end)
+
+        local inicio = tick()
+        while not terminou and (tick() - inicio) < IA_TEXTOS_CONFIG.Timeout do
+            task.wait(0.1)
+        end
+
+        if not terminou then return nil, "Tempo esgotado" end
+        if not resposta then return nil, "Falha na requisição" end
+        if resposta.StatusCode ~= 200 then return nil, "HTTP " .. tostring(resposta.StatusCode) end
+
+        local okJson, dados = pcall(function()
+            return HS:JSONDecode(resposta.Body)
+        end)
+        if not okJson or not dados.choices or not dados.choices[1] then
+            return nil, "Resposta inválida"
+        end
+
+        local msg = dados.choices[1].message
+        if not msg then return nil, "Resposta vazia" end
+
+        local txt = msg.content or ""
+        if txt == "" and msg.reasoning then txt = msg.reasoning end
+        if txt == "" then return nil, "Resposta vazia" end
+
+        local extraido = txt:match("<<<(.-)>>>")
+        if extraido and extraido ~= "" then txt = extraido end
+
+        txt = txt:gsub("^%s+", ""):gsub("%s+$", "")
+        txt = txt:gsub('^["\']+', ""):gsub('["\']+$', "")
+
+        if #txt > 500 or txt:match("^The user") or txt:match("^Let me") or txt:match("^I ") then
+            return nil, "IA não formatou corretamente. Tente novamente."
+        end
+
+        return txt
+    end
+
+    function ShowTextosProntos()
+        CurrentPage = "TextosProntos"
+        ClearContent()
+
+        local header = _I("Frame", _CH)
+        header.Size = _U2(1, 0, 0, 58)
+        header.BackgroundColor3 = C.Painel
+        header.BorderSizePixel = 0
+        header.LayoutOrder = 0
+        Corner(header, 9) Stroke(header, C.Borda, 1)
+
+        local title = _I("TextLabel", header)
+        title.BackgroundTransparency = 1
+        title.Position = _UO(12, 7) title.Size = _U2(1, -24, 0, 25)
+        title.Text = "📋 TEXTOS PRONTOS + IA"
+        title.TextColor3 = C.Texto title.TextSize = 16
+        title.Font = _GB title.TextXAlignment = _XL
+
+        local sub = _I("TextLabel", header)
+        sub.BackgroundTransparency = 1
+        sub.Position = _UO(13, 34) sub.Size = _U2(1, -26, 0, 15)
+        sub.Text = "Informações militares e gerador de texto inteligente"
+        sub.TextColor3 = C.TextoDim sub.TextSize = 9
+        sub.Font = _GM sub.TextXAlignment = _XL
+
+        for i, tema in ipairs(TEXTOS) do
+            local corIndex = ((i - 1) % #CARD_COLORS) + 1
             criarCard(tema, i, CARD_COLORS[corIndex])
         end
 
-        -- Card do gerador IA
-        local aiCard=_I("Frame")
-        aiCard.Size=_U2(1,0,0,0) aiCard.AutomaticSize=Enum.AutomaticSize.Y
-        aiCard.BackgroundColor3=_RGB(30,30,40) aiCard.BorderSizePixel=0
-        aiCard.LayoutOrder=999 aiCard.Parent=_CH
-        Corner(aiCard,8) Stroke(aiCard,_RGB(139,92,246),1,0.5)
-        aiCard.ClipsDescendants=true
-        local aiLayout=_I("UIListLayout")
-        aiLayout.SortOrder=Enum.SortOrder.LayoutOrder aiLayout.Parent=aiCard
-        local aiHeader=_I("Frame")
-        aiHeader.Size=_U2(1,0,0,35) aiHeader.BackgroundColor3=_RGB(139,92,246)
-        aiHeader.BorderSizePixel=0 aiHeader.LayoutOrder=1 aiHeader.Parent=aiCard
-        Corner(aiHeader,8)
-        local aiMask=_I("Frame")
-        aiMask.Size=_U2(1,0,0.5,0) aiMask.Position=_U2(0,0.5,0,0)
-        aiMask.BackgroundColor3=_RGB(139,92,246) aiMask.BorderSizePixel=0 aiMask.Parent=aiHeader
-        local aiTitle=_I("TextLabel")
-        aiTitle.Size=_U2(1,-20,0,20) aiTitle.Position=_UO(10,8)
-        aiTitle.BackgroundTransparency=1 aiTitle.Text="🤖 GERADOR DE TEXTO IA (EB)"
-        aiTitle.TextColor3=_RGB(255,255,255) aiTitle.Font=_GB
-        aiTitle.TextSize=12 aiTitle.TextXAlignment=_XL aiTitle.Parent=aiHeader
-        local aiBody=_I("Frame")
-        aiBody.Size=_U2(1,0,0,0) aiBody.AutomaticSize=Enum.AutomaticSize.Y
-        aiBody.BackgroundColor3=_RGB(30,30,40) aiBody.BorderSizePixel=0
-        aiBody.LayoutOrder=2 aiBody.Parent=aiCard
-        local aiPad=_I("UIPadding")
-        aiPad.PaddingTop=_UD(0,10) aiPad.PaddingBottom=_UD(0,10)
-        aiPad.PaddingLeft=_UD(0,10) aiPad.PaddingRight=_UD(0,10)
-        aiPad.Parent=aiBody
-        local aiBodyLayout=_I("UIListLayout")
-        aiBodyLayout.Padding=_UD(0,10) aiBodyLayout.SortOrder=Enum.SortOrder.LayoutOrder
-        aiBodyLayout.Parent=aiBody
-        local inputBox=_I("TextBox")
-        inputBox.Size=_U2(1,0,0,30) inputBox.BackgroundColor3=_RGB(25,25,25)
-        inputBox.PlaceholderText="Digite o tema (ex: Por que servir ao EB?)"
-        inputBox.PlaceholderColor3=_RGB(160,160,160) inputBox.Text=""
-        inputBox.TextColor3=_RGB(255,255,255) inputBox.Font=_GM
-        inputBox.TextSize=11 inputBox.TextXAlignment=_XL
-        inputBox.BorderSizePixel=0 inputBox.Parent=aiBody Corner(inputBox,6)
-        local btnGerar=_I("TextButton")
-        btnGerar.Size=_U2(1,0,0,35) btnGerar.BackgroundColor3=_RGB(139,92,246)
-        btnGerar.Text="⚡ GERAR TEXTO" btnGerar.TextColor3=_RGB(255,255,255)
-        btnGerar.Font=_GB btnGerar.TextSize=12 btnGerar.BorderSizePixel=0
-        btnGerar.AutoButtonColor=false btnGerar.Parent=aiBody
-        Corner(btnGerar,8) Stroke(btnGerar,_RGB(167,139,250),1,0.2)
-        local btnGrad=_I("UIGradient")
-        btnGrad.Color=ColorSequence.new(_RGB(139,92,246),_RGB(109,40,217))
-        btnGrad.Rotation=90 btnGrad.Parent=btnGerar
-        btnGerar.MouseEnter:Connect(function() btnGerar.BackgroundColor3=_RGB(167,139,250) end)
-        btnGerar.MouseLeave:Connect(function() btnGerar.BackgroundColor3=_RGB(139,92,246) end)
-        local outputLabel=_I("TextLabel")
-        outputLabel.Size=_U2(1,0,0,0) outputLabel.AutomaticSize=Enum.AutomaticSize.Y
-        outputLabel.BackgroundTransparency=1
-        outputLabel.Text="A resposta da IA aparecerá aqui..."
-        outputLabel.TextColor3=_RGB(160,160,160) outputLabel.Font=_GM
-        outputLabel.TextSize=11 outputLabel.TextXAlignment=_XL
-        outputLabel.TextWrapped=true outputLabel.LineHeight=1.2 outputLabel.Parent=aiBody
-        local aiBtnContainer=_I("Frame")
-        aiBtnContainer.Size=_U2(1,0,0,28) aiBtnContainer.BackgroundTransparency=1
-        aiBtnContainer.LayoutOrder=4 aiBtnContainer.Parent=aiBody
-        local btnCopiarIA=_I("TextButton")
-        btnCopiarIA.Size=_UO(75,28) btnCopiarIA.Position=_U2(1,0,0,0)
-        btnCopiarIA.AnchorPoint=_V2(1,0)
-        btnCopiarIA.BackgroundColor3=_RGB(35,35,35) btnCopiarIA.Text="Copiar"
-        btnCopiarIA.TextColor3=_RGB(160,160,160) btnCopiarIA.Font=_GB
-        btnCopiarIA.TextSize=11 btnCopiarIA.BorderSizePixel=0
-        btnCopiarIA.AutoButtonColor=false btnCopiarIA.Parent=aiBtnContainer
-        Corner(btnCopiarIA,6)
+        local aiCard = _I("Frame", _CH)
+        aiCard.Size = _U2(1, 0, 0, 0)
+        aiCard.AutomaticSize = Enum.AutomaticSize.Y
+        aiCard.BackgroundColor3 = _RGB(30, 30, 40)
+        aiCard.BorderSizePixel = 0
+        aiCard.LayoutOrder = 999
+        Corner(aiCard, 8)
+        Stroke(aiCard, _RGB(139, 92, 246), 1, 0.5)
+        aiCard.ClipsDescendants = true
+
+        local aiLayout = _I("UIListLayout", aiCard)
+        aiLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+        local aiHeader = _I("Frame", aiCard)
+        aiHeader.Size = _U2(1, 0, 0, 35)
+        aiHeader.BackgroundColor3 = _RGB(139, 92, 246)
+        aiHeader.BorderSizePixel = 0
+        aiHeader.LayoutOrder = 1
+        Corner(aiHeader, 8)
+        local aiMask = _I("Frame", aiHeader)
+        aiMask.Size = _U2(1, 0, 0.5, 0)
+        aiMask.Position = _U2(0, 0.5, 0, 0)
+        aiMask.BackgroundColor3 = _RGB(139, 92, 246)
+        aiMask.BorderSizePixel = 0
+
+        local aiTitle = _I("TextLabel", aiHeader)
+        aiTitle.Size = _U2(1, -20, 0, 20)
+        aiTitle.Position = _UO(10, 8)
+        aiTitle.BackgroundTransparency = 1
+        aiTitle.Text = "🤖 GERADOR DE TEXTO IA (EB)"
+        aiTitle.TextColor3 = C.Texto
+        aiTitle.Font = _GB
+        aiTitle.TextSize = 12
+        aiTitle.TextXAlignment = _XL
+
+        local aiBody = _I("Frame", aiCard)
+        aiBody.Size = _U2(1, 0, 0, 0)
+        aiBody.AutomaticSize = Enum.AutomaticSize.Y
+        aiBody.BackgroundColor3 = _RGB(30, 30, 40)
+        aiBody.BorderSizePixel = 0
+        aiBody.LayoutOrder = 2
+
+        local aiPad = _I("UIPadding", aiBody)
+        aiPad.PaddingTop = _UD(0, 10)
+        aiPad.PaddingBottom = _UD(0, 10)
+        aiPad.PaddingLeft = _UD(0, 10)
+        aiPad.PaddingRight = _UD(0, 10)
+
+        local aiBodyLayout = _I("UIListLayout", aiBody)
+        aiBodyLayout.Padding = _UD(0, 10)
+        aiBodyLayout.SortOrder = Enum.SortOrder.LayoutOrder
+
+        local inputBox = _I("TextBox", aiBody)
+        inputBox.Size = _U2(1, 0, 0, 30)
+        inputBox.BackgroundColor3 = C.Fundo
+        inputBox.PlaceholderText = "Digite o tema (ex: Por que servir ao EB?)"
+        inputBox.PlaceholderColor3 = C.TextoDim
+        inputBox.Text = ""
+        inputBox.TextColor3 = C.Texto
+        inputBox.Font = _GM
+        inputBox.TextSize = 11
+        inputBox.TextXAlignment = _XL
+        inputBox.BorderSizePixel = 0
+        Corner(inputBox, 6)
+
+        local btnGerar = _I("TextButton", aiBody)
+        btnGerar.Size = _U2(1, 0, 0, 35)
+        btnGerar.BackgroundColor3 = _RGB(139, 92, 246)
+        btnGerar.Text = "⚡ GERAR TEXTO"
+        btnGerar.TextColor3 = C.Texto
+        btnGerar.Font = _GB
+        btnGerar.TextSize = 12
+        btnGerar.BorderSizePixel = 0
+        btnGerar.AutoButtonColor = false
+        Corner(btnGerar, 8)
+        Stroke(btnGerar, _RGB(167, 139, 250), 1, 0.2)
+
+        local btnGrad = _I("UIGradient", btnGerar)
+        btnGrad.Color = ColorSequence.new(_RGB(139, 92, 246), _RGB(109, 40, 217))
+        btnGrad.Rotation = 90
+
+        btnGerar.MouseEnter:Connect(function() btnGerar.BackgroundColor3 = _RGB(167, 139, 250) end)
+        btnGerar.MouseLeave:Connect(function() btnGerar.BackgroundColor3 = _RGB(139, 92, 246) end)
+
+        local outputLabel = _I("TextLabel", aiBody)
+        outputLabel.Size = _U2(1, 0, 0, 0)
+        outputLabel.AutomaticSize = Enum.AutomaticSize.Y
+        outputLabel.BackgroundTransparency = 1
+        outputLabel.Text = "A resposta da IA aparecerá aqui..."
+        outputLabel.TextColor3 = C.TextoDim
+        outputLabel.Font = _GM
+        outputLabel.TextSize = 11
+        outputLabel.TextXAlignment = _XL
+        outputLabel.TextWrapped = true
+        outputLabel.LineHeight = 1.2
+
+        local aiBtnContainer = _I("Frame", aiBody)
+        aiBtnContainer.Size = _U2(1, 0, 0, 28)
+        aiBtnContainer.BackgroundTransparency = 1
+        aiBtnContainer.LayoutOrder = 4
+
+        local btnCopiarIA = _I("TextButton", aiBtnContainer)
+        btnCopiarIA.Size = _UO(75, 28)
+        btnCopiarIA.Position = _U2(1, 0, 0, 0)
+        btnCopiarIA.AnchorPoint = Vector2.new(1, 0)
+        btnCopiarIA.BackgroundColor3 = C.Painel
+        btnCopiarIA.Text = "Copiar"
+        btnCopiarIA.TextColor3 = C.TextoDim
+        btnCopiarIA.Font = _GB
+        btnCopiarIA.TextSize = 11
+        btnCopiarIA.BorderSizePixel = 0
+        btnCopiarIA.AutoButtonColor = false
+        Corner(btnCopiarIA, 6)
+
+        btnCopiarIA.MouseEnter:Connect(function()
+            if btnCopiarIA.BackgroundColor3 == C.Verde then btnCopiarIA.BackgroundColor3 = C.VerdeHover end
+        end)
+        btnCopiarIA.MouseLeave:Connect(function()
+            if btnCopiarIA.BackgroundColor3 == C.VerdeHover then btnCopiarIA.BackgroundColor3 = C.Verde end
+        end)
 
         btnGerar.MouseButton1Click:Connect(function()
-            local temaDigitado=inputBox.Text
-            if temaDigitado=="" then
-                outputLabel.Text="⚠️ Por favor, digite um tema primeiro."
-                outputLabel.TextColor3=_RGB(245,158,11)
+            local temaDigitado = inputBox.Text
+            if temaDigitado == "" then
+                outputLabel.Text = "⚠️ Por favor, digite um tema primeiro."
+                outputLabel.TextColor3 = _RGB(245, 158, 11)
                 return
             end
-            outputLabel.Text="⏳ Gerando texto... aguarde."
-            outputLabel.TextColor3=_RGB(245,158,11)
-            btnCopiarIA.BackgroundColor3=_RGB(35,35,35)
-            btnCopiarIA.TextColor3=_RGB(160,160,160)
-            task.spawn(function()
-                local textoGerado,erro=GerarTextoIA(temaDigitado)
-                if textoGerado then
-                    outputLabel.Text=textoGerado
-                    outputLabel.TextColor3=_RGB(255,255,255)
-                    btnCopiarIA.BackgroundColor3=_RGB(16,185,129)
-                    btnCopiarIA.TextColor3=_RGB(255,255,255)
-                    btnCopiarIA.MouseButton1Click:Connect(function()
-                        if setclipboard then
-                            pcall(setclipboard, textoGerado)
-                            btnCopiarIA.Text="Copiado!"
-                            btnCopiarIA.BackgroundColor3=_RGB(52,211,153)
-                            task.wait(1.5)
-                            btnCopiarIA.Text="Copiar"
-                            btnCopiarIA.BackgroundColor3=_RGB(16,185,129)
-                        end
-                    end)
-                else
-                    outputLabel.Text="❌ Erro: "..tostring(erro)
-                    outputLabel.TextColor3=_RGB(239,68,68)
-                end
-            end)
+
+            outputLabel.Text = "⏳ Gerando texto... aguarde."
+            outputLabel.TextColor3 = _RGB(245, 158, 11)
+            btnCopiarIA.BackgroundColor3 = C.Painel
+            btnCopiarIA.TextColor3 = C.TextoDim
+
+            local textoGerado, erro = GerarTexto(temaDigitado)
+
+            if textoGerado then
+                outputLabel.Text = textoGerado
+                outputLabel.TextColor3 = C.Texto
+                btnCopiarIA.BackgroundColor3 = C.Verde
+                btnCopiarIA.TextColor3 = C.Texto
+
+                btnCopiarIA.MouseButton1Click:Connect(function()
+                    if setclipboard then
+                        pcall(setclipboard, textoGerado)
+                        btnCopiarIA.Text = "Copiado!"
+                        btnCopiarIA.BackgroundColor3 = C.VerdeHover
+                        task.wait(1.5)
+                        btnCopiarIA.Text = "Copiar"
+                        btnCopiarIA.BackgroundColor3 = C.Verde
+                    end
+                end)
+            else
+                outputLabel.Text = "❌ Erro: " .. tostring(erro)
+                outputLabel.TextColor3 = _RGB(239, 68, 68)
+            end
         end)
-        Content.CanvasPosition=_V2()
+
+        Content.CanvasPosition = _V2()
     end
 end
 
 -- =========================================================================
--- COMBATE (Aimbot)
+-- COMBATE (Aimbot — bloco novo)
 -- =========================================================================
 local AIM_CONFIG = {
     Ativo=false, MostrarFOV=false, FOV=43, RingTransparency=0.3,
@@ -2227,7 +2291,6 @@ do
         LB(h,_UO(12,7),_U2(1,-24,0,25),"🎯 COMBATE • AIMBOT",_K.White,16,_GB)
         LB(h,_UO(13,34),_U2(1,-26,0,15),"Seletor Cabeça / Tronco • FOV ajustável",_K.DarkGray,9,_GM)
 
-        -- Botão Ligar
         local btnToggle=_I("TextButton")
         btnToggle.Size=_U2(1,0,0,42) btnToggle.LayoutOrder=1 btnToggle.Parent=_CH
         btnToggle.BackgroundColor3=C.Verde btnToggle.Text="LIGAR"
@@ -2246,7 +2309,6 @@ do
 
         Toggle(2,"Mostrar FOV",AIM_CONFIG.MostrarFOV,function(v) AIM_CONFIG.MostrarFOV=v end)
 
-        -- Seletor de alvo
         local alvoLbl=_I("TextLabel")
         alvoLbl.Size=_U2(1,0,0,14) alvoLbl.LayoutOrder=3 alvoLbl.BackgroundTransparency=1
         alvoLbl.Text="Parte do Alvo" alvoLbl.TextColor3=C.TextoDim
@@ -2288,7 +2350,6 @@ do
         Slider(5,"Tamanho FOV",AIM_CONFIG.FOV,20,200,false,function(v) AIM_CONFIG.FOV=v end)
         Slider(6,"Transparência",AIM_CONFIG.RingTransparency,0,1,true,function(v) AIM_CONFIG.RingTransparency=v end)
 
-        -- Cores
         local coresLista={
             _RGB(150,80,255),_RGB(255,0,0),_RGB(0,255,100),
             _RGB(255,200,0),_RGB(0,200,255),_RGB(255,0,255),_RGB(255,255,255)
@@ -2441,7 +2502,7 @@ do
 end
 
 -- =========================================================================
--- HITBOX (mantido)
+-- HITBOX
 -- =========================================================================
 local ShowHitbox
 do
@@ -2648,7 +2709,7 @@ do
 end
 
 -- =========================================================================
--- SELEÇÃO DE ABA (sidebar)
+-- SELEÇÃO DE ABA
 -- =========================================================================
 local function SelectButton(b)
     if selectedButton then
@@ -2683,11 +2744,6 @@ creditosButton.MouseButton1Click:Connect(function()
 end)
 lojaButton.MouseButton1Click:Connect(function()
     SelectButton(lojaButton) ShowLoja()
-end)
-jjButton.MouseButton1Click:Connect(function()
-    SelectButton(jjButton)
-    EBDeltaSubPage="Automacao"
-    ShowEBDelta()
 end)
 hitboxButton.MouseButton1Click:Connect(function()
     SelectButton(hitboxButton) ShowHitbox()
