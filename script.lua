@@ -363,31 +363,20 @@ local function GetRotation(f)
     if f.rx and f.ry and f.rz then return CFrame.Angles(f.rx,f.ry,f.rz) end
 end
 
--- ✅ ApplyPosition — andar natural com humanoid:Move
+-- ApplyPosition — modo pivot (original, não detectável)
 local function ApplyPosition(pos,rot)
     if not pos or not RefreshCharacter() then return false end
     local corrected=pos+Vector3.new(0,CONFIG.GroundOffset,0)
-    local diff=corrected-rootPart.Position
-    local dist=diff.Magnitude
-
-    -- Failsafe: se ficou muito longe ou caiu, teleporta
-    if dist>25 or rootPart.Position.Y<(corrected.Y-15) then
-        local cf
-        if rot then cf=CFrame.new(corrected)*rot
-        else cf=CFrame.new(corrected) end
-        pcall(function() character:PivotTo(cf) end)
-        humanoid.WalkSpeed=20
-        return true
-    end
-
-    -- Andar natural (ativa animação)
-    if dist>0.3 then
-        humanoid.WalkSpeed=math.clamp(dist*5,16,50)
-        humanoid:Move(diff.Unit,false)
+    local target
+    if rot then
+        target=CFrame.new(corrected)*rot
     else
-        humanoid.WalkSpeed=0
-        humanoid:Move(Vector3.zero,false)
+        local look=rootPart.CFrame.LookVector
+        local flat=Vector3.new(look.X,0,look.Z)
+        if flat.Magnitude<.01 then flat=Vector3.new(0,0,-1) else flat=flat.Unit end
+        target=CFrame.lookAt(corrected,corrected+flat)
     end
+    pcall(function() character:PivotTo(target) end)
     return true
 end
 
@@ -505,8 +494,8 @@ local function IniciarExecucao(name)
     Playback.WalkingToStart = false
     if RefreshCharacter() then
         humanoid:Move(Vector3.zero, false)
-        -- ✅ AutoRotate ON para o personagem girar naturalmente ao andar
-        pcall(function() humanoid.AutoRotate = true end)
+        -- AutoRotate desligado (modo pivot)
+        pcall(function() humanoid.AutoRotate = false end)
     end
     Playback.StartClock = os.clock()
     Playback.CurrentIndex = 1
@@ -521,7 +510,6 @@ local function IniciarExecucao(name)
             local final = frames[#frames]
             if elapsed >= final.t then
                 ApplyPosition(GetPosition(final), GetRotation(final))
-                task.wait(0.2)
                 StopPlayback("completed")
                 break
             end
@@ -530,7 +518,12 @@ local function IniciarExecucao(name)
             local pa, pb = GetPosition(a), GetPosition(b)
             if not pa or not pb then StopPlayback("error"); break end
             local pos = pa:Lerp(pb, alpha)
-            ApplyPosition(pos, nil)
+            local ra, rb = GetRotation(a), GetRotation(b)
+            local rot
+            if ra and rb then rot = ra:Lerp(rb, alpha)
+            elseif ra then rot = ra
+            elseif rb then rot = rb end
+            ApplyPosition(pos, rot)
             HandleJump(a, elapsed)
             task.wait()
         end
@@ -859,11 +852,6 @@ local function ClearContent()
     for _,c in ipairs(_CH:GetChildren()) do
         if c:IsA("GuiObject") then c:Destroy() end
     end
-    for _,c in ipairs(Gui:GetChildren()) do
-        if c:IsA("ScrollingFrame") and c.Name == "ZKY_DropdownList" then
-            c:Destroy()
-        end
-    end
 end
 
 -- =========================================================================
@@ -941,38 +929,46 @@ function UI.Toggle(parent, ordem, texto, inicial, callback)
     return row
 end
 
--- ✅ Dropdown: lista como filha do Gui (não cortada)
+-- ✅ Dropdown INLINE: lista empurra o conteúdo de baixo e fecha ao escolher
 function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     local wrap = _I("Frame", parent)
-    wrap.Size = _U2(1,0,0,54)
+    wrap.Size = _U2(1,0,0,0)
+    wrap.AutomaticSize = Enum.AutomaticSize.Y
     wrap.BackgroundTransparency = 1
     wrap.LayoutOrder = ordem
-    wrap.ZIndex = 5
 
-    local lbl = _I("TextLabel", wrap)
+    local lay = _I("UIListLayout", wrap)
+    lay.Padding = _UD(0,6)
+    lay.SortOrder = Enum.SortOrder.LayoutOrder
+    lay.Parent = wrap
+
+    -- linha do label
+    local row = _I("Frame", wrap)
+    row.Size = _U2(1,0,0,14)
+    row.BackgroundTransparency = 1
+    row.LayoutOrder = 1
+
+    local lbl = _I("TextLabel", row)
     lbl.BackgroundTransparency = 1
-    lbl.Position = _UO(0,0)
-    lbl.Size = _U2(1,-20,0,14)
+    lbl.Size = _U2(1,-20,1,0)
     lbl.Text = label
     lbl.TextColor3 = _K.Gray
     lbl.Font = _GM
     lbl.TextSize = 10
     lbl.TextXAlignment = _XL
-    lbl.ZIndex = 6
 
-    local help = UI.Help(wrap)
-    help.AnchorPoint = _V2(1,0)
-    help.Position = _U2(1,0,0,0)
-    help.ZIndex = 6
+    local help = UI.Help(row)
+    help.AnchorPoint = _V2(1,.5)
+    help.Position = _U2(1,0,.5,0)
 
+    -- botão fechado
     local box = _I("TextButton", wrap)
-    box.Position = _UO(0,20)
     box.Size = _U2(1,0,0,30)
     box.BackgroundColor3 = _RGB(18,18,24)
     box.BorderSizePixel = 0
     box.Text = ""
     box.AutoButtonColor = false
-    box.ZIndex = 6
+    box.LayoutOrder = 2
     Corner(box, 6)
     Stroke(box, _K.Stroke, 1)
 
@@ -985,7 +981,6 @@ function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     boxTxt.Font = _GB
     boxTxt.TextSize = 10
     boxTxt.TextXAlignment = _XL
-    boxTxt.ZIndex = 7
 
     local arrow = _I("TextLabel", box)
     arrow.AnchorPoint = _V2(1,.5)
@@ -996,44 +991,42 @@ function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     arrow.TextColor3 = _K.DarkGray
     arrow.Font = _GB
     arrow.TextSize = 9
-    arrow.ZIndex = 7
 
-    local estado = { aberto=false }
-
-    -- Lista como filha do Gui para não ser cortada
-    local lista = _I("ScrollingFrame", Gui)
-    lista.Name = "ZKY_DropdownList"
-    lista.BackgroundColor3 = _RGB(20,20,28)
+    -- lista inline (empurra o que vem depois)
+    local lista = _I("Frame", wrap)
+    lista.Size = _U2(1,0,0,0)
+    lista.BackgroundColor3 = _RGB(16,16,22)
     lista.BorderSizePixel = 0
     lista.ClipsDescendants = true
-    lista.ZIndex = 500
+    lista.LayoutOrder = 3
     lista.Visible = false
-    lista.ScrollBarThickness = 4
-    lista.ScrollBarImageColor3 = _K.Purple
-    lista.ScrollBarImageTransparency = 0.2
-    lista.CanvasSize = _UO(0, 0)
-    lista.AutomaticCanvasSize = Enum.AutomaticSize.Y
-    lista.ScrollingEnabled = true
-    lista.ElasticBehavior = Enum.ElasticBehavior.Never
     Corner(lista, 6)
     Stroke(lista, _K.Stroke, 1)
-
-    wrap.Destroying:Connect(function()
-        if lista and lista.Parent then lista:Destroy() end
-    end)
 
     local listaLay = _I("UIListLayout", lista)
     listaLay.Padding = _UD(0,1)
     listaLay.SortOrder = Enum.SortOrder.LayoutOrder
     listaLay.Parent = lista
 
-    local alturaItem = 28
-    local maxAltura = 220
+    local alturaItem = 26
+    local alturaTotal = #opcoes * alturaItem
+
+    local estado = { aberto=false }
+    local function fechar()
+        estado.aberto = false
+        lista.Visible = false
+        lista.Size = _U2(1,0,0,0)
+    end
+    local function abrir()
+        estado.aberto = true
+        lista.Visible = true
+        lista.Size = _U2(1,0,0,alturaTotal)
+    end
 
     for i,op in ipairs(opcoes) do
         local b = _I("TextButton", lista)
         b.Size = _U2(1,0,0,alturaItem)
-        b.BackgroundColor3 = _RGB(20,20,28)
+        b.BackgroundColor3 = _RGB(16,16,22)
         b.BorderSizePixel = 0
         b.Text = "   "..op
         b.TextColor3 = (op==atual) and _K.PurpleLight or _K.Gray
@@ -1041,33 +1034,14 @@ function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
         b.TextSize = 10
         b.TextXAlignment = _XL
         b.AutoButtonColor = false
-        b.ZIndex = 501
         b.LayoutOrder = i
-        b.MouseEnter:Connect(function() b.BackgroundColor3 = _RGB(30,30,40) end)
-        b.MouseLeave:Connect(function() b.BackgroundColor3 = _RGB(20,20,28) end)
+        b.MouseEnter:Connect(function() b.BackgroundColor3 = _RGB(28,28,36) end)
+        b.MouseLeave:Connect(function() b.BackgroundColor3 = _RGB(16,16,22) end)
         b.MouseButton1Click:Connect(function()
             boxTxt.Text = op
             callback(op)
             fechar()
         end)
-    end
-
-    local function fechar()
-        estado.aberto = false
-        lista.Visible = false
-    end
-    local function abrir()
-        estado.aberto = true
-        local absPos = box.AbsolutePosition
-        local absSize = box.AbsoluteSize
-        local alturaLista = math.min(#opcoes * alturaItem, maxAltura)
-        local y = absPos.Y + absSize.Y + 2
-        if y + alturaLista > Gui.AbsoluteSize.Y then
-            y = absPos.Y - alturaLista - 2
-        end
-        lista.Size = _U2(0, absSize.X, 0, alturaLista)
-        lista.Position = _U2(0, absPos.X, 0, y)
-        lista.Visible = true
     end
 
     box.MouseButton1Click:Connect(function()
