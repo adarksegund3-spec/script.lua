@@ -121,7 +121,7 @@ local CONFIG = {
     WalkToSpeed = 16,
     GroundOffset = 1.66
 }
-local MovementConfig = { Modo = "Dummy" } -- "Dummy" ou "Direto"
+local MovementConfig = { Modo = "Dummy" }
 
 local IA_CONFIG = {
     ApiKey = "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",
@@ -179,8 +179,7 @@ local _K = {
     StrokeLight = _RGB(65,65,80), White = _RGB(240,240,245), Gray = _RGB(170,170,180),
     DarkGray = _RGB(115,115,125), Success = _RGB(80,210,125), Error = _RGB(230,85,85),
     Orange = _RGB(255,145,45), SelectionRed = _RGB(225,70,70), SelectionRedDark = _RGB(75,32,32),
-    Primary = _RGB(185,185,185), Purple = _RGB(150,110,240), PurpleLight = _RGB(180,150,255),
-    PurpleDim = _RGB(90,70,150)
+    Primary = _RGB(185,185,185), Purple = _RGB(150,110,240), PurpleLight = _RGB(180,150,255)
 }
 
 local function Corner(o,r) local c=_I("UICorner") c.CornerRadius=_UD(0,r) c.Parent=o end
@@ -390,9 +389,7 @@ local function HandleJump(f,e)
     pcall(function() humanoid:ChangeState(Enum.HumanoidStateType.Jumping) end)
 end
 
--- =========================================================================
--- ANDAR ATÉ (modo Direto)
--- =========================================================================
+-- Andar até (modo Direto)
 local function AndarAte(destino,estaCancelado,aoTerminar)
     if not RefreshCharacter() then aoTerminar(false) return end
     humanoid.WalkSpeed=CONFIG.WalkToSpeed
@@ -408,9 +405,7 @@ local function AndarAte(destino,estaCancelado,aoTerminar)
     aoTerminar(sucesso and not estaCancelado())
 end
 
--- =========================================================================
--- DUMMY
--- =========================================================================
+-- Dummy
 local DummyObj
 local RemoverDummy
 local function CriarDummy(pos,rot)
@@ -485,9 +480,7 @@ local function StopPlayback(reason)
     elseif reason=="error" then Notify("ERRO","Não foi possível continuar.","Error") end
 end
 
--- =========================================================================
--- PLAYBACK
--- =========================================================================
+-- Playback por pivot (idêntico ao original)
 local function IniciarExecucao(name)
     if not Playback.Running then return end
     Playback.WalkingToStart = false
@@ -591,9 +584,7 @@ local function StartPlayback(data, cat, num, tower, towerRoute)
     end
 end
 
--- =========================================================================
--- VOLVERS
--- =========================================================================
+-- Volvers
 local function SaveDirection()
     if not RefreshCharacter() then Notify("ERRO","Personagem não encontrado.","Error") return end
     local look=rootPart.CFrame.LookVector
@@ -632,9 +623,7 @@ local function VanguardaVolver()
     Notify("VANGUARDA VOLVER!","Retornou à direção salva.","Success")
 end
 
--- =========================================================================
--- CHAT + IA
--- =========================================================================
+-- Chat + IA
 local function EnviarNoChat(msg)
     msg=string.sub(msg,1,200)
     if TCS.ChatVersion==Enum.ChatVersion.TextChatService then
@@ -783,11 +772,10 @@ local function ClearContent()
 end
 
 -- =========================================================================
--- COMPONENTES REUTILIZÁVEIS (estilo do print)
+-- COMPONENTES (estilo do print)
 -- =========================================================================
 local UI = {}
 
--- Ícone "?" de ajuda
 function UI.Help(parent)
     local h = _I("TextButton", parent)
     h.Size = _UO(14,14)
@@ -803,7 +791,6 @@ function UI.Help(parent)
     return h
 end
 
--- Toggle iOS style (linha com label à esquerda e switch à direita)
 function UI.Toggle(parent, ordem, texto, inicial, callback)
     local row = _I("Frame", parent)
     row.Size = _U2(1,0,0,28)
@@ -859,7 +846,6 @@ function UI.Toggle(parent, ordem, texto, inicial, callback)
     return row
 end
 
--- Dropdown select (label + caixa com ▼)
 function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     local wrap = _I("Frame", parent)
     wrap.Size = _U2(1,0,0,54)
@@ -910,14 +896,14 @@ function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     arrow.Font = _GB
     arrow.TextSize = 9
 
-    local estado = { aberto=false, sel=atual }
+    local estado = { aberto=false }
     local lista = _I("Frame", wrap)
     lista.Position = _UO(0,52)
     lista.Size = _U2(1,0,0,0)
     lista.BackgroundColor3 = _RGB(20,20,28)
     lista.BorderSizePixel = 0
     lista.ClipsDescendants = true
-    lista.ZIndex = 10
+    lista.ZIndex = 50
     lista.Visible = false
     Corner(lista, 6)
     Stroke(lista, _K.Stroke, 1)
@@ -949,12 +935,11 @@ function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
         b.TextSize = 10
         b.TextXAlignment = _XL
         b.AutoButtonColor = false
-        b.ZIndex = 11
+        b.ZIndex = 51
         b.MouseEnter:Connect(function() b.BackgroundColor3 = _RGB(30,30,40) end)
         b.MouseLeave:Connect(function() b.BackgroundColor3 = _RGB(20,20,28) end)
         b.MouseButton1Click:Connect(function()
             boxTxt.Text = op
-            estado.sel = op
             callback(op)
             fechar()
         end)
@@ -965,7 +950,6 @@ function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     end)
 end
 
--- Slider moderno
 function UI.Slider(parent, ordem, titulo, valor, min, max, isDec, callback)
     local wrap = _I("Frame", parent)
     wrap.Size = _U2(1,0,0,50)
@@ -1060,7 +1044,6 @@ function UI.Slider(parent, ordem, titulo, valor, min, max, isDec, callback)
     end)
 end
 
--- TextBox simples
 function UI.TextBox(parent, ordem, label, placeholder, valor, callback)
     local wrap = _I("Frame", parent)
     wrap.Size = _U2(1,0,0,54)
@@ -1100,10 +1083,9 @@ function UI.TextBox(parent, ordem, label, placeholder, valor, callback)
     box.FocusLost:Connect(function() callback(box.Text) end)
 end
 
--- Botão padrão "ação" (full-width)
 function UI.ActionButton(parent, ordem, texto, corBg, callback)
     local b = _I("TextButton", parent)
-    b.Size = _U2(1,0,0,30)
+    b.Size = _U2(1,0,0,32)
     b.BackgroundColor3 = corBg or _RGB(30,30,40)
     b.BorderSizePixel = 0
     b.Text = texto
@@ -1114,20 +1096,11 @@ function UI.ActionButton(parent, ordem, texto, corBg, callback)
     b.LayoutOrder = ordem
     Corner(b, 6)
     Stroke(b, _K.Stroke, 1)
-    b.MouseEnter:Connect(function()
-        T:Create(b,TweenInfo.new(.1),{BackgroundColor3 = corBg and Color3.new(
-            math.min(corBg.R+.05,1), math.min(corBg.G+.05,1), math.min(corBg.B+.05,1)
-        ) or _RGB(40,40,52)}):Play()
-    end)
-    b.MouseLeave:Connect(function()
-        T:Create(b,TweenInfo.new(.1),{BackgroundColor3 = corBg or _RGB(30,30,40)}):Play()
-    end)
     b.MouseButton1Click:Connect(callback)
     return b
 end
 
--- Card com header underline roxo + título
-function UI.Card(parent, ordem, titulo, alturaAuto)
+function UI.Card(parent, ordem, titulo)
     local card = _I("Frame", parent)
     card.Size = _U2(1,0,0,0)
     card.AutomaticSize = Enum.AutomaticSize.Y
@@ -1167,6 +1140,43 @@ function UI.Card(parent, ordem, titulo, alturaAuto)
         Corner(line, 1)
     end
     return card
+end
+
+-- Duas colunas
+local function CreateTwoColumns(parent, ordem)
+    local container = _I("Frame", parent)
+    container.Size = _U2(1,0,0,0)
+    container.AutomaticSize = Enum.AutomaticSize.Y
+    container.BackgroundTransparency = 1
+    container.LayoutOrder = ordem
+
+    local lay = _I("UIListLayout", container)
+    lay.FillDirection = Enum.FillDirection.Horizontal
+    lay.Padding = _UD(0, 10)
+    lay.SortOrder = Enum.SortOrder.LayoutOrder
+    lay.Parent = container
+
+    local col1 = _I("Frame", container)
+    col1.Size = _U2(0.5, -5, 0, 0)
+    col1.AutomaticSize = Enum.AutomaticSize.Y
+    col1.BackgroundTransparency = 1
+    col1.LayoutOrder = 1
+    local c1lay = _I("UIListLayout", col1)
+    c1lay.Padding = _UD(0, 10)
+    c1lay.SortOrder = Enum.SortOrder.LayoutOrder
+    c1lay.Parent = col1
+
+    local col2 = _I("Frame", container)
+    col2.Size = _U2(0.5, -5, 0, 0)
+    col2.AutomaticSize = Enum.AutomaticSize.Y
+    col2.BackgroundTransparency = 1
+    col2.LayoutOrder = 2
+    local c2lay = _I("UIListLayout", col2)
+    c2lay.Padding = _UD(0, 10)
+    c2lay.SortOrder = Enum.SortOrder.LayoutOrder
+    c2lay.Parent = col2
+
+    return col1, col2
 end
 
 -- =========================================================================
@@ -1215,7 +1225,7 @@ local TAFFS_DATA = {
         {"📅 Criado","1983"},
         {"👤 Comandante","RenanFoxiy."},
         {"👤 Subcomandante","TILAPIA_PROFISSIONAL."},
-        {"🛡️ Escudo","Fundo preto com bordas amarelas. No centro um paraquedas branco junto de uma faca vermelha, simbolizando operações especiais e combate."},
+        {"🛡️ Escudo","Fundo preto com bordas amarelas. No centro um paraquedas branco junto de uma faca vermelha."},
         {"📜 Lema","Qualquer missão, em qualquer lugar, a qualquer hora, de qualquer maneira."},
         {"💬 Saudação","Saudações, senhores Fantasmas."},
         {"💬 Saudação","Saudações, senhor Fantasma."},
@@ -1308,10 +1318,10 @@ local function ShowTAFFS()
     simBtn.TextSize=10 simBtn.Font=_GB simBtn.AutoButtonColor=false simBtn.Parent=warningCard
     Corner(simBtn,8)
     simBtn.MouseButton1Click:Connect(function()
-        local success = pcall(function()
+        local ok = pcall(function()
             loadstring(game:HttpGet("https://pastebin.com/raw/yyp8u4Xt"))()
         end)
-        if success then Notify("MENU SECUNDÁRIO","TAFFS adicionado com sucesso!","Success")
+        if ok then Notify("MENU SECUNDÁRIO","TAFFS adicionado com sucesso!","Success")
         else Notify("ERRO","Falha ao carregar o menu secundário.","Error") end
     end)
     local header=_I("Frame")
@@ -1358,67 +1368,20 @@ end
 -- =========================================================================
 local EBDeltaSubPage = "Parkour"
 
-local function GetCategoryColor(c)
-    if c=="Lento" then return _K.Success
-    elseif c=="Rápido" then return _K.White
-    elseif c=="Mais Rápido" then return _K.Orange
-    elseif c=="Sem Burla" then return _K.Gray end
-    return _K.Gray
-end
-
--- Grid 2 colunas helper
-local function CreateGrid(parent, ordem)
-    local grid = _I("Frame", parent)
-    grid.Size = _U2(1,0,0,0)
-    grid.AutomaticSize = Enum.AutomaticSize.Y
-    grid.BackgroundTransparency = 1
-    grid.LayoutOrder = ordem
-    local g = _I("UIGridLayout", grid)
-    g.CellSize = UDim2.new(0.5, -5, 0, 0)
-    g.CellPadding = UDim2.new(0, 10, 0, 10)
-    g.SortOrder = Enum.SortOrder.LayoutOrder
-    g.FillDirectionMaxCells = 2
-    return grid
-end
-
--- Conteúdo: PARKOUR (grid 2x2)
+-- Conteúdo: PARKOUR (2 colunas)
 local function ShowParkoursContent()
-    local grid = CreateGrid(_CH, 10)
+    local col1, col2 = CreateTwoColumns(_CH, 1)
 
-    for num=1,4 do
-        local card = _I("Frame", grid)
-        card.Size = _U2(1,0,0,0)
-        card.AutomaticSize = Enum.AutomaticSize.Y
-        card.BackgroundColor3 = _RGB(22,22,28)
-        card.BorderSizePixel = 0
-        card.LayoutOrder = num
-        Corner(card, 8)
-        Padding(card, 14, 14, 14, 14)
+    local function makeParkourCard(parent, num)
+        local card = UI.Card(parent, num, "Parkour "..num)
 
-        local lay = _I("UIListLayout", card)
-        lay.Padding = _UD(0,12)
-        lay.SortOrder = Enum.SortOrder.LayoutOrder
-        lay.Parent = card
-
-        local titulo = _I("TextLabel", card)
-        titulo.Size = _U2(1,0,0,18)
-        titulo.BackgroundTransparency = 1
-        titulo.Text = "Parkour "..num
-        titulo.TextColor3 = _K.White
-        titulo.Font = _GB
-        titulo.TextSize = 12
-        titulo.TextXAlignment = _XL
-        titulo.LayoutOrder = 0
-
-        -- Dropdown de velocidade
         local catAtual = selectedCategory[num] or "Lento"
         UI.Dropdown(card, 1, "Velocidade", CategoryOrder, catAtual, function(op)
             selectedCategory[num] = op
         end)
 
-        -- Botão iniciar
         local running = Playback.Running and Playback.Parkour==num and not Playback.Tower
-        local btn = UI.ActionButton(card, 2, running and "Parar" or ("Iniciar Parkour "..num),
+        UI.ActionButton(card, 2, running and "Parar" or ("Iniciar Parkour "..num),
             _RGB(28,28,36), function()
                 if Playback.Running and Playback.Parkour==num and not Playback.Tower then
                     StopPlayback("cancelled"); ShowEBDelta(); return
@@ -1434,40 +1397,21 @@ local function ShowParkoursContent()
                 task.wait(.1) ShowEBDelta()
             end)
     end
+
+    makeParkourCard(col1, 1)
+    makeParkourCard(col2, 2)
+    makeParkourCard(col1, 3)
+    makeParkourCard(col2, 4)
 end
 
--- Conteúdo: TORRES (grid 2 colunas)
+-- Conteúdo: TORRES (2 colunas)
 local function ShowTowersContent()
-    local grid = CreateGrid(_CH, 10)
+    local col1, col2 = CreateTwoColumns(_CH, 1)
 
     -- Torre 1
     do
-        local card = _I("Frame", grid)
-        card.Size = _U2(1,0,0,0)
-        card.AutomaticSize = Enum.AutomaticSize.Y
-        card.BackgroundColor3 = _RGB(22,22,28)
-        card.BorderSizePixel = 0
-        card.LayoutOrder = 1
-        Corner(card, 8)
-        Padding(card, 14, 14, 14, 14)
-
-        local lay = _I("UIListLayout", card)
-        lay.Padding = _UD(0,12)
-        lay.SortOrder = Enum.SortOrder.LayoutOrder
-        lay.Parent = card
-
-        local titulo = _I("TextLabel", card)
-        titulo.Size = _U2(1,0,0,18)
-        titulo.BackgroundTransparency = 1
-        titulo.Text = "Torre 1"
-        titulo.TextColor3 = _K.White
-        titulo.Font = _GB
-        titulo.TextSize = 12
-        titulo.TextXAlignment = _XL
-        titulo.LayoutOrder = 0
-
+        local card = UI.Card(col1, 1, "Torre 1")
         UI.Dropdown(card, 1, "Versão", {"Única"}, "Única", function(op) end)
-
         local running = Playback.Running and Playback.Tower=="Torre 1"
         UI.ActionButton(card, 2, running and "Parar" or "Iniciar Torre 1",
             _RGB(28,28,36), function()
@@ -1486,34 +1430,10 @@ local function ShowTowersContent()
 
     -- Torre 2
     do
-        local card = _I("Frame", grid)
-        card.Size = _U2(1,0,0,0)
-        card.AutomaticSize = Enum.AutomaticSize.Y
-        card.BackgroundColor3 = _RGB(22,22,28)
-        card.BorderSizePixel = 0
-        card.LayoutOrder = 2
-        Corner(card, 8)
-        Padding(card, 14, 14, 14, 14)
-
-        local lay = _I("UIListLayout", card)
-        lay.Padding = _UD(0,12)
-        lay.SortOrder = Enum.SortOrder.LayoutOrder
-        lay.Parent = card
-
-        local titulo = _I("TextLabel", card)
-        titulo.Size = _U2(1,0,0,18)
-        titulo.BackgroundTransparency = 1
-        titulo.Text = "Torre 2"
-        titulo.TextColor3 = _K.White
-        titulo.Font = _GB
-        titulo.TextSize = 12
-        titulo.TextXAlignment = _XL
-        titulo.LayoutOrder = 0
-
+        local card = UI.Card(col2, 1, "Torre 2")
         UI.Dropdown(card, 1, "Versão", Tower2RouteOrder, selectedTower2Route, function(op)
             selectedTower2Route = op
         end)
-
         local running = Playback.Running and Playback.Tower=="Torre 2"
         UI.ActionButton(card, 2, running and "Parar" or "Iniciar Torre 2",
             _RGB(28,28,36), function()
@@ -1531,7 +1451,7 @@ local function ShowTowersContent()
     end
 end
 
--- Conteúdo: AUTOMAÇÃO (Auto JJs + Auto Farm, grid 2 colunas)
+-- Conteúdo: AUTOMAÇÃO (2 colunas)
 local ShowAutomacaoContent
 do
     local ativo,VELOCIDADE,MAX_CLIQUES,META,META_ATIVA=false,53,2,308,true
@@ -1540,7 +1460,7 @@ do
 
     local function setBtnEstado(ligado)
         if not btnToggleRef or not btnToggleRef.Parent then return end
-        btnToggleRef.Text = ligado and "Parar" or "Iniciar Auto JJs"
+        btnToggleRef.Text = ligado and "Parar Auto JJS" or "Iniciar Auto JJS"
     end
     local function clicarFiresignal(obj)
         if firesignal then
@@ -1628,46 +1548,17 @@ do
     end)
 
     ShowAutomacaoContent=function()
-        local grid = CreateGrid(_CH, 10)
+        local col1, col2 = CreateTwoColumns(_CH, 1)
 
-        -- Auto JJs
+        -- Auto JJS (esquerda)
         do
-            local card = _I("Frame", grid)
-            card.Size = _U2(1,0,0,0)
-            card.AutomaticSize = Enum.AutomaticSize.Y
-            card.BackgroundColor3 = _RGB(22,22,28)
-            card.BorderSizePixel = 0
-            card.LayoutOrder = 1
-            Corner(card, 8)
-            Padding(card, 14, 14, 14, 14)
-
-            local lay = _I("UIListLayout", card)
-            lay.Padding = _UD(0,12)
-            lay.SortOrder = Enum.SortOrder.LayoutOrder
-            lay.Parent = card
-
-            local titulo = _I("TextLabel", card)
-            titulo.Size = _U2(1,0,0,18)
-            titulo.BackgroundTransparency = 1
-            titulo.Text = "Auto JJS"
-            titulo.TextColor3 = _K.White
-            titulo.Font = _GB
-            titulo.TextSize = 12
-            titulo.TextXAlignment = _XL
-            titulo.LayoutOrder = 0
-
-            UI.Toggle(card, 1, "Ativar Auto JJS", ativo, function(v)
-                ativo = v
-            end)
-
+            local card = UI.Card(col1, 1, "Auto JJS")
+            UI.Toggle(card, 1, "Ativar Auto JJS", ativo, function(v) ativo = v end)
             UI.TextBox(card, 2, "Quantidade Limite Exata", "Ex: 308", tostring(META), function(txt)
                 local v = tonumber(txt)
                 if v and v>0 then META=v end
             end)
-
-            UI.Slider(card, 3, "Delay", VELOCIDADE, 1, 100, false, function(v)
-                VELOCIDADE = v
-            end)
+            UI.Slider(card, 3, "Delay", VELOCIDADE, 1, 100, false, function(v) VELOCIDADE = v end)
 
             infoLbl = _I("TextLabel", card)
             infoLbl.Size = _U2(1,0,0,14)
@@ -1680,40 +1571,14 @@ do
             infoLbl.LayoutOrder = 4
         end
 
-        -- Auto Farm
+        -- Auto Farm (direita)
         do
-            local card = _I("Frame", grid)
-            card.Size = _U2(1,0,0,0)
-            card.AutomaticSize = Enum.AutomaticSize.Y
-            card.BackgroundColor3 = _RGB(22,22,28)
-            card.BorderSizePixel = 0
-            card.LayoutOrder = 2
-            Corner(card, 8)
-            Padding(card, 14, 14, 14, 14)
-
-            local lay = _I("UIListLayout", card)
-            lay.Padding = _UD(0,12)
-            lay.SortOrder = Enum.SortOrder.LayoutOrder
-            lay.Parent = card
-
-            local titulo = _I("TextLabel", card)
-            titulo.Size = _U2(1,0,0,18)
-            titulo.BackgroundTransparency = 1
-            titulo.Text = "Auto Farm"
-            titulo.TextColor3 = _K.White
-            titulo.Font = _GB
-            titulo.TextSize = 12
-            titulo.TextXAlignment = _XL
-            titulo.LayoutOrder = 0
-
+            local card = UI.Card(col2, 1, "Auto Farm")
             UI.Toggle(card, 1, "Ativar Auto Quest", false, function(v) end)
-
             UI.ActionButton(card, 2, "Coletar Todos os Troféus", _RGB(28,28,36), function()
                 Notify("AUTO FARM","Função não implementada.","Orange")
             end)
-
             UI.Dropdown(card, 3, "Tipo de Coleta", {"Coletar Lixo","Coletar Troféu","Coletar Tudo"}, "Coletar Lixo", function(op) end)
-
             UI.Toggle(card, 4, "Ativar Auto Farm", false, function(v) end)
         end
     end
@@ -1721,7 +1586,7 @@ end
 
 -- Conteúdo: CONFIGURAÇÃO
 local function ShowConfiguracaoContent()
-    local card = UI.Card(_CH, 10, "Geral")
+    local card = UI.Card(_CH, 1, "Geral")
 
     UI.Toggle(card, 1, "Desativar Dummies (Ir Direto/MoveTo)", desativarDummies, function(v)
         desativarDummies = v
@@ -1741,20 +1606,19 @@ local function ShowConfiguracaoContent()
     end)
 end
 
--- Mostrar EB DELTA
 function ShowEBDelta()
     CurrentPage = "EBDelta"
     ClearContent()
 
-    -- Hotbar de sub-abas (estilo do print, com underline)
+    -- Hotbar de sub-abas
     local hotbar = _I("Frame", _CH)
-    hotbar.Size = _U2(1,0,0,40)
+    hotbar.Size = _U2(1,0,0,30)
     hotbar.BackgroundTransparency = 1
     hotbar.LayoutOrder = 0
 
     local hbLay = _I("UIListLayout", hotbar)
     hbLay.FillDirection = Enum.FillDirection.Horizontal
-    hbLay.Padding = _UD(0,20)
+    hbLay.Padding = _UD(0,18)
     hbLay.VerticalAlignment = Enum.VerticalAlignment.Center
     hbLay.Parent = hotbar
 
@@ -1767,14 +1631,15 @@ function ShowEBDelta()
     for _, tab in ipairs(tabs) do
         local sel = EBDeltaSubPage == tab.Id
         local b = _I("TextButton", hotbar)
-        b.Size = _UO(0, 22) -- auto
-        b.AutomaticSize = Enum.AutomaticSize.X
+        b.Size = _UO(110, 28)
         b.BackgroundTransparency = 1
         b.Text = tab.Nome
         b.TextColor3 = sel and _K.White or _K.DarkGray
         b.Font = _GB
         b.TextSize = 12
         b.AutoButtonColor = false
+        b.TextXAlignment = Enum.TextXAlignment.Center
+
         b.MouseButton1Click:Connect(function()
             EBDeltaSubPage = tab.Id
             ShowEBDelta()
@@ -1782,9 +1647,9 @@ function ShowEBDelta()
 
         if sel then
             local line = _I("Frame", b)
-            line.AnchorPoint = _V2(0,1)
-            line.Position = _U2(0,0,1,2)
-            line.Size = _U2(1,0,0,2)
+            line.AnchorPoint = _V2(0.5,1)
+            line.Position = _U2(0.5,0,1,-2)
+            line.Size = _U2(0.6,0,0,2)
             line.BackgroundColor3 = _K.Purple
             line.BorderSizePixel = 0
             Corner(line,1)
@@ -1845,10 +1710,10 @@ local function ShowVolvers()
     simBtn.TextSize=10 simBtn.Font=_GB simBtn.AutoButtonColor=false simBtn.Parent=warningCard
     Corner(simBtn,8)
     simBtn.MouseButton1Click:Connect(function()
-        local success = pcall(function()
+        local ok = pcall(function()
             loadstring(game:HttpGet("https://pastebin.com/raw/ZrzHAenq"))()
         end)
-        if success then Notify("MENU SECUNDÁRIO","Volver aberto com sucesso!","Success")
+        if ok then Notify("MENU SECUNDÁRIO","Volver aberto com sucesso!","Success")
         else Notify("ERRO","Falha ao carregar o menu secundário.","Error") end
     end)
 
@@ -1895,7 +1760,7 @@ local iaOcupado=false
 local function ShowAutoCorrecao()
     CurrentPage="AutoCorrecao"
     ClearContent()
-    local card = UI.Card(_CH, 10, "🤖 IA CHAT")
+    local card = UI.Card(_CH, 1, "🤖 IA CHAT")
 
     local inputCard = _I("Frame", card)
     inputCard.Size = _U2(1,0,0,140)
@@ -1978,44 +1843,66 @@ local function ShowCreditos()
     CurrentPage="Creditos"
     ClearContent()
     local link="https://discord.gg/NY2RfC7Kx"
-    local header=_I("Frame")
-    header.Size=_U2(1,0,0,58) header.BackgroundColor3=_K.Card header.BorderSizePixel=0
-    header.LayoutOrder=0 header.Parent=_CH Corner(header,9) Stroke(header,_K.StrokeLight,1)
-    local title=_I("TextLabel")
-    title.BackgroundTransparency=1 title.Position=_UO(12,7) title.Size=_U2(1,-24,0,25)
-    title.Text="👑 CRÉDITOS" title.TextColor3=_K.White title.TextSize=16
-    title.Font=_GB title.TextXAlignment=_XL title.Parent=header
-    local sub=_I("TextLabel")
-    sub.BackgroundTransparency=1 sub.Position=_UO(13,34) sub.Size=_U2(1,-26,0,15)
-    sub.Text="Informações do desenvolvedor" sub.TextColor3=_K.DarkGray
-    sub.TextSize=9 sub.Font=_GM sub.TextXAlignment=_XL sub.Parent=header
-    local dev=_I("Frame")
-    dev.Size=_U2(1,0,0,70) dev.BackgroundColor3=_K.Card dev.BorderSizePixel=0
-    dev.LayoutOrder=1 dev.Parent=_CH Corner(dev,8) Stroke(dev,_K.Stroke,1)
-    local devT=_I("TextLabel")
-    devT.BackgroundTransparency=1 devT.Position=_UO(11,8) devT.Size=_U2(1,-22,0,54)
-    devT.Text="Esse script foi desenvolvido pelo akira007p 🔵 discord"
-    devT.TextColor3=_K.White devT.TextSize=11 devT.Font=_GB
-    devT.TextWrapped=true devT.TextXAlignment=_XL
-    devT.TextYAlignment=Enum.TextYAlignment.Center devT.Parent=dev
-    local srv=_I("Frame")
-    srv.Size=_U2(1,0,0,70) srv.BackgroundColor3=_K.Card srv.BorderSizePixel=0
-    srv.LayoutOrder=2 srv.Parent=_CH Corner(srv,8) Stroke(srv,_K.Orange,1.5)
-    local srvT=_I("TextLabel")
-    srvT.BackgroundTransparency=1 srvT.Position=_UO(11,9) srvT.Size=_U2(1,-100,0,20)
-    srvT.Text="🔵 Servidor do Discord" srvT.TextColor3=_K.White
-    srvT.TextSize=10 srvT.Font=Enum.Font.GothamBlack srvT.TextXAlignment=_XL srvT.Parent=srv
-    local srvL=_I("TextLabel")
-    srvL.BackgroundTransparency=1 srvL.Position=_UO(11,32) srvL.Size=_U2(1,-100,0,28)
-    srvL.Text=link srvL.TextColor3=_K.Gray srvL.TextSize=8
-    srvL.Font=_GM srvL.TextWrapped=true srvL.TextXAlignment=_XL
-    srvL.TextYAlignment=Enum.TextYAlignment.Top srvL.Parent=srv
-    local enter=_I("TextButton")
-    enter.AnchorPoint=_V2(1,.5) enter.Position=_U2(1,-8,.5,0)
-    enter.Size=_UO(70,32) enter.BackgroundColor3=_RGB(88,101,242)
-    enter.BorderSizePixel=0 enter.Text="▶ ENTRAR" enter.TextColor3=_K.White
-    enter.TextSize=9 enter.Font=_GB enter.AutoButtonColor=false enter.Parent=srv
-    Corner(enter,8)
+    local card = UI.Card(_CH, 1, "👑 CRÉDITOS")
+
+    local dev = _I("Frame", card)
+    dev.Size = _U2(1,0,0,50)
+    dev.BackgroundColor3 = _RGB(18,18,24)
+    dev.BorderSizePixel = 0
+    dev.LayoutOrder = 1
+    Corner(dev,6) Stroke(dev,_K.Stroke,1)
+
+    local devT = _I("TextLabel", dev)
+    devT.BackgroundTransparency = 1
+    devT.Position = _UO(12,0)
+    devT.Size = _U2(1,-24,1,0)
+    devT.Text = "Esse script foi desenvolvido pelo akira007p 🔵 discord"
+    devT.TextColor3 = _K.White
+    devT.Font = _GB
+    devT.TextSize = 11
+    devT.TextWrapped = true
+    devT.TextXAlignment = _XL
+    devT.TextYAlignment = Enum.TextYAlignment.Center
+
+    local srv = _I("Frame", card)
+    srv.Size = _U2(1,0,0,60)
+    srv.BackgroundColor3 = _RGB(18,18,24)
+    srv.BorderSizePixel = 0
+    srv.LayoutOrder = 2
+    Corner(srv,6) Stroke(srv,_K.Orange,1)
+
+    local srvT = _I("TextLabel", srv)
+    srvT.BackgroundTransparency = 1
+    srvT.Position = _UO(12,8)
+    srvT.Size = _U2(1,-100,0,20)
+    srvT.Text = "🔵 Servidor do Discord"
+    srvT.TextColor3 = _K.White
+    srvT.Font = _GB
+    srvT.TextSize = 11
+    srvT.TextXAlignment = _XL
+
+    local srvL = _I("TextLabel", srv)
+    srvL.BackgroundTransparency = 1
+    srvL.Position = _UO(12,30)
+    srvL.Size = _U2(1,-100,0,20)
+    srvL.Text = link
+    srvL.TextColor3 = _K.Gray
+    srvL.TextSize = 9
+    srvL.Font = _GM
+    srvL.TextXAlignment = _XL
+
+    local enter = _I("TextButton", srv)
+    enter.AnchorPoint = _V2(1,.5)
+    enter.Position = _U2(1,-10,.5,0)
+    enter.Size = _UO(75,32)
+    enter.BackgroundColor3 = _RGB(88,101,242)
+    enter.BorderSizePixel = 0
+    enter.Text = "▶ ENTRAR"
+    enter.TextColor3 = _K.White
+    enter.TextSize = 9
+    enter.Font = _GB
+    enter.AutoButtonColor = false
+    Corner(enter,6)
     enter.MouseButton1Click:Connect(function()
         pcall(function() setclipboard(link) end)
         pcall(function() game:GetService("GuiService"):OpenBrowserWindow(link) end)
@@ -2025,7 +1912,7 @@ local function ShowCreditos()
 end
 
 -- =========================================================================
--- TEXTOS PRONTOS + IA (idêntico ao arquivo base)
+-- TEXTOS PRONTOS (idêntico ao base)
 -- =========================================================================
 do
     local CARD_COLORS = {
@@ -2322,7 +2209,7 @@ do
 end
 
 -- =========================================================================
--- COMBATE (Aimbot + Hitbox integrados)
+-- COMBATE (Aimbot + Hitbox — mesma funcionalidade, visual novo)
 -- =========================================================================
 local AIM_CONFIG = {
     Ativo=false, MostrarFOV=false, FOV=43, RingTransparency=0.3,
@@ -2330,7 +2217,7 @@ local AIM_CONFIG = {
     OffsetX=0, OffsetY=-47, ParteAlvo="Cabeça"
 }
 local HB_CONFIG = {
-    Ativo=false, Visual=true, Tamanho=2, Transparencia=.5,
+    Ativo=false, Visual=true, Tamanho=2, Transparencia=0.5,
     Cor=_RGB(255,0,0), Material="Neon"
 }
 local HB_Original = {}
@@ -2478,36 +2365,23 @@ function ShowCombate()
     ClearContent()
     Content.ScrollingEnabled = true
 
-    -- Grid 2 colunas
-    local grid = _I("Frame", _CH)
-    grid.Size = _U2(1,0,0,0)
-    grid.AutomaticSize = Enum.AutomaticSize.Y
-    grid.BackgroundTransparency = 1
-    grid.LayoutOrder = 0
-    local gl = _I("UIGridLayout", grid)
-    gl.CellSize = UDim2.new(0.5, -5, 0, 0)
-    gl.CellPadding = UDim2.new(0, 10, 0, 10)
-    gl.SortOrder = Enum.SortOrder.LayoutOrder
-    gl.FillDirectionMaxCells = 2
+    local col1, col2 = CreateTwoColumns(_CH, 0)
 
     -- HITBOX (esquerda)
-    local hbCard = UI.Card(grid, 1, "🎯 Hitbox Modificador")
+    local hbCard = UI.Card(col1, 1, "🎯 Hitbox Modificador")
     UI.Toggle(hbCard, 1, "Ativar Hitbox", HB_CONFIG.Ativo, function(v)
         HB_CONFIG.Ativo = v
         Notify("HITBOX", v and "Ativado." or "Desativado.", v and "Success" or "Error")
     end)
     UI.Slider(hbCard, 2, "Tamanho", HB_CONFIG.Tamanho, 1, 20, false, function(v) HB_CONFIG.Tamanho = v end)
-    UI.Slider(hbCard, 3, "Transparência", math.floor((1-HB_CONFIG.Transparencia)*10+.5), 0, 10, false,
-        function(v) HB_CONFIG.Transparencia = 1 - v/10 end)
+    UI.Slider(hbCard, 3, "Transparência", math.floor(HB_CONFIG.Transparencia*10+.5), 0, 10, false,
+        function(v) HB_CONFIG.Transparencia = v/10 end)
 
-    -- Formato (dropdown) — apenas visual
-    UI.Dropdown(hbCard, 4, "Formato", {"Quadrado","Esfera","Cilindro"}, "Quadrado", function(op) end)
-
-    -- Cor da Hitbox (linha com quadrado colorido)
+    -- Cor da Hitbox — linha com quadrado colorido + paleta
     local corRow = _I("Frame", hbCard)
     corRow.Size = _U2(1,0,0,26)
     corRow.BackgroundTransparency = 1
-    corRow.LayoutOrder = 5
+    corRow.LayoutOrder = 4
     local corLbl = _I("TextLabel", corRow)
     corLbl.BackgroundTransparency = 1
     corLbl.Size = _U2(1,-90,1,0)
@@ -2528,13 +2402,36 @@ function ShowCombate()
     corSwatch.Text = ""
     corSwatch.AutoButtonColor = false
     Corner(corSwatch, 4) Stroke(corSwatch, _K.Stroke, 1)
-    corSwatch.MouseButton1Click:Connect(function()
-        HB_CONFIG.Cor = _RGB(math.random(0,255), math.random(0,255), math.random(0,255))
-        corSwatch.BackgroundColor3 = HB_CONFIG.Cor
-    end)
+
+    local HB_Presets = {
+        _RGB(255,0,0), _RGB(0,255,100), _RGB(0,150,255),
+        _RGB(255,200,0), _RGB(255,0,255), _RGB(150,80,255),
+        _RGB(255,255,255), _RGB(0,0,0)
+    }
+    local presetFrame = _I("Frame", hbCard)
+    presetFrame.Size = _U2(1,0,0,18)
+    presetFrame.BackgroundTransparency = 1
+    presetFrame.LayoutOrder = 5
+    local pl = _I("UIListLayout", presetFrame)
+    pl.FillDirection = Enum.FillDirection.Horizontal
+    pl.Padding = _UD(0,4)
+    pl.Parent = presetFrame
+    for _,cor in ipairs(HB_Presets) do
+        local b = _I("TextButton", presetFrame)
+        b.Size = _UO(16,16)
+        b.BackgroundColor3 = cor
+        b.BorderSizePixel = 0
+        b.Text = ""
+        b.AutoButtonColor = false
+        Corner(b,4) Stroke(b,_K.Stroke,1)
+        b.MouseButton1Click:Connect(function()
+            HB_CONFIG.Cor = cor
+            corSwatch.BackgroundColor3 = cor
+        end)
+    end
 
     -- AIM (direita)
-    local aimCard = UI.Card(grid, 2, "🎯 Aim (PC)")
+    local aimCard = UI.Card(col2, 1, "🎯 Aim (PC)")
     UI.Toggle(aimCard, 1, "Ativar Aimbot", AIM_CONFIG.Ativo, function(v)
         AIM_CONFIG.Ativo = v
     end)
@@ -2542,14 +2439,109 @@ function ShowCombate()
         AIM_CONFIG.MostrarFOV = v
     end)
 
-    UI.Dropdown(aimCard, 3, "Parte do Alvo", {"Cabeça","Tronco"}, AIM_CONFIG.ParteAlvo, function(op)
-        AIM_CONFIG.ParteAlvo = op
-    end)
+    -- Seletor Cabeça / Tronco (botões)
+    local alvoWrap = _I("Frame", aimCard)
+    alvoWrap.Size = _U2(1,0,0,44)
+    alvoWrap.BackgroundTransparency = 1
+    alvoWrap.LayoutOrder = 3
+
+    local alvoLbl = _I("TextLabel", alvoWrap)
+    alvoLbl.BackgroundTransparency = 1
+    alvoLbl.Position = _UO(0,0)
+    alvoLbl.Size = _U2(1,-20,0,14)
+    alvoLbl.Text = "Parte do Alvo"
+    alvoLbl.TextColor3 = _K.Gray
+    alvoLbl.Font = _GM
+    alvoLbl.TextSize = 10
+    alvoLbl.TextXAlignment = _XL
+
+    local btnFrame = _I("Frame", alvoWrap)
+    btnFrame.Position = _UO(0,20)
+    btnFrame.Size = _U2(1,0,0,24)
+    btnFrame.BackgroundTransparency = 1
+    local bfl = _I("UIListLayout", btnFrame)
+    bfl.FillDirection = Enum.FillDirection.Horizontal
+    bfl.Padding = _UD(0,4)
+    bfl.Parent = btnFrame
+
+    local opcoes = {"Cabeça","Tronco"}
+    local btnAlvos = {}
+    local function atualizarAlvos()
+        for _,item in ipairs(btnAlvos) do
+            if item.Nome == AIM_CONFIG.ParteAlvo then
+                item.Btn.BackgroundColor3 = _RGB(60,40,110)
+                item.Btn.TextColor3 = _K.PurpleLight
+                item.Stroke.Color = _K.Purple
+            else
+                item.Btn.BackgroundColor3 = _RGB(30,30,40)
+                item.Btn.TextColor3 = _K.Gray
+                item.Stroke.Color = _K.Stroke
+            end
+        end
+    end
+    for _,nome in ipairs(opcoes) do
+        local b = _I("TextButton", btnFrame)
+        b.Size = _U2(0.5,-2,1,0)
+        b.BackgroundColor3 = _RGB(30,30,40)
+        b.Text = nome
+        b.TextColor3 = _K.Gray
+        b.Font = _GB
+        b.TextSize = 10
+        b.BorderSizePixel = 0
+        b.AutoButtonColor = false
+        Corner(b,6)
+        local s = Stroke(b,_K.Stroke,1)
+        table.insert(btnAlvos,{Btn=b,Nome=nome,Stroke=s})
+        b.MouseButton1Click:Connect(function()
+            AIM_CONFIG.ParteAlvo = nome
+            atualizarAlvos()
+        end)
+    end
+    atualizarAlvos()
 
     UI.Slider(aimCard, 4, "Tamanho FOV", AIM_CONFIG.FOV, 20, 200, false,
         function(v) AIM_CONFIG.FOV = v end)
-    UI.Slider(aimCard, 5, "Transparência", 1 - AIM_CONFIG.RingTransparency, 0, 1, true,
-        function(v) AIM_CONFIG.RingTransparency = 1 - v end)
+    UI.Slider(aimCard, 5, "Transparência", AIM_CONFIG.RingTransparency, 0, 1, true,
+        function(v) AIM_CONFIG.RingTransparency = v end)
+
+    -- Paleta de cores do FOV
+    local coresWrap = _I("Frame", aimCard)
+    coresWrap.Size = _U2(1,0,0,34)
+    coresWrap.BackgroundTransparency = 1
+    coresWrap.LayoutOrder = 6
+
+    local coresLbl = _I("TextLabel", coresWrap)
+    coresLbl.BackgroundTransparency = 1
+    coresLbl.Position = _UO(0,0)
+    coresLbl.Size = _U2(1,0,0,14)
+    coresLbl.Text = "Cor do FOV"
+    coresLbl.TextColor3 = _K.Gray
+    coresLbl.Font = _GM
+    coresLbl.TextSize = 10
+    coresLbl.TextXAlignment = _XL
+
+    local coresInner = _I("Frame", coresWrap)
+    coresInner.Position = _UO(0,18)
+    coresInner.Size = _U2(1,0,0,16)
+    coresInner.BackgroundTransparency = 1
+    local cil = _I("UIListLayout", coresInner)
+    cil.FillDirection = Enum.FillDirection.Horizontal
+    cil.Padding = _UD(0,4)
+    cil.Parent = coresInner
+    local coresLista = {
+        _RGB(150,80,255),_RGB(255,0,0),_RGB(0,255,100),
+        _RGB(255,200,0),_RGB(0,200,255),_RGB(255,0,255),_RGB(255,255,255)
+    }
+    for _,cor in ipairs(coresLista) do
+        local b = _I("TextButton", coresInner)
+        b.Size = _UO(16,16)
+        b.BackgroundColor3 = cor
+        b.BorderSizePixel = 0
+        b.Text = ""
+        b.AutoButtonColor = false
+        Corner(b,4) Stroke(b,_K.Stroke,1)
+        b.MouseButton1Click:Connect(function() AIM_CONFIG.Cor = cor end)
+    end
 
     Content.CanvasPosition = _V2()
 end
