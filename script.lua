@@ -365,7 +365,7 @@ local function GetRotation(f)
     if f.rx and f.ry and f.rz then return CFrame.Angles(f.rx,f.ry,f.rz) end
 end
 
--- ✅ COM ANIMAÇÃO DE ANDAR
+-- ✅ ApplyPosition com animação de andar
 local function ApplyPosition(pos,rot)
     if not pos or not RefreshCharacter() then return false end
     local corrected=pos+Vector3.new(0,CONFIG.GroundOffset,0)
@@ -653,7 +653,7 @@ local function EnviarNoChat(msg)
     return false
 end
 
--- IA: correção gramatical (IA CHAT)
+-- IA CHAT (correção gramatical)
 local function CorrigirTexto(texto)
     if not httpRequest then return nil,"Executor sem suporte a HTTP" end
     local corpo=HS:JSONEncode({
@@ -683,14 +683,17 @@ local function CorrigirTexto(texto)
     if resposta.StatusCode~=200 then return nil,"HTTP "..tostring(resposta.StatusCode) end
     local okJson,dados=pcall(function() return HS:JSONDecode(resposta.Body) end)
     if not okJson or not dados.choices or not dados.choices[1] then return nil,"Resposta inválida" end
-    local txt=dados.choices[1].message and dados.choices[1].message.content
+    local msg = dados.choices[1].message
+    if not msg then return nil,"Resposta vazia" end
+    local txt = msg.content
+    if (not txt or txt == "") and msg.reasoning then txt = msg.reasoning end
     if not txt or txt=="" then return nil,"Resposta vazia" end
     txt=txt:gsub("^%s+",""):gsub("%s+$","")
     txt=txt:gsub('^["\']+',""):gsub('["\']+$',"")
     return txt
 end
 
--- ✅ IA: gerador de texto (Textos Prontos) — VERSÃO FUNCIONAL
+-- ✅ Gerador de Texto IA (Textos Prontos) — com fallback de reasoning
 local function GerarTextoIA(tema)
     if not httpRequest then
         return nil, "Executor sem suporte a HTTP"
@@ -742,7 +745,13 @@ local function GerarTextoIA(tema)
         return nil, "Resposta inválida"
     end
 
-    local txt = dados.choices[1].message and dados.choices[1].message.content
+    local msg = dados.choices[1].message
+    if not msg then return nil, "Resposta vazia" end
+
+    local txt = msg.content
+    if (not txt or txt == "") and msg.reasoning then
+        txt = msg.reasoning
+    end
     if not txt or txt == "" then return nil, "Resposta vazia" end
 
     txt = txt:gsub("^%s+", ""):gsub("%s+$", "")
@@ -857,7 +866,7 @@ local function ClearContent()
 end
 
 -- =========================================================================
--- COMPONENTES (estilo do print)
+-- COMPONENTES
 -- =========================================================================
 local UI = {}
 
@@ -931,7 +940,7 @@ function UI.Toggle(parent, ordem, texto, inicial, callback)
     return row
 end
 
--- ✅ Dropdown com ZIndex corrigido
+-- ✅ Dropdown com lista rolável
 function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     local wrap = _I("Frame", parent)
     wrap.Size = _U2(1,0,0,54)
@@ -989,7 +998,8 @@ function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     arrow.ZIndex = 7
 
     local estado = { aberto=false }
-    local lista = _I("Frame", wrap)
+
+    local lista = _I("ScrollingFrame", wrap)
     lista.Position = _UO(0,52)
     lista.Size = _U2(1,0,0,0)
     lista.BackgroundColor3 = _RGB(20,20,28)
@@ -997,12 +1007,23 @@ function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     lista.ClipsDescendants = true
     lista.ZIndex = 100
     lista.Visible = false
+    lista.ScrollBarThickness = 4
+    lista.ScrollBarImageColor3 = _K.Purple
+    lista.ScrollBarImageTransparency = 0.2
+    lista.CanvasSize = _UO(0, 0)
+    lista.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    lista.ScrollingEnabled = true
+    lista.ElasticBehavior = Enum.ElasticBehavior.Never
     Corner(lista, 6)
     Stroke(lista, _K.Stroke, 1)
 
     local listaLay = _I("UIListLayout", lista)
     listaLay.Padding = _UD(0,1)
+    listaLay.SortOrder = Enum.SortOrder.LayoutOrder
     listaLay.Parent = lista
+
+    local MAX_ALTURA = 150
+    local alturaPorItem = 27
 
     local function fechar()
         estado.aberto = false
@@ -1012,13 +1033,13 @@ function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     local function abrir()
         estado.aberto = true
         lista.Visible = true
-        local h = #opcoes * 28
+        local h = math.min(#opcoes * alturaPorItem, MAX_ALTURA)
         T:Create(lista, TweenInfo.new(.15), {Size=_U2(1,0,0,h)}):Play()
     end
 
-    for _,op in ipairs(opcoes) do
+    for i,op in ipairs(opcoes) do
         local b = _I("TextButton", lista)
-        b.Size = _U2(1,0,0,27)
+        b.Size = _U2(1,0,0,alturaPorItem)
         b.BackgroundColor3 = _RGB(20,20,28)
         b.BorderSizePixel = 0
         b.Text = "   "..op
@@ -1028,6 +1049,7 @@ function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
         b.TextXAlignment = _XL
         b.AutoButtonColor = false
         b.ZIndex = 101
+        b.LayoutOrder = i
         b.MouseEnter:Connect(function() b.BackgroundColor3 = _RGB(30,30,40) end)
         b.MouseLeave:Connect(function() b.BackgroundColor3 = _RGB(20,20,28) end)
         b.MouseButton1Click:Connect(function()
@@ -1136,7 +1158,6 @@ function UI.Slider(parent, ordem, titulo, valor, min, max, isDec, callback)
     end)
 end
 
--- ✅ TextBox retorna o box
 function UI.TextBox(parent, ordem, label, placeholder, valor, callback)
     local wrap = _I("Frame", parent)
     wrap.Size = _U2(1,0,0,54)
@@ -1540,7 +1561,7 @@ local function ShowTowersContent()
     end
 end
 
--- ✅ AUTOMAÇÃO: SÓ Auto JJS (com toggle de Meta funcional)
+-- AUTOMAÇÃO: Auto JJS com toggle de Meta
 local ShowAutomacaoContent
 do
     local ativo,VELOCIDADE,MAX_CLIQUES,META,META_ATIVA=false,53,2,308,true
@@ -2037,7 +2058,7 @@ local function ShowCreditos()
 end
 
 -- =========================================================================
--- TEXTOS PRONTOS (com IA funcional)
+-- TEXTOS PRONTOS + IA
 -- =========================================================================
 do
     local CARD_COLORS = {
@@ -2445,7 +2466,6 @@ function ShowCombate()
 
     local col1, col2 = CreateTwoColumns(_CH, 0)
 
-    -- HITBOX
     local hbCard = UI.Card(col1, 1, "🎯 Hitbox Modificador")
     UI.Toggle(hbCard, 1, "Ativar Hitbox", HB_CONFIG.Ativo, function(v)
         HB_CONFIG.Ativo = v
@@ -2507,7 +2527,6 @@ function ShowCombate()
         end)
     end
 
-    -- AIM
     local aimCard = UI.Card(col2, 1, "🎯 Aim (PC)")
     UI.Toggle(aimCard, 1, "Ativar Aimbot", AIM_CONFIG.Ativo, function(v)
         AIM_CONFIG.Ativo = v
