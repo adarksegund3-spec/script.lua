@@ -20,7 +20,7 @@ do
     local t = Instance.new("TextLabel", f)
     t.Size = UDim2.new(1, 0, 0, 36)
     t.BackgroundTransparency = 1
-    t.Text = "ZKY PARKOUR - KEY"
+    t.Text = "AKIRA MENU - KEY"
     t.TextColor3 = Color3.new(1, 1, 1)
     t.Font = Enum.Font.GothamBold
     t.TextSize = 16
@@ -258,6 +258,46 @@ end
 Pl.CharacterAdded:Connect(function() task.wait(.2); RefreshCharacter() end)
 RefreshCharacter()
 
+-- ✅ Animação de andar durante a rota (via Animator manual — visual local, seguro)
+local walkTrack
+local function iniciarAnimacaoAndar()
+    if not RefreshCharacter() then return end
+    local animator = humanoid:FindFirstChildOfClass("Animator")
+    if not animator then
+        animator = _I("Animator")
+        animator.Parent = humanoid
+    end
+    local animationId = nil
+    local animate = character:FindFirstChild("Animate")
+    if animate then
+        local walkFolder = animate:FindFirstChild("walk")
+        if walkFolder then
+            local anim = walkFolder:FindFirstChildOfClass("Animation")
+            if anim then animationId = anim.AnimationId end
+        end
+    end
+    if not animationId then
+        local isR15 = humanoid.RigType == Enum.HumanoidRigType.R15
+        animationId = isR15 and "rbxassetid://507777826" or "rbxassetid://180426354"
+    end
+    pcall(function()
+        if walkTrack then walkTrack:Stop() end
+        local anim = _I("Animation")
+        anim.AnimationId = animationId
+        walkTrack = animator:LoadAnimation(anim)
+        walkTrack.Looped = true
+        walkTrack.Priority = Enum.AnimationPriority.Movement
+        walkTrack:Play()
+    end)
+end
+
+local function pararAnimacaoAndar()
+    if walkTrack then
+        pcall(function() walkTrack:Stop() end)
+        walkTrack = nil
+    end
+end
+
 local function Number(v) return v and tonumber(v) end
 
 local function ParseRoutes(raw)
@@ -363,7 +403,7 @@ local function GetRotation(f)
     if f.rx and f.ry and f.rz then return CFrame.Angles(f.rx,f.ry,f.rz) end
 end
 
--- ApplyPosition — modo pivot (original, não detectável)
+-- ApplyPosition — modo pivot (original, seguro)
 local function ApplyPosition(pos,rot)
     if not pos or not RefreshCharacter() then return false end
     local corrected=pos+Vector3.new(0,CONFIG.GroundOffset,0)
@@ -483,6 +523,7 @@ local function StopPlayback(reason)
         humanoid:Move(Vector3.zero,false); humanoid.Jump=false
         pcall(function() humanoid.AutoRotate=true end)
     end
+    pararAnimacaoAndar()
     ClearLines()
     if reason=="completed" then Notify("CONCLUÍDO","Rota finalizada!","Success")
     elseif reason=="cancelled" then Notify("PARADO","Reprodução interrompida.","Error")
@@ -494,9 +535,9 @@ local function IniciarExecucao(name)
     Playback.WalkingToStart = false
     if RefreshCharacter() then
         humanoid:Move(Vector3.zero, false)
-        -- AutoRotate desligado (modo pivot)
         pcall(function() humanoid.AutoRotate = false end)
     end
+    iniciarAnimacaoAndar()
     Playback.StartClock = os.clock()
     Playback.CurrentIndex = 1
     Playback.LastJump = -math.huge
@@ -781,12 +822,12 @@ Corner(Header,10) Stroke(Header,_K.Stroke)
 
 local Title=_I("TextLabel")
 Title.BackgroundTransparency=1 Title.Position=_UO(13,7) Title.Size=_U2(.55,0,0,23)
-Title.Text="🚀 ZKY PARKOUR" Title.TextColor3=_K.White Title.TextSize=17
+Title.Text="🚀 AKIRA MENU" Title.TextColor3=_K.White Title.TextSize=17
 Title.Font=_GB Title.TextXAlignment=_XL Title.ZIndex=22 Title.Parent=Header
 
 local Subtitle=_I("TextLabel")
 Subtitle.BackgroundTransparency=1 Subtitle.Position=_UO(14,31) Subtitle.Size=_U2(.65,0,0,15)
-Subtitle.Text="Auto Parkour • V2.2" Subtitle.TextColor3=_K.DarkGray
+Subtitle.Text="Auto Parkour • Akira" Subtitle.TextColor3=_K.DarkGray
 Subtitle.TextSize=9 Subtitle.Font=_GM Subtitle.TextXAlignment=_XL Subtitle.ZIndex=22 Subtitle.Parent=Header
 
 local Version=_I("TextLabel")
@@ -929,7 +970,7 @@ function UI.Toggle(parent, ordem, texto, inicial, callback)
     return row
 end
 
--- ✅ Dropdown INLINE: lista empurra o conteúdo de baixo e fecha ao escolher
+-- Dropdown inline (empurra o conteúdo de baixo, fecha ao escolher)
 function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     local wrap = _I("Frame", parent)
     wrap.Size = _U2(1,0,0,0)
@@ -942,7 +983,6 @@ function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     lay.SortOrder = Enum.SortOrder.LayoutOrder
     lay.Parent = wrap
 
-    -- linha do label
     local row = _I("Frame", wrap)
     row.Size = _U2(1,0,0,14)
     row.BackgroundTransparency = 1
@@ -961,7 +1001,6 @@ function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     help.AnchorPoint = _V2(1,.5)
     help.Position = _U2(1,0,.5,0)
 
-    -- botão fechado
     local box = _I("TextButton", wrap)
     box.Size = _U2(1,0,0,30)
     box.BackgroundColor3 = _RGB(18,18,24)
@@ -992,7 +1031,6 @@ function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     arrow.Font = _GB
     arrow.TextSize = 9
 
-    -- lista inline (empurra o que vem depois)
     local lista = _I("Frame", wrap)
     lista.Size = _U2(1,0,0,0)
     lista.BackgroundColor3 = _RGB(16,16,22)
@@ -2857,4 +2895,4 @@ task.defer(function()
         loaded==4 and lt1 and lt2==4 and "Success" or "Error")
 end)
 
-print("ZKY PARKOUR V2.2 (EB DELTA) carregado com sucesso!")
+print("AKIRA MENU V2.2 carregado com sucesso!")
