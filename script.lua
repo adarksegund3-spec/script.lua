@@ -363,34 +363,31 @@ local function GetRotation(f)
     if f.rx and f.ry and f.rz then return CFrame.Angles(f.rx,f.ry,f.rz) end
 end
 
--- ✅ NOVA ApplyPosition: anda naturalmente com humanoid:Move() (animação padrão)
+-- ✅ ApplyPosition — andar natural com humanoid:Move
 local function ApplyPosition(pos,rot)
     if not pos or not RefreshCharacter() then return false end
     local corrected=pos+Vector3.new(0,CONFIG.GroundOffset,0)
+    local diff=corrected-rootPart.Position
+    local dist=diff.Magnitude
 
-    local diff = corrected - rootPart.Position
-    local dist = diff.Magnitude
-
-    -- Fallback 1: se ficou muito longe (perdeu o alvo), teleporta
-    if dist > 20 then
-        pcall(function() character:PivotTo(CFrame.new(corrected)) end)
+    -- Failsafe: se ficou muito longe ou caiu, teleporta
+    if dist>25 or rootPart.Position.Y<(corrected.Y-15) then
+        local cf
+        if rot then cf=CFrame.new(corrected)*rot
+        else cf=CFrame.new(corrected) end
+        pcall(function() character:PivotTo(cf) end)
+        humanoid.WalkSpeed=20
         return true
     end
 
-    -- Fallback 2: se caiu para baixo do alvo (andou pra fora), teleporta
-    if rootPart.Position.Y < (corrected.Y - 12) then
-        pcall(function() character:PivotTo(CFrame.new(corrected)) end)
-        return true
+    -- Andar natural (ativa animação)
+    if dist>0.3 then
+        humanoid.WalkSpeed=math.clamp(dist*5,16,50)
+        humanoid:Move(diff.Unit,false)
+    else
+        humanoid.WalkSpeed=0
+        humanoid:Move(Vector3.zero,false)
     end
-
-    -- WalkSpeed proporcional à distância (longe = mais rápido, mas sem exagerar)
-    humanoid.WalkSpeed = math.clamp(dist * 4, 20, 70)
-
-    -- ✅ Anda naturalmente (animação padrão do Roblox é ativada pelo Move)
-    if dist > 0.5 then
-        humanoid:Move(diff.Unit, false)
-    end
-
     return true
 end
 
@@ -508,7 +505,7 @@ local function IniciarExecucao(name)
     Playback.WalkingToStart = false
     if RefreshCharacter() then
         humanoid:Move(Vector3.zero, false)
-        -- ✅ AutoRotate ATIVADO para o personagem girar naturalmente ao andar
+        -- ✅ AutoRotate ON para o personagem girar naturalmente ao andar
         pcall(function() humanoid.AutoRotate = true end)
     end
     Playback.StartClock = os.clock()
@@ -524,7 +521,7 @@ local function IniciarExecucao(name)
             local final = frames[#frames]
             if elapsed >= final.t then
                 ApplyPosition(GetPosition(final), GetRotation(final))
-                task.wait(0.3)
+                task.wait(0.2)
                 StopPlayback("completed")
                 break
             end
@@ -862,7 +859,6 @@ local function ClearContent()
     for _,c in ipairs(_CH:GetChildren()) do
         if c:IsA("GuiObject") then c:Destroy() end
     end
-    -- ✅ Limpa listas órfãs de dropdowns antigos
     for _,c in ipairs(Gui:GetChildren()) do
         if c:IsA("ScrollingFrame") and c.Name == "ZKY_DropdownList" then
             c:Destroy()
@@ -945,7 +941,7 @@ function UI.Toggle(parent, ordem, texto, inicial, callback)
     return row
 end
 
--- ✅ Dropdown com lista como filha do Gui (não cortada pelo Content) + scroll
+-- ✅ Dropdown: lista como filha do Gui (não cortada)
 function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     local wrap = _I("Frame", parent)
     wrap.Size = _U2(1,0,0,54)
@@ -1004,11 +1000,9 @@ function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
 
     local estado = { aberto=false }
 
-    -- ✅ Lista criada como filha do ScreenGui — não é cortada pelo Content
+    -- Lista como filha do Gui para não ser cortada
     local lista = _I("ScrollingFrame", Gui)
     lista.Name = "ZKY_DropdownList"
-    lista.Size = _U2(0,100,0,0)
-    lista.Position = _U2(0,0,0,0)
     lista.BackgroundColor3 = _RGB(20,20,28)
     lista.BorderSizePixel = 0
     lista.ClipsDescendants = true
@@ -1017,17 +1011,15 @@ function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     lista.ScrollBarThickness = 4
     lista.ScrollBarImageColor3 = _K.Purple
     lista.ScrollBarImageTransparency = 0.2
-    lista.CanvasSize = _UO(0,0)
+    lista.CanvasSize = _UO(0, 0)
     lista.AutomaticCanvasSize = Enum.AutomaticSize.Y
     lista.ScrollingEnabled = true
-    lista.ScrollingDirection = Enum.ScrollingDirection.Y
     lista.ElasticBehavior = Enum.ElasticBehavior.Never
     Corner(lista, 6)
     Stroke(lista, _K.Stroke, 1)
 
-    -- Limpa a lista quando o dropdown for destruído
     wrap.Destroying:Connect(function()
-        if lista.Parent then lista:Destroy() end
+        if lista and lista.Parent then lista:Destroy() end
     end)
 
     local listaLay = _I("UIListLayout", lista)
@@ -1035,12 +1027,12 @@ function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     listaLay.SortOrder = Enum.SortOrder.LayoutOrder
     listaLay.Parent = lista
 
-    local MAX_ALTURA = 220
-    local alturaPorItem = 28
+    local alturaItem = 28
+    local maxAltura = 220
 
     for i,op in ipairs(opcoes) do
         local b = _I("TextButton", lista)
-        b.Size = _U2(1,0,0,alturaPorItem)
+        b.Size = _U2(1,0,0,alturaItem)
         b.BackgroundColor3 = _RGB(20,20,28)
         b.BorderSizePixel = 0
         b.Text = "   "..op
@@ -1068,10 +1060,9 @@ function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
         estado.aberto = true
         local absPos = box.AbsolutePosition
         local absSize = box.AbsoluteSize
-        -- Se não couber embaixo, abre pra cima
-        local alturaLista = math.min(#opcoes * alturaPorItem, MAX_ALTURA)
+        local alturaLista = math.min(#opcoes * alturaItem, maxAltura)
         local y = absPos.Y + absSize.Y + 2
-        if y + alturaLista > workspace.CurrentCamera.ViewportSize.Y then
+        if y + alturaLista > Gui.AbsoluteSize.Y then
             y = absPos.Y - alturaLista - 2
         end
         lista.Size = _U2(0, absSize.X, 0, alturaLista)
@@ -1581,7 +1572,6 @@ local function ShowTowersContent()
     end
 end
 
--- AUTOMAÇÃO
 local ShowAutomacaoContent
 do
     local ativo,VELOCIDADE,MAX_CLIQUES,META,META_ATIVA=false,53,2,308,true
