@@ -132,7 +132,6 @@ local IA_CONFIG = {
     SystemPrompt = "Você é um corretor gramatical extremamente rigoroso de português do Brasil. Corrija TODOS os erros da mensagem do usuário, sem deixar passar nenhum, incluindo: letras maiúsculas no início de frases e em nomes próprios; todos os acentos gráficos (agudo, circunflexo, til, crase) e a cedilha; toda a pontuação, como vírgulas, pontos finais, pontos de interrogação e de exclamação; concordância verbal e nominal; ortografia e separação de palavras. Não deixe nenhuma palavra sem acento ou sem maiúscula onde for necessário, nem nenhuma frase sem pontuação final. Não resuma, não reescreva o estilo, não mude o significado, o tom nem o tamanho da mensagem: apenas corrija a gramática, a ortografia e a pontuação, mantendo as mesmas palavras sempre que possível. Responda APENAS com a mensagem corrigida, sem explicações, aspas, comentários extras ou qualquer texto adicional."
 }
 
--- ✅ IA de textos — exatamente o bloco que você mandou
 local IA_TEXTOS = {
     ApiKey = "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",
     Endpoint = "https://api.groq.com/openai/v1/chat/completions",
@@ -260,7 +259,7 @@ end
 Pl.CharacterAdded:Connect(function() task.wait(.2); RefreshCharacter() end)
 RefreshCharacter()
 
--- ✅ Animação de andar: simples — toca durante a rota, para quando sai
+-- Animação de andar durante a rota
 local walkTrack
 local function iniciarAnimacaoAndar()
     if not RefreshCharacter() then return end
@@ -300,7 +299,6 @@ local function pararAnimacaoAndar()
     end
 end
 
--- Toca enquanto a rota está ativa; para quando a rota termina
 R.Heartbeat:Connect(function()
     if Playback.Running then
         if not walkTrack or not walkTrack.IsPlaying then
@@ -737,7 +735,7 @@ local function CorrigirTexto(texto)
     return txt
 end
 
--- ✅ GerarTextoIA — 100% o bloco que você mandou
+-- ✅ GerarTextoIA: max_tokens 800, sem fallback reasoning, rejeita texto em inglês
 local function GerarTextoIA(tema)
     if not httpRequest then
         return nil, "Executor sem suporte a HTTP"
@@ -753,7 +751,7 @@ local function GerarTextoIA(tema)
             { role = "user", content = "Tema: " .. tema }
         },
         temperature = 0.85,
-        max_tokens = 150
+        max_tokens = 800
     })
 
     local resposta, terminou = nil, false
@@ -789,19 +787,27 @@ local function GerarTextoIA(tema)
         return nil, "Resposta inválida"
     end
 
-    -- ✅ 100% a lógica original — content, fallback reasoning, truncamento
     local msg = dados.choices[1].message
     if not msg then return nil, "Resposta vazia" end
+
+    -- ✅ Só usa content
     local txt = msg.content
-    if (not txt or txt == "") and msg.reasoning then
-        txt = msg.reasoning
+    if not txt or txt == "" then
+        return nil, "IA não gerou texto. Tente novamente."
     end
-    if not txt or txt == "" then return nil, "Resposta vazia" end
 
     txt = txt:gsub("^%s+", ""):gsub("%s+$", "")
     txt = txt:gsub('^["\']+', ""):gsub('["\']+$', "")
     txt = txt:gsub("^Tema:%s*", "")
     txt = txt:gsub("^Texto:%s*", "")
+
+    -- ✅ Rejeita raciocínio em inglês
+    if txt:match("^We ") or txt:match("^The user") or txt:match("^Let me")
+       or txt:match("^I ") or txt:match("^I'll") or txt:match("^I need")
+       or txt:match("^First") or txt:match("^The text") or txt:match("^Here")
+       or txt:find("150%-210") or (txt:find("characters") and txt:find("spaces")) then
+        return nil, "IA gerou raciocínio. Clique novamente."
+    end
 
     if #txt > 200 then
         txt = txt:sub(1, 200)
@@ -2343,11 +2349,11 @@ do
 end
 
 -- =========================================================================
--- COMBATE (Hitbox = expandir HRP | Aim = mira + dano)
+-- COMBATE (Hitbox aplicada NOS OUTROS | Aim com dano)
 -- =========================================================================
 local Cam = workspace.CurrentCamera
 
--- ===== HITBOX: expande o HRP próprio (Akira Reach clássico) =====
+-- ===== HITBOX: aplica nos OUTROS jogadores =====
 local HB_CONFIG = {
     Ativo=false, Visual=true, Tamanho=2, Transparencia=0.5,
     Cor=_RGB(255,0,0)
@@ -2399,9 +2405,11 @@ HB_Conn = R.Heartbeat:Connect(function()
         return
     end
     if HB_CONFIG.Ativo then
-        -- Aplica só no SEU personagem (hitbox própria) — clássico Akira Reach
-        if RefreshCharacter() then
-            HB_Aplicar(character)
+        -- ✅ Aplica NOS OUTROS jogadores
+        for _, p in ipairs(P:GetPlayers()) do
+            if p ~= Pl and p.Character then
+                HB_Aplicar(p.Character)
+            end
         end
         for char in pairs(HB_Original) do
             if not char.Parent then HB_Original[char] = nil end
