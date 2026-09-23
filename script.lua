@@ -105,7 +105,6 @@ local R = game:GetService("RunService")
 local HS = game:GetService("HttpService")
 local TCS = game:GetService("TextChatService")
 local RS = game:GetService("ReplicatedStorage")
-local VIM = game:GetService("VirtualInputManager")
 local Pl = P.LocalPlayer
 local PG = Pl:WaitForChild("PlayerGui")
 local character,humanoid,rootPart
@@ -259,11 +258,10 @@ end
 Pl.CharacterAdded:Connect(function() task.wait(.2); RefreshCharacter() end)
 RefreshCharacter()
 
--- Animação de andar durante a rota
+-- ✅ Animação de andar durante a rota (via Animator manual — visual local, seguro)
 local walkTrack
 local function iniciarAnimacaoAndar()
     if not RefreshCharacter() then return end
-    if walkTrack and walkTrack.IsPlaying then return end
     local animator = humanoid:FindFirstChildOfClass("Animator")
     if not animator then
         animator = _I("Animator")
@@ -283,6 +281,7 @@ local function iniciarAnimacaoAndar()
         animationId = isR15 and "rbxassetid://507777826" or "rbxassetid://180426354"
     end
     pcall(function()
+        if walkTrack then walkTrack:Stop() end
         local anim = _I("Animation")
         anim.AnimationId = animationId
         walkTrack = animator:LoadAnimation(anim)
@@ -298,18 +297,6 @@ local function pararAnimacaoAndar()
         walkTrack = nil
     end
 end
-
-R.Heartbeat:Connect(function()
-    if Playback.Running then
-        if not walkTrack or not walkTrack.IsPlaying then
-            iniciarAnimacaoAndar()
-        end
-    else
-        if walkTrack and walkTrack.IsPlaying then
-            pararAnimacaoAndar()
-        end
-    end
-end)
 
 local function Number(v) return v and tonumber(v) end
 
@@ -416,6 +403,7 @@ local function GetRotation(f)
     if f.rx and f.ry and f.rz then return CFrame.Angles(f.rx,f.ry,f.rz) end
 end
 
+-- ApplyPosition — modo pivot (original, seguro)
 local function ApplyPosition(pos,rot)
     if not pos or not RefreshCharacter() then return false end
     local corrected=pos+Vector3.new(0,CONFIG.GroundOffset,0)
@@ -549,6 +537,7 @@ local function IniciarExecucao(name)
         humanoid:Move(Vector3.zero, false)
         pcall(function() humanoid.AutoRotate = false end)
     end
+    iniciarAnimacaoAndar()
     Playback.StartClock = os.clock()
     Playback.CurrentIndex = 1
     Playback.LastJump = -math.huge
@@ -735,7 +724,6 @@ local function CorrigirTexto(texto)
     return txt
 end
 
--- ✅ GerarTextoIA: max_tokens 800, sem fallback reasoning, rejeita texto em inglês
 local function GerarTextoIA(tema)
     if not httpRequest then
         return nil, "Executor sem suporte a HTTP"
@@ -751,7 +739,7 @@ local function GerarTextoIA(tema)
             { role = "user", content = "Tema: " .. tema }
         },
         temperature = 0.85,
-        max_tokens = 800
+        max_tokens = 150
     })
 
     local resposta, terminou = nil, false
@@ -790,24 +778,16 @@ local function GerarTextoIA(tema)
     local msg = dados.choices[1].message
     if not msg then return nil, "Resposta vazia" end
 
-    -- ✅ Só usa content
     local txt = msg.content
-    if not txt or txt == "" then
-        return nil, "IA não gerou texto. Tente novamente."
+    if (not txt or txt == "") and msg.reasoning then
+        txt = msg.reasoning
     end
+    if not txt or txt == "" then return nil, "Resposta vazia" end
 
     txt = txt:gsub("^%s+", ""):gsub("%s+$", "")
     txt = txt:gsub('^["\']+', ""):gsub('["\']+$', "")
     txt = txt:gsub("^Tema:%s*", "")
     txt = txt:gsub("^Texto:%s*", "")
-
-    -- ✅ Rejeita raciocínio em inglês
-    if txt:match("^We ") or txt:match("^The user") or txt:match("^Let me")
-       or txt:match("^I ") or txt:match("^I'll") or txt:match("^I need")
-       or txt:match("^First") or txt:match("^The text") or txt:match("^Here")
-       or txt:find("150%-210") or (txt:find("characters") and txt:find("spaces")) then
-        return nil, "IA gerou raciocínio. Clique novamente."
-    end
 
     if #txt > 200 then
         txt = txt:sub(1, 200)
@@ -990,6 +970,7 @@ function UI.Toggle(parent, ordem, texto, inicial, callback)
     return row
 end
 
+-- Dropdown inline (empurra o conteúdo de baixo, fecha ao escolher)
 function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     local wrap = _I("Frame", parent)
     wrap.Size = _U2(1,0,0,0)
@@ -2349,82 +2330,21 @@ do
 end
 
 -- =========================================================================
--- COMBATE (Hitbox aplicada NOS OUTROS | Aim com dano)
+-- COMBATE
 -- =========================================================================
-local Cam = workspace.CurrentCamera
-
--- ===== HITBOX: aplica nos OUTROS jogadores =====
-local HB_CONFIG = {
-    Ativo=false, Visual=true, Tamanho=2, Transparencia=0.5,
-    Cor=_RGB(255,0,0)
-}
-local HB_Original = {}
-local HB_Tok = os.clock()
-PG:SetAttribute("ZKYHitbox", HB_Tok)
-
-local function HB_Salvar(char)
-    if HB_Original[char] then return end
-    local hrp = char:FindFirstChild("HumanoidRootPart")
-    if not hrp then return end
-    HB_Original[char] = {Size=hrp.Size, Transparency=hrp.Transparency,
-        Color=hrp.Color, Material=hrp.Material, CanCollide=hrp.CanCollide}
-end
-local function HB_Aplicar(char)
-    if not char then return end
-    local hrp = char:FindFirstChild("HumanoidRootPart")
-    if not hrp then return end
-    HB_Salvar(char)
-    pcall(function()
-        hrp.Size = Vector3.new(HB_CONFIG.Tamanho,HB_CONFIG.Tamanho,HB_CONFIG.Tamanho)
-        hrp.Transparency = HB_CONFIG.Visual and HB_CONFIG.Transparencia or 1
-        hrp.Color = HB_CONFIG.Cor
-        hrp.Material = Enum.Material.Neon
-        hrp.CanCollide = false
-    end)
-end
-local function HB_Restaurar(char)
-    if not char then return end
-    local orig = HB_Original[char]
-    if not orig then return end
-    local hrp = char:FindFirstChild("HumanoidRootPart")
-    if hrp then
-        pcall(function()
-            hrp.Size = orig.Size hrp.Transparency = orig.Transparency
-            hrp.Color = orig.Color hrp.Material = orig.Material
-            hrp.CanCollide = orig.CanCollide
-        end)
-    end
-    HB_Original[char] = nil
-end
-
-local HB_Conn
-HB_Conn = R.Heartbeat:Connect(function()
-    if PG:GetAttribute("ZKYHitbox") ~= HB_Tok then
-        HB_Conn:Disconnect()
-        for c in pairs(HB_Original) do HB_Restaurar(c) end
-        return
-    end
-    if HB_CONFIG.Ativo then
-        -- ✅ Aplica NOS OUTROS jogadores
-        for _, p in ipairs(P:GetPlayers()) do
-            if p ~= Pl and p.Character then
-                HB_Aplicar(p.Character)
-            end
-        end
-        for char in pairs(HB_Original) do
-            if not char.Parent then HB_Original[char] = nil end
-        end
-    else
-        for char in pairs(HB_Original) do HB_Restaurar(char) end
-    end
-end)
-
--- ===== AIM: mira + dano automático =====
 local AIM_CONFIG = {
     Ativo=false, MostrarFOV=false, FOV=43, RingTransparency=0.3,
     Cor=Color3.fromRGB(150,80,255), Thickness=2,
     OffsetX=0, OffsetY=-47, ParteAlvo="Cabeça"
 }
+local HB_CONFIG = {
+    Ativo=false, Visual=true, Tamanho=2, Transparencia=0.5,
+    Cor=_RGB(255,0,0), Material="Neon"
+}
+local HB_Original = {}
+local HB_Tok = os.clock()
+PG:SetAttribute("ZKYHitbox", HB_Tok)
+
 local AimFOVring
 pcall(function()
     AimFOVring = Drawing.new("Circle")
@@ -2434,6 +2354,7 @@ pcall(function()
     AimFOVring.Filled=false
     AimFOVring.Radius=AIM_CONFIG.FOV
 end)
+local Cam = workspace.CurrentCamera
 
 local function AIM_getCentro()
     return Vector2.new(
@@ -2489,23 +2410,6 @@ local function AIM_lookAtComOffset(target)
     Cam.CFrame = cf
 end
 
-local function AIM_atacar()
-    if not RefreshCharacter() then return end
-    pcall(function()
-        VIM:SendMouseButtonEvent(0, 0, 0, true, game, 1)
-        VIM:SendMouseButtonEvent(0, 0, 0, false, game, 1)
-    end)
-    local tool = character:FindFirstChildOfClass("Tool")
-    if tool then
-        pcall(function() tool:Activate() end)
-    end
-    if mouse1click then pcall(mouse1click) end
-    if mouse1press and mouse1release then
-        pcall(function() mouse1press() mouse1release() end)
-    end
-end
-
-local ultimoAtaque = 0
 R.RenderStepped:Connect(function()
     if AimFOVring then
         AimFOVring.Visible = AIM_CONFIG.MostrarFOV or AIM_CONFIG.Ativo
@@ -2519,13 +2423,61 @@ R.RenderStepped:Connect(function()
     local closest = AIM_getClosest()
     if closest then
         local part = AIM_pegarParteAlvo(closest.Character)
-        if part then
-            AIM_lookAtComOffset(part.Position)
-            if tick() - ultimoAtaque > 0.08 then
-                AIM_atacar()
-                ultimoAtaque = tick()
-            end
+        if part then AIM_lookAtComOffset(part.Position) end
+    end
+end)
+
+local function HB_Salvar(char)
+    if HB_Original[char] then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    HB_Original[char] = {Size=hrp.Size, Transparency=hrp.Transparency,
+        Color=hrp.Color, Material=hrp.Material, CanCollide=hrp.CanCollide}
+end
+local function HB_Aplicar(char)
+    if not char then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    HB_Salvar(char)
+    pcall(function()
+        hrp.Size = Vector3.new(HB_CONFIG.Tamanho,HB_CONFIG.Tamanho,HB_CONFIG.Tamanho)
+        hrp.Transparency = HB_CONFIG.Visual and HB_CONFIG.Transparencia or 1
+        hrp.Color = HB_CONFIG.Cor
+        hrp.Material = Enum.Material.Neon
+        hrp.CanCollide = false
+    end)
+end
+local function HB_Restaurar(char)
+    if not char then return end
+    local orig = HB_Original[char]
+    if not orig then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if hrp then
+        pcall(function()
+            hrp.Size = orig.Size hrp.Transparency = orig.Transparency
+            hrp.Color = orig.Color hrp.Material = orig.Material
+            hrp.CanCollide = orig.CanCollide
+        end)
+    end
+    HB_Original[char] = nil
+end
+
+local HB_Conn
+HB_Conn = R.Heartbeat:Connect(function()
+    if PG:GetAttribute("ZKYHitbox") ~= HB_Tok then
+        HB_Conn:Disconnect()
+        for c in pairs(HB_Original) do HB_Restaurar(c) end
+        return
+    end
+    if HB_CONFIG.Ativo then
+        for _,p in ipairs(P:GetPlayers()) do
+            if p ~= Pl and p.Character then HB_Aplicar(p.Character) end
         end
+        for char in pairs(HB_Original) do
+            if not char.Parent then HB_Original[char] = nil end
+        end
+    else
+        for char in pairs(HB_Original) do HB_Restaurar(char) end
     end
 end)
 
@@ -2939,7 +2891,7 @@ task.defer(function()
         if LoadTowerRoute("Torre 2",rn) then lt2+=1 end
     end
     ShowEBDelta()
-    Notify("AKIRA MENU",loaded.."/4 parkours • Torre 1: "..(lt1 and "OK" or "ERRO").." • Torre 2: "..lt2.."/4",
+    Notify("ZKY PARKOUR",loaded.."/4 parkours • Torre 1: "..(lt1 and "OK" or "ERRO").." • Torre 2: "..lt2.."/4",
         loaded==4 and lt1 and lt2==4 and "Success" or "Error")
 end)
 
