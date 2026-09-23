@@ -105,6 +105,7 @@ local R = game:GetService("RunService")
 local HS = game:GetService("HttpService")
 local TCS = game:GetService("TextChatService")
 local RS = game:GetService("ReplicatedStorage")
+local VIM = game:GetService("VirtualInputManager")
 local Pl = P.LocalPlayer
 local PG = Pl:WaitForChild("PlayerGui")
 local character,humanoid,rootPart
@@ -258,7 +259,7 @@ end
 Pl.CharacterAdded:Connect(function() task.wait(.2); RefreshCharacter() end)
 RefreshCharacter()
 
--- ✅ Animação de andar (só toca quando o personagem está andando de verdade, para ao pular/cair)
+-- ===== Animação de andar =====
 local walkTrack
 local function iniciarAnimacaoAndar()
     if not RefreshCharacter() then return end
@@ -298,19 +299,27 @@ local function pararAnimacaoAndar()
     end
 end
 
--- ✅ Loop que só toca a animação quando o estado é Running/Walking
-task.spawn(function()
-    while true do
-        task.wait(0.15)
-        if not Playback.Running then
+-- ✅ Animação natural: só toca quando está REALMENTE andando no chão
+R.RenderStepped:Connect(function()
+    if not Playback.Running then
+        if walkTrack and walkTrack.IsPlaying then pararAnimacaoAndar() end
+        return
+    end
+    if not RefreshCharacter() then return end
+    local st = humanoid:GetState()
+    local vel = rootPart.AssemblyLinearVelocity
+    local horizSpeed = Vector3.new(vel.X, 0, vel.Z).Magnitude
+    local noChao = (st == Enum.HumanoidStateType.Running
+                 or st == Enum.HumanoidStateType.Walking
+                 or st == Enum.HumanoidStateType.RunningNoPhysics)
+    local andando = noChao and horizSpeed > 3
+    if andando then
+        if not walkTrack or not walkTrack.IsPlaying then
+            iniciarAnimacaoAndar()
+        end
+    else
+        if walkTrack and walkTrack.IsPlaying then
             pararAnimacaoAndar()
-        elseif RefreshCharacter() then
-            local st = humanoid:GetState()
-            if st == Enum.HumanoidStateType.Running or st == Enum.HumanoidStateType.Walking then
-                iniciarAnimacaoAndar()
-            else
-                pararAnimacaoAndar()
-            end
         end
     end
 end)
@@ -2344,14 +2353,14 @@ do
 end
 
 -- =========================================================================
--- COMBATE (Hitbox baseado no script fornecido + Aim com dano automático)
+-- COMBATE
 -- =========================================================================
 local Cam = workspace.CurrentCamera
 
--- ===== HITBOX: FOV-based camera lock (baseado no script fornecido) =====
+-- ===== HITBOX: FOV-based camera lock =====
 local HB_CONFIG = {
     Ativo=false,
-    Tamanho=5,        -- multiplicado por 8 para FOV radius
+    Tamanho=5,
     Transparencia=0.5,
     Cor=_RGB(255,0,0)
 }
@@ -2413,7 +2422,7 @@ R.RenderStepped:Connect(function()
     end
 end)
 
--- ===== AIM: mantém 90% do atual + auto-dano =====
+-- ===== AIM: mira + dano automático =====
 local AIM_CONFIG = {
     Ativo=false, MostrarFOV=false, FOV=43, RingTransparency=0.3,
     Cor=Color3.fromRGB(150,80,255), Thickness=2,
@@ -2483,6 +2492,31 @@ local function AIM_lookAtComOffset(target)
     Cam.CFrame = cf
 end
 
+-- ✅ Função de ataque: usa vários métodos em cadeia
+local function AIM_atacar()
+    if not RefreshCharacter() then return end
+
+    -- 1) VirtualInputManager (clique real simulado)
+    pcall(function()
+        VIM:SendMouseButtonEvent(0, 0, 0, true, game, 1)
+        VIM:SendMouseButtonEvent(0, 0, 0, false, game, 1)
+    end)
+
+    -- 2) Ativar Tool equipada
+    local tool = character:FindFirstChildOfClass("Tool")
+    if tool then
+        pcall(function() tool:Activate() end)
+    end
+
+    -- 3) mouse1click (função nativa de executores)
+    if mouse1click then
+        pcall(mouse1click)
+    end
+    if mouse1press and mouse1release then
+        pcall(function() mouse1press() mouse1release() end)
+    end
+end
+
 local ultimoAtaque = 0
 R.RenderStepped:Connect(function()
     if AimFOVring then
@@ -2499,15 +2533,9 @@ R.RenderStepped:Connect(function()
         local part = AIM_pegarParteAlvo(closest.Character)
         if part then
             AIM_lookAtComOffset(part.Position)
-            -- ✅ Auto-dano: ativa a ferramenta atual
-            if tick() - ultimoAtaque > 0.1 then
-                if RefreshCharacter() then
-                    local tool = character:FindFirstChildOfClass("Tool")
-                    if tool then
-                        pcall(function() tool:Activate() end)
-                        ultimoAtaque = tick()
-                    end
-                end
+            if tick() - ultimoAtaque > 0.08 then
+                AIM_atacar()
+                ultimoAtaque = tick()
             end
         end
     end
@@ -2520,7 +2548,6 @@ function ShowCombate()
 
     local col1, col2 = CreateTwoColumns(_CH, 0)
 
-    -- HITBOX (visual inalterado)
     local hbCard = UI.Card(col1, 1, "🎯 Hitbox Modificador")
     UI.Toggle(hbCard, 1, "Ativar Hitbox", HB_CONFIG.Ativo, function(v)
         HB_CONFIG.Ativo = v
@@ -2582,7 +2609,6 @@ function ShowCombate()
         end)
     end
 
-    -- AIM (visual inalterado)
     local aimCard = UI.Card(col2, 1, "🎯 Aim")
     UI.Toggle(aimCard, 1, "Ativar Aimbot", AIM_CONFIG.Ativo, function(v)
         AIM_CONFIG.Ativo = v
@@ -2916,7 +2942,7 @@ Close.MouseButton1Click:Connect(CloseMenu)
 -- =========================================================================
 task.defer(function()
     local loaded=0
-    for _,cat in ipairs(CategoryOrders or CategoryOrder) do
+    for _,cat in ipairs(CategoryOrder) do
         if LoadCategory(cat) then loaded+=1 end
     end
     local lt1=LoadTowerRoute("Torre 1","Única")
