@@ -123,12 +123,22 @@ local CONFIG = {
 }
 local MovementConfig = { Modo = "Dummy" }
 
+-- IA para correção gramatical (IA CHAT)
 local IA_CONFIG = {
     ApiKey = "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",
     Endpoint = "https://api.groq.com/openai/v1/chat/completions",
     Modelo = "openai/gpt-oss-120b",
     Timeout = 10,
     SystemPrompt = "Você é um corretor gramatical extremamente rigoroso de português do Brasil. Corrija TODOS os erros da mensagem do usuário, sem deixar passar nenhum, incluindo: letras maiúsculas no início de frases e em nomes próprios; todos os acentos gráficos (agudo, circunflexo, til, crase) e a cedilha; toda a pontuação, como vírgulas, pontos finais, pontos de interrogação e de exclamação; concordância verbal e nominal; ortografia e separação de palavras. Não deixe nenhuma palavra sem acento ou sem maiúscula onde for necessário, nem nenhuma frase sem pontuação final. Não resuma, não reescreva o estilo, não mude o significado, o tom nem o tamanho da mensagem: apenas corrija a gramática, a ortografia e a pontuação, mantendo as mesmas palavras sempre que possível. Responda APENAS com a mensagem corrigida, sem explicações, aspas, comentários extras ou qualquer texto adicional."
+}
+
+-- IA para gerar textos (Textos Prontos)
+local IA_TEXTOS = {
+    ApiKey = "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",
+    Endpoint = "https://api.groq.com/openai/v1/chat/completions",
+    Modelo = "openai/gpt-oss-120b",
+    Timeout = 15,
+    SystemPrompt = "Você é um gerador de textos do Exército Brasileiro em um jogo de Roblox (roleplay militar). O usuário vai te dar um TEMA. Você deve escrever um texto curto, humano, gramaticalmente perfeito e patriótico sobre exatamente esse tema. REGRAS OBRIGATÓRIAS: (1) O texto DEVE ter entre 150 e 210 caracteres, contando espaços. (2) Máximo 3 frases curtas. (3) Fique 100% fiel ao tema pedido, sem fugir do assunto. (4) Tom militar realista, natural e humano, sem exageros nem clichês. (5) Sem saudações, sem aspas, sem emojis, sem formatação, sem introduções. (6) Responda APENAS com o texto final, nada mais."
 }
 
 local httpRequest = request or (syn and syn.request) or (http and http.request) or http_request
@@ -354,6 +364,8 @@ local function GetRotation(f)
     if f.rotation then return f.rotation end
     if f.rx and f.ry and f.rz then return CFrame.Angles(f.rx,f.ry,f.rz) end
 end
+
+-- ✅ COM ANIMAÇÃO DE ANDAR
 local function ApplyPosition(pos,rot)
     if not pos or not RefreshCharacter() then return false end
     local corrected=pos+Vector3.new(0,CONFIG.GroundOffset,0)
@@ -366,9 +378,15 @@ local function ApplyPosition(pos,rot)
         if flat.Magnitude<.01 then flat=Vector3.new(0,0,-1) else flat=flat.Unit end
         target=CFrame.lookAt(corrected,corrected+flat)
     end
+    pcall(function()
+        if humanoid and humanoid.WalkSpeed > 0 then
+            humanoid:Move(target.LookVector)
+        end
+    end)
     pcall(function() character:PivotTo(target) end)
     return true
 end
+
 local function GetFrames(frames,elapsed)
     local count=#frames; if count<2 then return end
     if elapsed<=frames[1].t then Playback.CurrentIndex=1; return frames[1],frames[2],0 end
@@ -389,7 +407,6 @@ local function HandleJump(f,e)
     pcall(function() humanoid:ChangeState(Enum.HumanoidStateType.Jumping) end)
 end
 
--- Andar até (modo Direto)
 local function AndarAte(destino,estaCancelado,aoTerminar)
     if not RefreshCharacter() then aoTerminar(false) return end
     humanoid.WalkSpeed=CONFIG.WalkToSpeed
@@ -480,7 +497,6 @@ local function StopPlayback(reason)
     elseif reason=="error" then Notify("ERRO","Não foi possível continuar.","Error") end
 end
 
--- Playback por pivot (idêntico ao original)
 local function IniciarExecucao(name)
     if not Playback.Running then return end
     Playback.WalkingToStart = false
@@ -623,7 +639,7 @@ local function VanguardaVolver()
     Notify("VANGUARDA VOLVER!","Retornou à direção salva.","Success")
 end
 
--- Chat + IA
+-- Chat
 local function EnviarNoChat(msg)
     msg=string.sub(msg,1,200)
     if TCS.ChatVersion==Enum.ChatVersion.TextChatService then
@@ -636,6 +652,8 @@ local function EnviarNoChat(msg)
     if say then say:FireServer(msg,"All"); return true end
     return false
 end
+
+-- IA: correção gramatical (IA CHAT)
 local function CorrigirTexto(texto)
     if not httpRequest then return nil,"Executor sem suporte a HTTP" end
     local corpo=HS:JSONEncode({
@@ -669,6 +687,73 @@ local function CorrigirTexto(texto)
     if not txt or txt=="" then return nil,"Resposta vazia" end
     txt=txt:gsub("^%s+",""):gsub("%s+$","")
     txt=txt:gsub('^["\']+',""):gsub('["\']+$',"")
+    return txt
+end
+
+-- ✅ IA: gerador de texto (Textos Prontos) — VERSÃO FUNCIONAL
+local function GerarTextoIA(tema)
+    if not httpRequest then
+        return nil, "Executor sem suporte a HTTP"
+    end
+    if not tema or tema == "" then
+        return nil, "Tema vazio"
+    end
+
+    local corpo = HS:JSONEncode({
+        model = IA_TEXTOS.Modelo,
+        messages = {
+            { role = "system", content = IA_TEXTOS.SystemPrompt },
+            { role = "user", content = "Tema: " .. tema }
+        },
+        temperature = 0.85,
+        max_tokens = 150
+    })
+
+    local resposta, terminou = nil, false
+    task.spawn(function()
+        local ok, res = pcall(function()
+            return httpRequest({
+                Url = IA_TEXTOS.Endpoint,
+                Method = "POST",
+                Headers = {
+                    ["Content-Type"] = "application/json",
+                    ["Authorization"] = "Bearer " .. IA_TEXTOS.ApiKey
+                },
+                Body = corpo
+            })
+        end)
+        if ok then resposta = res end
+        terminou = true
+    end)
+
+    local inicio = tick()
+    while not terminou and (tick() - inicio) < IA_TEXTOS.Timeout do
+        task.wait(0.1)
+    end
+
+    if not terminou then return nil, "Tempo esgotado" end
+    if not resposta then return nil, "Falha na requisição" end
+    if resposta.StatusCode ~= 200 then return nil, "HTTP " .. tostring(resposta.StatusCode) end
+
+    local okJson, dados = pcall(function()
+        return HS:JSONDecode(resposta.Body)
+    end)
+    if not okJson or not dados.choices or not dados.choices[1] then
+        return nil, "Resposta inválida"
+    end
+
+    local txt = dados.choices[1].message and dados.choices[1].message.content
+    if not txt or txt == "" then return nil, "Resposta vazia" end
+
+    txt = txt:gsub("^%s+", ""):gsub("%s+$", "")
+    txt = txt:gsub('^["\']+', ""):gsub('["\']+$', "")
+    txt = txt:gsub("^Tema:%s*", "")
+    txt = txt:gsub("^Texto:%s*", "")
+
+    if #txt > 200 then
+        txt = txt:sub(1, 200)
+    end
+
     return txt
 end
 
@@ -846,11 +931,13 @@ function UI.Toggle(parent, ordem, texto, inicial, callback)
     return row
 end
 
+-- ✅ Dropdown com ZIndex corrigido
 function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     local wrap = _I("Frame", parent)
     wrap.Size = _U2(1,0,0,54)
     wrap.BackgroundTransparency = 1
     wrap.LayoutOrder = ordem
+    wrap.ZIndex = 5
 
     local lbl = _I("TextLabel", wrap)
     lbl.BackgroundTransparency = 1
@@ -861,10 +948,12 @@ function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     lbl.Font = _GM
     lbl.TextSize = 10
     lbl.TextXAlignment = _XL
+    lbl.ZIndex = 6
 
     local help = UI.Help(wrap)
     help.AnchorPoint = _V2(1,0)
     help.Position = _U2(1,0,0,0)
+    help.ZIndex = 6
 
     local box = _I("TextButton", wrap)
     box.Position = _UO(0,20)
@@ -873,6 +962,7 @@ function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     box.BorderSizePixel = 0
     box.Text = ""
     box.AutoButtonColor = false
+    box.ZIndex = 6
     Corner(box, 6)
     Stroke(box, _K.Stroke, 1)
 
@@ -885,6 +975,7 @@ function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     boxTxt.Font = _GB
     boxTxt.TextSize = 10
     boxTxt.TextXAlignment = _XL
+    boxTxt.ZIndex = 7
 
     local arrow = _I("TextLabel", box)
     arrow.AnchorPoint = _V2(1,.5)
@@ -895,6 +986,7 @@ function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     arrow.TextColor3 = _K.DarkGray
     arrow.Font = _GB
     arrow.TextSize = 9
+    arrow.ZIndex = 7
 
     local estado = { aberto=false }
     local lista = _I("Frame", wrap)
@@ -903,7 +995,7 @@ function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     lista.BackgroundColor3 = _RGB(20,20,28)
     lista.BorderSizePixel = 0
     lista.ClipsDescendants = true
-    lista.ZIndex = 50
+    lista.ZIndex = 100
     lista.Visible = false
     Corner(lista, 6)
     Stroke(lista, _K.Stroke, 1)
@@ -935,7 +1027,7 @@ function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
         b.TextSize = 10
         b.TextXAlignment = _XL
         b.AutoButtonColor = false
-        b.ZIndex = 51
+        b.ZIndex = 101
         b.MouseEnter:Connect(function() b.BackgroundColor3 = _RGB(30,30,40) end)
         b.MouseLeave:Connect(function() b.BackgroundColor3 = _RGB(20,20,28) end)
         b.MouseButton1Click:Connect(function()
@@ -1044,6 +1136,7 @@ function UI.Slider(parent, ordem, titulo, valor, min, max, isDec, callback)
     end)
 end
 
+-- ✅ TextBox retorna o box
 function UI.TextBox(parent, ordem, label, placeholder, valor, callback)
     local wrap = _I("Frame", parent)
     wrap.Size = _U2(1,0,0,54)
@@ -1081,6 +1174,7 @@ function UI.TextBox(parent, ordem, label, placeholder, valor, callback)
     Stroke(box, _K.Stroke, 1)
     Padding(box, 0,0,10,10)
     box.FocusLost:Connect(function() callback(box.Text) end)
+    return box
 end
 
 function UI.ActionButton(parent, ordem, texto, corBg, callback)
@@ -1142,7 +1236,6 @@ function UI.Card(parent, ordem, titulo)
     return card
 end
 
--- Duas colunas
 local function CreateTwoColumns(parent, ordem)
     local container = _I("Frame", parent)
     container.Size = _U2(1,0,0,0)
@@ -1368,7 +1461,6 @@ end
 -- =========================================================================
 local EBDeltaSubPage = "Parkour"
 
--- Conteúdo: PARKOUR (2 colunas)
 local function ShowParkoursContent()
     local col1, col2 = CreateTwoColumns(_CH, 1)
 
@@ -1404,11 +1496,9 @@ local function ShowParkoursContent()
     makeParkourCard(col2, 4)
 end
 
--- Conteúdo: TORRES (2 colunas)
 local function ShowTowersContent()
     local col1, col2 = CreateTwoColumns(_CH, 1)
 
-    -- Torre 1
     do
         local card = UI.Card(col1, 1, "Torre 1")
         UI.Dropdown(card, 1, "Versão", {"Única"}, "Única", function(op) end)
@@ -1428,7 +1518,6 @@ local function ShowTowersContent()
             end)
     end
 
-    -- Torre 2
     do
         local card = UI.Card(col2, 1, "Torre 2")
         UI.Dropdown(card, 1, "Versão", Tower2RouteOrder, selectedTower2Route, function(op)
@@ -1451,7 +1540,7 @@ local function ShowTowersContent()
     end
 end
 
--- Conteúdo: AUTOMAÇÃO (2 colunas)
+-- ✅ AUTOMAÇÃO: SÓ Auto JJS (com toggle de Meta funcional)
 local ShowAutomacaoContent
 do
     local ativo,VELOCIDADE,MAX_CLIQUES,META,META_ATIVA=false,53,2,308,true
@@ -1497,8 +1586,11 @@ do
         while true do
             task.wait(0.1)
             if not ativo then continue end
-            if META_ATIVA and jjsFeitos>=META then
-                ativo=false setBtnEstado(false) continue
+            if META_ATIVA and jjsFeitos >= META then
+                ativo = false
+                setBtnEstado(false)
+                Notify("AUTO JJS","Meta atingida: "..jjsFeitos.."/"..META,"Success")
+                continue
             end
             local delayAtual=VELOCIDADE/100
             local agora=tick()
@@ -1531,9 +1623,6 @@ do
                     if clicou then break end
                 end
             end
-            if META_ATIVA and jjsFeitos==META-1 and (tick()-ultimaBolhaVista>2) then
-                ativo=false setBtnEstado(false) continue
-            end
             if clicou then task.wait(delayAtual) else task.wait(0.02) end
         end
     end)
@@ -1542,49 +1631,86 @@ do
         while true do
             task.wait(0.3)
             if infoLbl and infoLbl.Parent then
-                infoLbl.Text=string.format("JJs: %d/%d",jjsFeitos,META)
+                if META_ATIVA then
+                    infoLbl.Text=string.format("JJs: %d/%d",jjsFeitos,META)
+                    infoLbl.TextColor3 = (jjsFeitos>=META) and _K.Success or _K.Orange
+                else
+                    infoLbl.Text=string.format("JJs: %d (sem meta)",jjsFeitos)
+                    infoLbl.TextColor3 = _K.PurpleLight
+                end
             end
         end
     end)
 
     ShowAutomacaoContent=function()
-        local col1, col2 = CreateTwoColumns(_CH, 1)
+        local card = UI.Card(_CH, 1, "Auto JJS")
 
-        -- Auto JJS (esquerda)
-        do
-            local card = UI.Card(col1, 1, "Auto JJS")
-            UI.Toggle(card, 1, "Ativar Auto JJS", ativo, function(v) ativo = v end)
-            UI.TextBox(card, 2, "Quantidade Limite Exata", "Ex: 308", tostring(META), function(txt)
-                local v = tonumber(txt)
-                if v and v>0 then META=v end
-            end)
-            UI.Slider(card, 3, "Delay", VELOCIDADE, 1, 100, false, function(v) VELOCIDADE = v end)
+        UI.Toggle(card, 1, "Ativar Auto JJS", ativo, function(v) ativo = v end)
 
-            infoLbl = _I("TextLabel", card)
-            infoLbl.Size = _U2(1,0,0,14)
-            infoLbl.BackgroundTransparency = 1
-            infoLbl.Text = "JJs: 0/0"
-            infoLbl.TextColor3 = _K.Orange
-            infoLbl.Font = _GB
-            infoLbl.TextSize = 10
-            infoLbl.TextXAlignment = _XL
-            infoLbl.LayoutOrder = 4
+        local metaBox
+        local function updateMetaBoxState()
+            if not metaBox then return end
+            if META_ATIVA then
+                metaBox.TextEditable = true
+                metaBox.TextColor3 = _K.White
+                metaBox.BackgroundColor3 = _RGB(18,18,24)
+                metaBox.PlaceholderColor3 = _K.DarkGray
+            else
+                metaBox.TextEditable = false
+                metaBox.TextColor3 = _K.DarkGray
+                metaBox.BackgroundColor3 = _RGB(13,13,17)
+                metaBox.PlaceholderColor3 = _RGB(70,70,80)
+            end
         end
 
-        -- Auto Farm (direita)
-        do
-            local card = UI.Card(col2, 1, "Auto Farm")
-            UI.Toggle(card, 1, "Ativar Auto Quest", false, function(v) end)
-            UI.ActionButton(card, 2, "Coletar Todos os Troféus", _RGB(28,28,36), function()
-                Notify("AUTO FARM","Função não implementada.","Orange")
-            end)
-            UI.Dropdown(card, 3, "Tipo de Coleta", {"Coletar Lixo","Coletar Troféu","Coletar Tudo"}, "Coletar Lixo", function(op) end)
-            UI.Toggle(card, 4, "Ativar Auto Farm", false, function(v) end)
-        end
+        UI.Toggle(card, 2, "Ativar Meta", META_ATIVA, function(v)
+            META_ATIVA = v
+            updateMetaBoxState()
+            if v then
+                Notify("AUTO JJS","Meta ativada. Alvo: "..META,"Success")
+            else
+                Notify("AUTO JJS","Meta desativada. Campo bloqueado.","Orange")
+            end
+        end)
+
+        metaBox = UI.TextBox(card, 3, "Quantidade Limite Exata", "Ex: 308", tostring(META), function(txt)
+            local v = tonumber(txt)
+            if v and v>0 then META=v end
+        end)
+        updateMetaBoxState()
+
+        UI.Slider(card, 4, "Delay", VELOCIDADE, 1, 100, false, function(v) VELOCIDADE = v end)
+
+        infoLbl = _I("TextLabel", card)
+        infoLbl.Size = _U2(1,0,0,14)
+        infoLbl.BackgroundTransparency = 1
+        infoLbl.Text = META_ATIVA and ("JJs: 0/"..META) or "JJs: 0 (sem meta)"
+        infoLbl.TextColor3 = _K.Orange
+        infoLbl.Font = _GB
+        infoLbl.TextSize = 10
+        infoLbl.TextXAlignment = _XL
+        infoLbl.LayoutOrder = 5
+
+        btnToggleRef = UI.ActionButton(card, 6, "Iniciar Auto JJS", _RGB(28,28,36), function()
+            if not ativo and jjsFeitos >= META then
+                jjsFeitos = 0
+                cliquesTotal = 0
+                bolhasVistas = {}
+            end
+            ativo = not ativo
+            setBtnEstado(ativo)
+            if ativo then ultimaBolhaVista=tick() end
+        end)
+
+        UI.ActionButton(card, 7, "Resetar Contador", _RGB(24,24,30), function()
+            jjsFeitos = 0
+            cliquesTotal = 0
+            bolhasVistas = {}
+            Notify("AUTO JJS","Contador resetado.","Success")
+        end)
     end
 end
 
--- Conteúdo: CONFIGURAÇÃO
 local function ShowConfiguracaoContent()
     local card = UI.Card(_CH, 1, "Geral")
 
@@ -1610,7 +1736,6 @@ function ShowEBDelta()
     CurrentPage = "EBDelta"
     ClearContent()
 
-    -- Hotbar de sub-abas
     local hotbar = _I("Frame", _CH)
     hotbar.Size = _U2(1,0,0,30)
     hotbar.BackgroundTransparency = 1
@@ -1912,7 +2037,7 @@ local function ShowCreditos()
 end
 
 -- =========================================================================
--- TEXTOS PRONTOS (idêntico ao base)
+-- TEXTOS PRONTOS (com IA funcional)
 -- =========================================================================
 do
     local CARD_COLORS = {
@@ -1930,13 +2055,6 @@ do
         TextoDim   = _RGB(160, 160, 160),
         Verde      = _RGB(16, 185, 129),
         VerdeHover = _RGB(52, 211, 153),
-    }
-    local IA_CONFIG_TEXTOS = {
-        ApiKey = "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",
-        Endpoint = "https://api.groq.com/openai/v1/chat/completions",
-        Modelo = "openai/gpt-oss-120b",
-        Timeout = 15,
-        SystemPrompt = "Você é um militar do Exército Brasileiro (EB) em um jogo de Roblox (Roleplay). Gere um texto CURTO, gramatical, humanizado, ético e patriótico sobre o tema fornecido. O texto deve ter entre 150 e 250 caracteres (2 a 3 frases). REGRA OBRIGATÓRIA: envolva a resposta final EXATAMENTE entre os marcadores <<< e >>>, assim: <<<seu texto aqui>>>. Você pode pensar o quanto quiser antes, mas o texto final DEVE estar APENAS entre <<< e >>>, sem aspas, sem saudações, sem nada fora dos marcadores."
     }
     local TEXTOS = {
         { Titulo = "POR QUE O EB É IMPORTANTE PRA SOCIEDADE?", Texto = "O EB não é apenas farda e arma: é o braço forte que guarda a pátria, socorre em tragédias, forma cidadãos de honra e defende a soberania. Sem ele, não há paz social nem futuro seguro pra ninguém." },
@@ -2012,52 +2130,6 @@ do
                 btnCopiar.BackgroundColor3 = C.Verde
             end
         end)
-    end
-    local function GerarTexto(tema)
-        if not httpRequest then return nil, "Executor sem suporte a HTTP" end
-        local corpo = HS:JSONEncode({
-            model = IA_CONFIG_TEXTOS.Modelo,
-            messages = {
-                { role = "system", content = IA_CONFIG_TEXTOS.SystemPrompt },
-                { role = "user", content = "Escreva um texto sobre: " .. tema }
-            },
-            temperature = 0.7, max_tokens = 800
-        })
-        local resposta, terminou = nil, false
-        task.spawn(function()
-            local ok, res = pcall(function()
-                return httpRequest({
-                    Url = IA_CONFIG_TEXTOS.Endpoint, Method = "POST",
-                    Headers = {
-                        ["Content-Type"] = "application/json",
-                        ["Authorization"] = "Bearer " .. IA_CONFIG_TEXTOS.ApiKey
-                    },
-                    Body = corpo
-                })
-            end)
-            if ok then resposta = res end
-            terminou = true
-        end)
-        local inicio = tick()
-        while not terminou and (tick() - inicio) < IA_CONFIG_TEXTOS.Timeout do task.wait(0.1) end
-        if not terminou then return nil, "Tempo esgotado" end
-        if not resposta then return nil, "Falha na requisição" end
-        if resposta.StatusCode ~= 200 then return nil, "HTTP " .. tostring(resposta.StatusCode) end
-        local okJson, dados = pcall(function() return HS:JSONDecode(resposta.Body) end)
-        if not okJson or not dados.choices or not dados.choices[1] then return nil, "Resposta inválida" end
-        local msg = dados.choices[1].message
-        if not msg then return nil, "Resposta vazia" end
-        local txt = msg.content or ""
-        if txt == "" and msg.reasoning then txt = msg.reasoning end
-        if txt == "" then return nil, "Resposta vazia" end
-        local extraido = txt:match("<<<(.-)>>>")
-        if extraido and extraido ~= "" then txt = extraido end
-        txt = txt:gsub("^%s+", ""):gsub("%s+$", "")
-        txt = txt:gsub('^["\']+', ""):gsub('["\']+$', "")
-        if #txt > 500 or txt:match("^The user") or txt:match("^Let me") or txt:match("^I ") then
-            return nil, "IA não formatou corretamente. Tente novamente."
-        end
-        return txt
     end
     function ShowTextosProntos()
         CurrentPage = "TextosProntos"
@@ -2172,6 +2244,7 @@ do
         btnCopiarIA.MouseLeave:Connect(function()
             if btnCopiarIA.BackgroundColor3 == C.VerdeHover then btnCopiarIA.BackgroundColor3 = C.Verde end
         end)
+        local textoAtual = nil
         btnGerar.MouseButton1Click:Connect(function()
             local temaDigitado = inputBox.Text
             if temaDigitado == "" then
@@ -2183,25 +2256,30 @@ do
             outputLabel.TextColor3 = _RGB(245, 158, 11)
             btnCopiarIA.BackgroundColor3 = C.Painel
             btnCopiarIA.TextColor3 = C.TextoDim
-            local textoGerado, erro = GerarTexto(temaDigitado)
-            if textoGerado then
-                outputLabel.Text = textoGerado
-                outputLabel.TextColor3 = C.Texto
+            textoAtual = nil
+            task.spawn(function()
+                local textoGerado, erro = GerarTextoIA(temaDigitado)
+                if textoGerado then
+                    textoAtual = textoGerado
+                    outputLabel.Text = textoGerado
+                    outputLabel.TextColor3 = C.Texto
+                    btnCopiarIA.BackgroundColor3 = C.Verde
+                    btnCopiarIA.TextColor3 = C.Texto
+                else
+                    outputLabel.Text = "❌ Erro: " .. tostring(erro)
+                    outputLabel.TextColor3 = _RGB(239, 68, 68)
+                end
+            end)
+        end)
+        btnCopiarIA.MouseButton1Click:Connect(function()
+            if not textoAtual then return end
+            if setclipboard then
+                pcall(setclipboard, textoAtual)
+                btnCopiarIA.Text = "Copiado!"
+                btnCopiarIA.BackgroundColor3 = C.VerdeHover
+                task.wait(1.5)
+                btnCopiarIA.Text = "Copiar"
                 btnCopiarIA.BackgroundColor3 = C.Verde
-                btnCopiarIA.TextColor3 = C.Texto
-                btnCopiarIA.MouseButton1Click:Connect(function()
-                    if setclipboard then
-                        pcall(setclipboard, textoGerado)
-                        btnCopiarIA.Text = "Copiado!"
-                        btnCopiarIA.BackgroundColor3 = C.VerdeHover
-                        task.wait(1.5)
-                        btnCopiarIA.Text = "Copiar"
-                        btnCopiarIA.BackgroundColor3 = C.Verde
-                    end
-                end)
-            else
-                outputLabel.Text = "❌ Erro: " .. tostring(erro)
-                outputLabel.TextColor3 = _RGB(239, 68, 68)
             end
         end)
         Content.CanvasPosition = _V2()
@@ -2209,7 +2287,7 @@ do
 end
 
 -- =========================================================================
--- COMBATE (Aimbot + Hitbox — mesma funcionalidade, visual novo)
+-- COMBATE
 -- =========================================================================
 local AIM_CONFIG = {
     Ativo=false, MostrarFOV=false, FOV=43, RingTransparency=0.3,
@@ -2367,7 +2445,7 @@ function ShowCombate()
 
     local col1, col2 = CreateTwoColumns(_CH, 0)
 
-    -- HITBOX (esquerda)
+    -- HITBOX
     local hbCard = UI.Card(col1, 1, "🎯 Hitbox Modificador")
     UI.Toggle(hbCard, 1, "Ativar Hitbox", HB_CONFIG.Ativo, function(v)
         HB_CONFIG.Ativo = v
@@ -2377,7 +2455,6 @@ function ShowCombate()
     UI.Slider(hbCard, 3, "Transparência", math.floor(HB_CONFIG.Transparencia*10+.5), 0, 10, false,
         function(v) HB_CONFIG.Transparencia = v/10 end)
 
-    -- Cor da Hitbox — linha com quadrado colorido + paleta
     local corRow = _I("Frame", hbCard)
     corRow.Size = _U2(1,0,0,26)
     corRow.BackgroundTransparency = 1
@@ -2430,7 +2507,7 @@ function ShowCombate()
         end)
     end
 
-    -- AIM (direita)
+    -- AIM
     local aimCard = UI.Card(col2, 1, "🎯 Aim (PC)")
     UI.Toggle(aimCard, 1, "Ativar Aimbot", AIM_CONFIG.Ativo, function(v)
         AIM_CONFIG.Ativo = v
@@ -2439,7 +2516,6 @@ function ShowCombate()
         AIM_CONFIG.MostrarFOV = v
     end)
 
-    -- Seletor Cabeça / Tronco (botões)
     local alvoWrap = _I("Frame", aimCard)
     alvoWrap.Size = _U2(1,0,0,44)
     alvoWrap.BackgroundTransparency = 1
@@ -2504,7 +2580,6 @@ function ShowCombate()
     UI.Slider(aimCard, 5, "Transparência", AIM_CONFIG.RingTransparency, 0, 1, true,
         function(v) AIM_CONFIG.RingTransparency = v end)
 
-    -- Paleta de cores do FOV
     local coresWrap = _I("Frame", aimCard)
     coresWrap.Size = _U2(1,0,0,34)
     coresWrap.BackgroundTransparency = 1
