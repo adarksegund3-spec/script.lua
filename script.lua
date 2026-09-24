@@ -131,16 +131,15 @@ local IA_CONFIG = {
     SystemPrompt = "Você é um corretor gramatical extremamente rigoroso de português do Brasil. Corrija TODOS os erros da mensagem do usuário, sem deixar passar nenhum, incluindo: letras maiúsculas no início de frases e em nomes próprios; todos os acentos gráficos (agudo, circunflexo, til, crase) e a cedilha; toda a pontuação, como vírgulas, pontos finais, pontos de interrogação e de exclamação; concordância verbal e nominal; ortografia e separação de palavras. Não deixe nenhuma palavra sem acento ou sem maiúscula onde for necessário, nem nenhuma frase sem pontuação final. Não resuma, não reescreva o estilo, não mude o significado, o tom nem o tamanho da mensagem: apenas corrija a gramática, a ortografia e a pontuação, mantendo as mesmas palavras sempre que possível. Responda APENAS com a mensagem corrigida, sem explicações, aspas, comentários extras ou qualquer texto adicional."
 }
 
-local httpRequest = request or (syn and syn.request) or (http and http.request) or http_request
-
--- ✅ CONFIG DA IA (GERADOR DE TEXTO) — ESTRUTURA FUNCIONAL EXATA
 local IA_TEXTOS = {
     ApiKey = "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",
     Endpoint = "https://api.groq.com/openai/v1/chat/completions",
     Modelo = "openai/gpt-oss-120b",
-    Timeout = 20,
-    SystemPrompt = "Você é um gerador de textos curtos para um jogo de Roblox de roleplay militar do Exército Brasileiro (EB). Regras obrigatórias: (1) Escreva 100% em português do Brasil, sobre o tema exato que o usuário mandar, sem fugir do assunto. (2) O texto final deve ter entre 150 e 250 caracteres, em 2 a 3 frases curtas, tom sério, humano e patriótico, sem exageros nem clichês. (3) Nunca escreva raciocínio, explicações, introduções, saudações, aspas ou emojis. (4) A ÚNICA coisa que aparece na sua resposta é o texto final, envolto EXATAMENTE assim: <<<texto aqui>>>. Nada antes dos <<<, nada depois dos >>>."
+    Timeout = 15,
+    SystemPrompt = "Você é um gerador de textos do Exército Brasileiro em um jogo de Roblox (roleplay militar). O usuário vai te dar um TEMA. Você deve escrever um texto curto, humano, gramaticalmente perfeito e patriótico sobre exatamente esse tema. REGRAS OBRIGATÓRIAS: (1) O texto DEVE ter entre 150 e 210 caracteres, contando espaços. (2) Máximo 3 frases curtas. (3) Fique 100% fiel ao tema pedido, sem fugir do assunto. (4) Tom militar realista, natural e humano, sem exageros nem clichês. (5) Sem saudações, sem aspas, sem emojis, sem formatação, sem introduções. (6) Responda APENAS com o texto final, nada mais."
 }
+
+local httpRequest = request or (syn and syn.request) or (http and http.request) or http_request
 
 local Pastebins = {
     Lento = "https://pastebin.com/raw/M7DvRgTc",
@@ -259,6 +258,74 @@ end
 Pl.CharacterAdded:Connect(function() task.wait(.2); RefreshCharacter() end)
 RefreshCharacter()
 
+-- ✅ Animação de andar NATURAL — só toca quando estiver no CHÃO durante a rota
+local walkTrack
+local function iniciarAnimacaoAndar()
+    if not RefreshCharacter() then return end
+    if walkTrack and walkTrack.IsPlaying then return end
+    local animator = humanoid:FindFirstChildOfClass("Animator")
+    if not animator then
+        animator = _I("Animator")
+        animator.Parent = humanoid
+    end
+    local animationId = nil
+    local animate = character:FindFirstChild("Animate")
+    if animate then
+        local walkFolder = animate:FindFirstChild("walk")
+        if walkFolder then
+            local anim = walkFolder:FindFirstChildOfClass("Animation")
+            if anim then animationId = anim.AnimationId end
+        end
+    end
+    if not animationId then
+        local isR15 = humanoid.RigType == Enum.HumanoidRigType.R15
+        animationId = isR15 and "rbxassetid://507777826" or "rbxassetid://180426354"
+    end
+    pcall(function()
+        local anim = _I("Animation")
+        anim.AnimationId = animationId
+        walkTrack = animator:LoadAnimation(anim)
+        walkTrack.Looped = true
+        walkTrack.Priority = Enum.AnimationPriority.Movement
+        walkTrack:Play()
+    end)
+end
+
+local function pararAnimacaoAndar()
+    if walkTrack then
+        pcall(function() walkTrack:Stop() end)
+        walkTrack = nil
+    end
+end
+
+-- ✅ Loop: só toca animação se estiver em execução de rota E no CHÃO (FloorMaterial ~= Air)
+task.spawn(function()
+    while true do
+        task.wait(0.08)
+        if Playback.Running and not Playback.WalkingToStart and RefreshCharacter() then
+            local noChao = humanoid.FloorMaterial ~= Enum.Material.Air
+            local st = humanoid:GetState()
+            local estadoChao = (st == Enum.HumanoidStateType.Running
+                             or st == Enum.HumanoidStateType.Walking
+                             or st == Enum.HumanoidStateType.RunningNoPhysics
+                             or st == Enum.HumanoidStateType.Landed)
+            if noChao and estadoChao then
+                if not walkTrack or not walkTrack.IsPlaying then
+                    iniciarAnimacaoAndar()
+                end
+            else
+                if walkTrack and walkTrack.IsPlaying then
+                    pararAnimacaoAndar()
+                end
+            end
+        else
+            if walkTrack and walkTrack.IsPlaying then
+                pararAnimacaoAndar()
+            end
+        end
+    end
+end)
+
 local function Number(v) return v and tonumber(v) end
 
 local function ParseRoutes(raw)
@@ -364,7 +431,6 @@ local function GetRotation(f)
     if f.rx and f.ry and f.rz then return CFrame.Angles(f.rx,f.ry,f.rz) end
 end
 
--- ✅ ApplyPosition COM PivotTo (para a rota funcionar) + humanoid:Move (para animar)
 local function ApplyPosition(pos,rot)
     if not pos or not RefreshCharacter() then return false end
     local corrected=pos+Vector3.new(0,CONFIG.GroundOffset,0)
@@ -374,17 +440,9 @@ local function ApplyPosition(pos,rot)
     else
         local look=rootPart.CFrame.LookVector
         local flat=Vector3.new(look.X,0,look.Z)
-        if flat.Magnitude<.01 then flat=Vector3.new(0,0,-1)else flat=flat.Unit end
+        if flat.Magnitude<.01 then flat=Vector3.new(0,0,-1) else flat=flat.Unit end
         target=CFrame.lookAt(corrected,corrected+flat)
     end
-    local delta=corrected-rootPart.Position
-    pcall(function()
-        if delta.Magnitude>.02 then
-            humanoid:Move(delta.Unit,false)
-        else
-            humanoid:Move(Vector3.zero,false)
-        end
-    end)
     pcall(function() character:PivotTo(target) end)
     return true
 end
@@ -492,6 +550,7 @@ local function StopPlayback(reason)
         humanoid:Move(Vector3.zero,false); humanoid.Jump=false
         pcall(function() humanoid.AutoRotate=true end)
     end
+    pararAnimacaoAndar()
     ClearLines()
     if reason=="completed" then Notify("CONCLUÍDO","Rota finalizada!","Success")
     elseif reason=="cancelled" then Notify("PARADO","Reprodução interrompida.","Error")
@@ -691,57 +750,76 @@ local function CorrigirTexto(texto)
     return txt
 end
 
--- ✅ FUNÇÃO QUE CHAMA A IA (GERADOR) — ESTRUTURA FUNCIONAL EXATA
 local function GerarTextoIA(tema)
-    if not httpRequest then return nil,"Executor sem suporte a HTTP" end
-    local corpo=HS:JSONEncode({
-        model=IA_TEXTOS.Modelo,
-        messages={
-            {role="system",content=IA_TEXTOS.SystemPrompt},
-            {role="user",content="Tema: "..tema}
+    if not httpRequest then
+        return nil, "Executor sem suporte a HTTP"
+    end
+    if not tema or tema == "" then
+        return nil, "Tema vazio"
+    end
+
+    local corpo = HS:JSONEncode({
+        model = IA_TEXTOS.Modelo,
+        messages = {
+            { role = "system", content = IA_TEXTOS.SystemPrompt },
+            { role = "user", content = "Tema: " .. tema }
         },
-        temperature=.6,
-        max_tokens=1200
+        temperature = 0.85,
+        max_tokens = 150
     })
-    local resposta,terminou=nil,false
+
+    local resposta, terminou = nil, false
     task.spawn(function()
-        local ok,res=pcall(function()
+        local ok, res = pcall(function()
             return httpRequest({
-                Url=IA_TEXTOS.Endpoint,
-                Method="POST",
-                Headers={
-                    ["Content-Type"]="application/json",
-                    ["Authorization"]="Bearer "..IA_TEXTOS.ApiKey
+                Url = IA_TEXTOS.Endpoint,
+                Method = "POST",
+                Headers = {
+                    ["Content-Type"] = "application/json",
+                    ["Authorization"] = "Bearer " .. IA_TEXTOS.ApiKey
                 },
-                Body=corpo
+                Body = corpo
             })
         end)
-        if ok then resposta=res end
-        terminou=true
+        if ok then resposta = res end
+        terminou = true
     end)
-    local inicio=tick()
-    while not terminou and (tick()-inicio)<IA_TEXTOS.Timeout do task.wait(.1) end
-    if not terminou then return nil,"Tempo esgotado" end
-    if not resposta then return nil,"Falha na requisição" end
-    if resposta.StatusCode~=200 then return nil,"HTTP "..tostring(resposta.StatusCode) end
-    local okJson,dados=pcall(function() return HS:JSONDecode(resposta.Body) end)
-    if not okJson or not dados.choices or not dados.choices[1] then return nil,"Resposta inválida" end
-    local msg=dados.choices[1].message
-    if not msg then return nil,"Resposta vazia" end
-    local txt=msg.content or ""
-    local extraido=txt:match("<<<(.-)>>>")
-    if not extraido and msg.reasoning then
-        extraido=msg.reasoning:match("<<<(.-)>>>")
+
+    local inicio = tick()
+    while not terminou and (tick() - inicio) < IA_TEXTOS.Timeout do
+        task.wait(0.1)
     end
-    if not extraido or extraido:gsub("%s+","")=="" then
-        return nil,"A IA não formatou a resposta corretamente. Tente gerar de novo."
+
+    if not terminou then return nil, "Tempo esgotado" end
+    if not resposta then return nil, "Falha na requisição" end
+    if resposta.StatusCode ~= 200 then return nil, "HTTP " .. tostring(resposta.StatusCode) end
+
+    local okJson, dados = pcall(function()
+        return HS:JSONDecode(resposta.Body)
+    end)
+    if not okJson or not dados.choices or not dados.choices[1] then
+        return nil, "Resposta inválida"
     end
-    local final=extraido:gsub("^%s+",""):gsub("%s+$","")
-    final=final:gsub('^["\']+',""):gsub('["\']+$',"")
-    if final=="" or #final>400 then
-        return nil,"A IA não formatou a resposta corretamente. Tente gerar de novo."
+
+    local msg = dados.choices[1].message
+    if not msg then return nil, "Resposta vazia" end
+
+    local txt = msg.content
+    if (not txt or txt == "") and msg.reasoning then
+        txt = msg.reasoning
     end
-    return final
+    if not txt or txt == "" then return nil, "Resposta vazia" end
+
+    txt = txt:gsub("^%s+", ""):gsub("%s+$", "")
+    txt = txt:gsub('^["\']+', ""):gsub('["\']+$', "")
+    txt = txt:gsub("^Tema:%s*", "")
+    txt = txt:gsub("^Texto:%s*", "")
+
+    if #txt > 200 then
+        txt = txt:sub(1, 200)
+    end
+
+    return txt
 end
 
 -- =========================================================================
@@ -780,7 +858,7 @@ Subtitle.TextSize=9 Subtitle.Font=_GM Subtitle.TextXAlignment=_XL Subtitle.ZInde
 
 local Version=_I("TextLabel")
 Version.BackgroundColor3=_K.Card Version.AnchorPoint=_V2(.5,.5)
-Version.Position=_U2(.5,0,.5,0) Version.Size=_UO(55,25) Version.Text="V2.6"
+Version.Position=_U2(.5,0,.5,0) Version.Size=_UO(55,25) Version.Text="V2.2"
 Version.TextColor3=_K.Gray Version.TextSize=10 Version.Font=_GB
 Version.ZIndex=22 Version.Parent=Header Corner(Version,8) Stroke(Version,_K.Stroke)
 
@@ -1547,71 +1625,42 @@ end
 local ShowAutomacaoContent
 do
     local ativo,VELOCIDADE,MAX_CLIQUES,META,META_ATIVA=false,53,2,308,true
-    local jjsFeitos,bolhasVistas,cliquesTotal=0,{},0
+    local jjsFeitos,bolhasVistas,cliquesTotal,ultimaBolhaVista=0,{},0,0
     local btnToggleRef,infoLbl
 
     local function setBtnEstado(ligado)
         if not btnToggleRef or not btnToggleRef.Parent then return end
         btnToggleRef.Text = ligado and "Parar Auto JJS" or "Iniciar Auto JJS"
     end
-
     local function clicarFiresignal(obj)
         if firesignal then
             pcall(function()
-                if obj.MouseButton1Down then firesignal(obj.MouseButton1Down) end
-                if obj.MouseButton1Up then firesignal(obj.MouseButton1Up) end
-                if obj.MouseButton1Click then firesignal(obj.MouseButton1Click) end
-                if obj.Activated then firesignal(obj.Activated) end
+                firesignal(obj.MouseButton1Down)
+                firesignal(obj.MouseButton1Up)
+                firesignal(obj.MouseButton1Click)
             end)
+            return
         end
         pcall(function()
-            if obj.MouseButton1Down and obj.MouseButton1Down.Fire then obj.MouseButton1Down:Fire() end
-            if obj.MouseButton1Up and obj.MouseButton1Up.Fire then obj.MouseButton1Up:Fire() end
-            if obj.MouseButton1Click and obj.MouseButton1Click.Fire then obj.MouseButton1Click:Fire() end
-        end)
-        pcall(function()
-            if obj.Activated and obj.Activated.Fire then obj.Activated:Fire() end
+            obj.MouseButton1Down:Fire()
+            obj.MouseButton1Up:Fire()
+            obj.MouseButton1Click:Fire()
         end)
     end
-
     local function ehBolha(obj)
-        if not obj or not obj.Parent then return false end
+        if obj.ClassName~="ImageButton" then return false end
+        if obj.Name~="InputTemplate" then return false end
         if not obj.Visible then return false end
-        if not (obj:IsA("ImageButton") or obj:IsA("TextButton") or obj:IsA("ImageLabel")) then return false end
-
-        local nome = string.lower(obj.Name)
-        local pnome = obj.Parent and string.lower(obj.Parent.Name) or ""
-        local avo = obj.Parent and obj.Parent.Parent and string.lower(obj.Parent.Parent.Name) or ""
-
-        local padrao = nome:find("input") or nome:find("bubble") or nome:find("bolha")
-            or nome:find("jj") or nome:find("click") or nome:find("tap")
-            or pnome:find("input") or pnome:find("bubble") or pnome:find("bolha")
-            or pnome:find("jj") or avo:find("input") or avo:find("bubble")
-
-        local s = obj.AbsoluteSize
-        local tamanhoOk = s.X >= 15 and s.Y >= 15 and s.X <= 250 and s.Y <= 250
-
-        local p = obj.AbsolutePosition
-        local posOk = p.X > 0 and p.Y > 0
-
-        local visivelOk = true
-        local parent = obj
-        for i = 1, 3 do
-            if parent and parent.Parent then
-                parent = parent.Parent
-                if parent:IsA("GuiObject") and not parent.Visible then visivelOk = false break end
-            end
-        end
-
-        if padrao and tamanhoOk and posOk and visivelOk then return true end
-        if tamanhoOk and posOk and visivelOk and (obj:IsA("ImageButton") or obj:IsA("TextButton")) then
-            if s.X >= 40 and s.Y >= 40 and s.X <= 150 and s.Y <= 150 then return true end
-        end
-        return false
+        local s=obj.AbsoluteSize
+        if s.X<20 or s.Y<20 or s.X>200 or s.Y>200 then return false end
+        local p=obj.AbsolutePosition
+        if p.X<=0 or p.Y<=0 then return false end
+        return true
     end
-
     local function gerarID(obj)
-        return tostring(obj)
+        local pos=obj.AbsolutePosition local size=obj.AbsoluteSize
+        local cx=pos.X+size.X/2 local cy=pos.Y+size.Y/2
+        return math.floor(cx/40).."_"..math.floor(cy/40)
     end
 
     task.spawn(function()
@@ -1634,6 +1683,7 @@ do
                 if gui:IsA("ScreenGui") and gui~=Gui then
                     for _,obj in ipairs(gui:GetDescendants()) do
                         if ehBolha(obj) then
+                            ultimaBolhaVista=tick()
                             local id=gerarID(obj)
                             local dados=bolhasVistas[id]
                             if not dados then
@@ -1730,6 +1780,7 @@ do
             end
             ativo = not ativo
             setBtnEstado(ativo)
+            if ativo then ultimaBolhaVista=tick() end
         end)
 
         UI.ActionButton(card, 7, "Resetar Contador", _RGB(24,24,30), function()
@@ -2067,7 +2118,7 @@ local function ShowCreditos()
 end
 
 -- =========================================================================
--- TEXTOS PRONTOS + GERADOR
+-- TEXTOS PRONTOS + IA
 -- =========================================================================
 do
     local CARD_COLORS = {
@@ -2186,7 +2237,6 @@ do
             local corIndex = ((i - 1) % #CARD_COLORS) + 1
             criarCard(tema, i, CARD_COLORS[corIndex])
         end
-        -- Card roxo: GERADOR DE TEXTO IA (EB)
         local aiCard = _I("Frame", _CH)
         aiCard.Size = _U2(1, 0, 0, 0)
         aiCard.AutomaticSize = Enum.AutomaticSize.Y
@@ -2204,6 +2254,11 @@ do
         aiHeader.BorderSizePixel = 0
         aiHeader.LayoutOrder = 1
         Corner(aiHeader, 8)
+        local aiMask = _I("Frame", aiHeader)
+        aiMask.Size = _U2(1, 0, 0.5, 0)
+        aiMask.Position = _U2(0, 0.5, 0, 0)
+        aiMask.BackgroundColor3 = _RGB(139, 92, 246)
+        aiMask.BorderSizePixel = 0
         local aiTitle = _I("TextLabel", aiHeader)
         aiTitle.Size = _U2(1, -20, 0, 20)
         aiTitle.Position = _UO(10, 8)
@@ -2226,7 +2281,7 @@ do
         local inputBox = _I("TextBox", aiBody)
         inputBox.Size = _U2(1, 0, 0, 30)
         inputBox.BackgroundColor3 = C.Fundo
-        inputBox.PlaceholderText = "Tema (ex: Por que servir ao EB?)"
+        inputBox.PlaceholderText = "Digite o tema (ex: Por que servir ao EB?)"
         inputBox.PlaceholderColor3 = C.TextoDim
         inputBox.Text = "" inputBox.TextColor3 = C.Texto
         inputBox.Font = _GM inputBox.TextSize = 11
@@ -2239,6 +2294,12 @@ do
         btnGerar.TextColor3 = C.Texto btnGerar.Font = _GB
         btnGerar.TextSize = 12 btnGerar.BorderSizePixel = 0
         btnGerar.AutoButtonColor = false Corner(btnGerar, 8)
+        Stroke(btnGerar, _RGB(167, 139, 250), 1, 0.2)
+        local btnGrad = _I("UIGradient", btnGerar)
+        btnGrad.Color = ColorSequence.new(_RGB(139, 92, 246), _RGB(109, 40, 217))
+        btnGrad.Rotation = 90
+        btnGerar.MouseEnter:Connect(function() btnGerar.BackgroundColor3 = _RGB(167, 139, 250) end)
+        btnGerar.MouseLeave:Connect(function() btnGerar.BackgroundColor3 = _RGB(139, 92, 246) end)
         local outputLabel = _I("TextLabel", aiBody)
         outputLabel.Size = _U2(1, 0, 0, 0)
         outputLabel.AutomaticSize = Enum.AutomaticSize.Y
@@ -2258,17 +2319,20 @@ do
         btnCopiarIA.TextColor3 = C.TextoDim btnCopiarIA.Font = _GB
         btnCopiarIA.TextSize = 11 btnCopiarIA.BorderSizePixel = 0
         btnCopiarIA.AutoButtonColor = false Corner(btnCopiarIA, 6)
+        btnCopiarIA.MouseEnter:Connect(function()
+            if btnCopiarIA.BackgroundColor3 == C.Verde then btnCopiarIA.BackgroundColor3 = C.VerdeHover end
+        end)
+        btnCopiarIA.MouseLeave:Connect(function()
+            if btnCopiarIA.BackgroundColor3 == C.VerdeHover then btnCopiarIA.BackgroundColor3 = C.Verde end
+        end)
         local textoAtual = nil
-        local iaOcupado = false
         btnGerar.MouseButton1Click:Connect(function()
-            if iaOcupado then return end
             local temaDigitado = inputBox.Text
             if temaDigitado == "" then
                 outputLabel.Text = "⚠️ Por favor, digite um tema primeiro."
                 outputLabel.TextColor3 = _RGB(245, 158, 11)
                 return
             end
-            iaOcupado = true
             outputLabel.Text = "⏳ Gerando texto... aguarde."
             outputLabel.TextColor3 = _RGB(245, 158, 11)
             btnCopiarIA.BackgroundColor3 = C.Painel
@@ -2286,7 +2350,6 @@ do
                     outputLabel.Text = "❌ Erro: " .. tostring(erro)
                     outputLabel.TextColor3 = _RGB(239, 68, 68)
                 end
-                iaOcupado = false
             end)
         end)
         btnCopiarIA.MouseButton1Click:Connect(function()
@@ -2305,7 +2368,7 @@ do
 end
 
 -- =========================================================================
--- COMBATE
+-- COMBATE — Aim (só mira) + Hitbox nos outros
 -- =========================================================================
 local Cam = workspace.CurrentCamera
 
@@ -2386,6 +2449,7 @@ local function AIM_lookAtComOffset(target)
     Cam.CFrame = cf
 end
 
+-- ✅ Aimbot: só mira (sem auto-atirar)
 R.RenderStepped:Connect(function()
     if AimFOVring then
         AimFOVring.Visible = AIM_CONFIG.MostrarFOV or AIM_CONFIG.Ativo
@@ -2403,6 +2467,7 @@ R.RenderStepped:Connect(function()
     end
 end)
 
+-- ✅ Hitbox: aplica apenas nos OUTROS (nunca em você)
 local function HB_Salvar(char)
     if HB_Original[char] then return end
     local hrp = char:FindFirstChild("HumanoidRootPart")
@@ -2874,4 +2939,4 @@ task.defer(function()
         loaded==4 and lt1 and lt2==4 and "Success" or "Error")
 end)
 
-print("AKIRA MENU V2.6 carregado com sucesso!")
+print("AKIRA MENU V2.2 carregado com sucesso!")
