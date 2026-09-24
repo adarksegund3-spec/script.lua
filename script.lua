@@ -1,14 +1,14 @@
 -- =========================================================================
--- AKIRA MENU V2.5 — Arquivo completo
+-- AKIRA MENU V2.7.1 — Arquivo completo
 --  • Abre por padrão em CRÉDITOS
---  • Auto JJS completo (todos os controles)
---  • Combate completo (Hitbox + Aim inteiros)
+--  • Auto JJS (bloco extraído V2.3)
+--  • Combate completo (bloco extraído V2.3)
+--  • ✅ UI.Card corrigido (AutomaticSize travando na 1ª linha)
 --  • Animação de andar só quando realmente anda
 --  • TAFFS sem aviso de menu secundário
 --  • Aba EXTRAS com Zoom Unlock
 -- =========================================================================
 
--- Kill-switch global
 if _G.ZKY_KILL and type(_G.ZKY_KILL) == "function" then
     pcall(_G.ZKY_KILL)
 end
@@ -112,9 +112,6 @@ do
 end
 repeat task.wait() until _G.ZKY_OK
 
--- =========================================================================
--- SERVIÇOS E ATALHOS
--- =========================================================================
 local _I,_U2,_UO,_UD,_RGB,_V2,_GB,_GM,_XL,_XC = Instance.new,UDim2.new,UDim2.fromOffset,UDim.new,Color3.fromRGB,Vector2.new,Enum.Font.GothamBold,Enum.Font.GothamMedium,Enum.TextXAlignment.Left,Enum.TextXAlignment.Center
 local P = game:GetService("Players")
 local T = game:GetService("TweenService")
@@ -127,9 +124,6 @@ local Pl = P.LocalPlayer
 local PG = Pl:WaitForChild("PlayerGui")
 local character,humanoid,rootPart
 
--- =========================================================================
--- CONFIGURAÇÃO
--- =========================================================================
 local CONFIG = {
     LineThickness = .15,
     LineTransparency = .2,
@@ -141,7 +135,6 @@ local CONFIG = {
 }
 local MovementConfig = { Modo = "Dummy" }
 
--- ========== CONFIG DA IA (CORRETOR GRAMATICAL) ==========
 local IA_CONFIG={
     ApiKey="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",
     Endpoint="https://api.groq.com/openai/v1/chat/completions",
@@ -151,7 +144,6 @@ local IA_CONFIG={
     SystemPrompt="Você é um corretor gramatical. Corrija a mensagem do usuário para português do Brasil, mantendo o significado e o tom original. Responda APENAS com a mensagem corrigida, sem explicações, aspas ou comentários extras."
 }
 
--- ========== CONFIG DA IA (GERADOR DE TEXTOS EB) ==========
 local IA_TEXTOS_CONFIG={
     ApiKey="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",
     Endpoint="https://api.groq.com/openai/v1/chat/completions",
@@ -185,7 +177,7 @@ local towerRoutes = {["Torre 1"]={},["Torre 2"]={Frente={},["Atrás"]={},Esquerd
 local selectedCategory = {}
 for i=1,4 do selectedCategory[i]="Lento" end
 local selectedTower2Route = "Frente"
-local CurrentPage = "Creditos"  -- ✅ abre em CRÉDITOS
+local CurrentPage = "Creditos"
 local lineFolder
 local linesVisible = true
 local mostrarLinhas = true
@@ -220,9 +212,6 @@ local function Padding(o,t,b,l,rr)
     p.Parent=o
 end
 
--- =========================================================================
--- NOTIFICAÇÕES
--- =========================================================================
 local NH = _I("Frame")
 NH.Name="Notifications" NH.AnchorPoint=_V2(1,1) NH.Position=_U2(1,-15,1,-15)
 NH.Size=_UO(270,300) NH.BackgroundTransparency=1 NH.ZIndex=200 NH.Parent=PG
@@ -265,9 +254,6 @@ local function Notify(tt,msg,nt)
     end)
 end
 
--- =========================================================================
--- PERSONAGEM
--- =========================================================================
 local function RefreshCharacter()
     character=Pl.Character
     if not character or not character.Parent then return false end
@@ -749,10 +735,6 @@ local function EnviarNoChat(msg)
     return false
 end
 
--- =========================================================================
--- FUNÇÕES DA IA
--- =========================================================================
-
 local function CorrigirTexto(texto)
     if not httpRequest then return nil,"Executor sem suporte a HTTP" end
     local corpo=HS:JSONEncode({
@@ -849,9 +831,6 @@ local function GerarTextoPronto(tema)
     return final
 end
 
--- =========================================================================
--- GUI PRINCIPAL
--- =========================================================================
 local Gui=_I("ScreenGui")
 Gui.Name="ZKY_PARKOUR" Gui.ResetOnSpawn=false Gui.IgnoreGuiInset=true
 Gui.ZIndexBehavior=Enum.ZIndexBehavior.Sibling Gui.Parent=PG
@@ -885,7 +864,7 @@ Subtitle.TextSize=9 Subtitle.Font=_GM Subtitle.TextXAlignment=_XL Subtitle.ZInde
 
 local Version=_I("TextLabel")
 Version.BackgroundColor3=_K.Card Version.AnchorPoint=_V2(.5,.5)
-Version.Position=_U2(.5,0,.5,0) Version.Size=_UO(55,25) Version.Text="V2.5"
+Version.Position=_U2(.5,0,.5,0) Version.Size=_UO(55,25) Version.Text="V2.7"
 Version.TextColor3=_K.Gray Version.TextSize=10 Version.Font=_GB
 Version.ZIndex=22 Version.Parent=Header Corner(Version,8) Stroke(Version,_K.Stroke)
 
@@ -918,7 +897,6 @@ local function SideButton(text,selected)
     return b
 end
 
--- ✅ CRÉDITOS é a aba selecionada por padrão
 local creditosButton = SideButton("👑 CRÉDITOS", true)
 local ebDeltaButton  = SideButton("🚀 EB DELTA", false)
 local taffsButton    = SideButton("📝 TAFFS", false)
@@ -950,9 +928,6 @@ local function ClearContent()
     end
 end
 
--- =========================================================================
--- COMPONENTES
--- =========================================================================
 local UI = {}
 
 function UI.Help(parent)
@@ -1293,32 +1268,46 @@ function UI.ActionButton(parent, ordem, texto, corBg, callback)
     return b
 end
 
+-- =========================================================================
+-- ✅ UI.Card CORRIGIDO — força recálculo de altura após novos filhos
+-- =========================================================================
 function UI.Card(parent, ordem, titulo)
     local card = _I("Frame", parent)
-    card.Size = _U2(1,0,0,0)
+    card.Size = _U2(1, 0, 0, 0)
     card.AutomaticSize = Enum.AutomaticSize.Y
     card.BackgroundColor3 = _RGB(22,22,28)
     card.BorderSizePixel = 0
     card.LayoutOrder = ordem
     Corner(card, 8)
 
-    Padding(card, 14, 14, 14, 14)
+    local pad = _I("UIPadding", card)
+    pad.PaddingTop = _UD(0,14)
+    pad.PaddingBottom = _UD(0,14)
+    pad.PaddingLeft = _UD(0,14)
+    pad.PaddingRight = _UD(0,14)
 
     local lay = _I("UIListLayout", card)
     lay.Padding = _UD(0,12)
     lay.SortOrder = Enum.SortOrder.LayoutOrder
+    lay.HorizontalAlignment = Enum.HorizontalAlignment.Left
+    lay.VerticalAlignment = Enum.VerticalAlignment.Top
     lay.Parent = card
+
+    -- Força o card a acompanhar a altura real do conteúdo
+    lay:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+        card.Size = UDim2.new(1, 0, 0, lay.AbsoluteContentSize.Y + 28)
+    end)
 
     if titulo then
         local hwrap = _I("Frame", card)
-        hwrap.Size = _U2(1,0,0,20)
+        hwrap.Size = _U2(1, 0, 0, 20)
         hwrap.BackgroundTransparency = 1
         hwrap.LayoutOrder = -1
 
         local h = _I("TextLabel", hwrap)
         h.BackgroundTransparency = 1
         h.Position = _UO(0,0)
-        h.Size = _U2(1,0,0,16)
+        h.Size = _U2(1, 0, 0, 16)
         h.Text = titulo
         h.TextColor3 = _K.White
         h.Font = _GB
@@ -1326,8 +1315,8 @@ function UI.Card(parent, ordem, titulo)
         h.TextXAlignment = _XL
 
         local line = _I("Frame", hwrap)
-        line.Position = _UO(0,18)
-        line.Size = _U2(0,36,0,2)
+        line.Position = _UO(0, 18)
+        line.Size = _U2(0, 36, 0, 2)
         line.BackgroundColor3 = _K.Purple
         line.BorderSizePixel = 0
         Corner(line, 1)
@@ -1371,9 +1360,6 @@ local function CreateTwoColumns(parent, ordem)
     return col1, col2
 end
 
--- =========================================================================
--- TAFFS (sem aviso de menu secundário)
--- =========================================================================
 local TAFFS_DATA = {
     { Name="TAF (CIGS)", Emoji="🐅", Color=_RGB(255, 180, 50), Fields={
         {"🐅 TAF", "Teste de Aptidão Física: CIGS"},
@@ -1540,9 +1526,6 @@ local function ShowTAFFS()
     Content.CanvasPosition=_V2()
 end
 
--- =========================================================================
--- EXTRAS (Zoom Unlock)
--- =========================================================================
 local zoomUnlockAtivo = false
 local zoomOriginalMax = Pl.CameraMaxZoomDistance
 
@@ -1584,9 +1567,6 @@ local function ShowExtras()
     Content.CanvasPosition = _V2()
 end
 
--- =========================================================================
--- EB DELTA
--- =========================================================================
 local EBDeltaSubPage = "Parkour"
 
 local function ShowParkoursContent()
@@ -1668,19 +1648,16 @@ local function ShowTowersContent()
     end
 end
 
--- =========================================================================
--- AUTO JJS (completo)
--- =========================================================================
 local ShowAutomacaoContent
 do
     local ativo,VELOCIDADE,MAX_CLIQUES,META,META_ATIVA=false,53,2,308,true
     local jjsFeitos,bolhasVistas,cliquesTotal,ultimaBolhaVista=0,{},0,0
-    local toggleRowRef,infoLbl
+    local btnToggleRef,infoLbl
+    local SESSION = os.clock()
 
     local function setBtnEstado(ligado)
-        if toggleRowRef and toggleRowRef.SetToggle then
-            toggleRowRef.SetToggle(ligado)
-        end
+        if not btnToggleRef or not btnToggleRef.Parent then return end
+        btnToggleRef.Text = ligado and "Parar Auto JJS" or "Iniciar Auto JJS"
     end
 
     local function clicarFiresignal(obj)
@@ -1773,17 +1750,7 @@ do
     ShowAutomacaoContent=function()
         local card = UI.Card(_CH, 1, "Auto JJS")
 
-        toggleRowRef = UI.Toggle(card, 1, "Ativar Auto JJS", ativo, function(v)
-            ativo = v
-            if v then
-                if META_ATIVA and jjsFeitos >= META then
-                    jjsFeitos = 0
-                    cliquesTotal = 0
-                    bolhasVistas = {}
-                end
-                ultimaBolhaVista = tick()
-            end
-        end)
+        UI.Toggle(card, 1, "Ativar Auto JJS", ativo, function(v) ativo = v end)
 
         local metaBox
         local function updateMetaBoxState()
@@ -1829,7 +1796,18 @@ do
         infoLbl.TextXAlignment = _XL
         infoLbl.LayoutOrder = 5
 
-        UI.ActionButton(card, 6, "Resetar Contador", _RGB(24,24,30), function()
+        btnToggleRef = UI.ActionButton(card, 6, "Iniciar Auto JJS", _RGB(28,28,36), function()
+            if not ativo and jjsFeitos >= META then
+                jjsFeitos = 0
+                cliquesTotal = 0
+                bolhasVistas = {}
+            end
+            ativo = not ativo
+            setBtnEstado(ativo)
+            if ativo then ultimaBolhaVista=tick() end
+        end)
+
+        UI.ActionButton(card, 7, "Resetar Contador", _RGB(24,24,30), function()
             jjsFeitos = 0
             cliquesTotal = 0
             bolhasVistas = {}
@@ -1921,9 +1899,6 @@ function ShowEBDelta()
     Content.CanvasPosition=_V2()
 end
 
--- =========================================================================
--- VOLVERS
--- =========================================================================
 local function ShowVolvers()
     CurrentPage="Volvers"
     ClearContent()
@@ -2005,9 +1980,6 @@ local function ShowVolvers()
     Content.CanvasPosition=_V2()
 end
 
--- =========================================================================
--- IA CHAT
--- =========================================================================
 local iaOcupado=false
 local function ShowAutoCorrecao()
     CurrentPage="AutoCorrecao"
@@ -2178,9 +2150,6 @@ local function ShowAutoCorrecao()
     Content.CanvasPosition=_V2()
 end
 
--- =========================================================================
--- CRÉDITOS
--- =========================================================================
 local function ShowCreditos()
     CurrentPage="Creditos"
     ClearContent()
@@ -2253,9 +2222,6 @@ local function ShowCreditos()
     Content.CanvasPosition=_V2()
 end
 
--- =========================================================================
--- TEXTOS PRONTOS + GERADOR IA (EB)
--- =========================================================================
 do
     local CARD_COLORS = {
         { Header = _RGB(59, 130, 246), Body = _RGB(35, 35, 35) },
@@ -2495,9 +2461,6 @@ do
     end
 end
 
--- =========================================================================
--- COMBATE — Aim (só mira) + Hitbox nos outros
--- =========================================================================
 local Cam = workspace.CurrentCamera
 
 local AIM_CONFIG = {
@@ -2658,7 +2621,6 @@ function ShowCombate()
 
     local col1, col2 = CreateTwoColumns(_CH, 0)
 
-    -- COLUNA 1: Hitbox Modificador
     local hbCard = UI.Card(col1, 1, "🎯 Hitbox Modificador")
     UI.Toggle(hbCard, 1, "Ativar Hitbox", HB_CONFIG.Ativo, function(v)
         HB_CONFIG.Ativo = v
@@ -2720,7 +2682,6 @@ function ShowCombate()
         end)
     end
 
-    -- COLUNA 2: Aim
     local aimCard = UI.Card(col2, 1, "🎯 Aim")
     UI.Toggle(aimCard, 1, "Ativar Aimbot", AIM_CONFIG.Ativo, function(v)
         AIM_CONFIG.Ativo = v
@@ -2834,9 +2795,6 @@ function ShowCombate()
     Content.CanvasPosition = _V2()
 end
 
--- =========================================================================
--- LOJA
--- =========================================================================
 local ShowLoja
 do
     local AC={Fundo=_RGB(10,10,14),Card=_RGB(20,20,28),Borda=_RGB(0,220,255),
@@ -2950,9 +2908,6 @@ do
     end
 end
 
--- =========================================================================
--- SELEÇÃO DE ABA
--- =========================================================================
 local function SelectButton(b)
     if selectedButton then
         selectedButton.BackgroundColor3=_K.Card
@@ -2991,9 +2946,6 @@ lojaButton.MouseButton1Click:Connect(function()
     SelectButton(lojaButton) ShowLoja()
 end)
 
--- =========================================================================
--- ARRASTAR LOGO / MENU
--- =========================================================================
 local LogoDragging=false
 local LogoDragStart,LogoStartPosition
 Logo.InputBegan:Connect(function(i)
@@ -3052,9 +3004,6 @@ Logo.MouseButton1Click:Connect(function()
 end)
 Close.MouseButton1Click:Connect(CloseMenu)
 
--- =========================================================================
--- CARREGAR ROTAS (abre em CRÉDITOS)
--- =========================================================================
 task.defer(function()
     local loaded=0
     for _,cat in ipairs(CategoryOrder) do
@@ -3065,9 +3014,9 @@ task.defer(function()
     for _,rn in ipairs(Tower2RouteOrder) do
         if LoadTowerRoute("Torre 2",rn) then lt2+=1 end
     end
-    ShowCreditos()   -- ✅ aba inicial
+    ShowCreditos()
     Notify("ZKY PARKOUR",loaded.."/4 parkours • Torre 1: "..(lt1 and "OK" or "ERRO").." • Torre 2: "..lt2.."/4",
         loaded==4 and lt1 and lt2==4 and "Success" or "Error")
 end)
 
-print("AKIRA MENU V2.5 carregado com sucesso!")
+print("AKIRA MENU V2.7 carregado com sucesso!")
