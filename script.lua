@@ -120,12 +120,14 @@ local CONFIG = {
     PlaybackSpeed = 1,
     WalkToSpeed = 16,
     RouteWalkSpeed = 22,
+    DiretoWalkSpeed = 16,
     GroundOffset = 1.66,
     MinWalkDist = 0.3,
     RotateThreshold = 0.995
 }
 local MovementConfig = { Modo = "Dummy" }
 
+-- ✅ CORRETOR GRAMATICAL (config)
 local IA_CONFIG = {
     ApiKey = "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",
     Endpoint = "https://api.groq.com/openai/v1/chat/completions",
@@ -134,13 +136,13 @@ local IA_CONFIG = {
     SystemPrompt = "Você é um corretor gramatical extremamente rigoroso de português do Brasil. Corrija TODOS os erros da mensagem do usuário, sem deixar passar nenhum, incluindo: letras maiúsculas no início de frases e em nomes próprios; todos os acentos gráficos (agudo, circunflexo, til, crase) e a cedilha; toda a pontuação, como vírgulas, pontos finais, pontos de interrogação e de exclamação; concordância verbal e nominal; ortografia e separação de palavras. Não deixe nenhuma palavra sem acento ou sem maiúscula onde for necessário, nem nenhuma frase sem pontuação final. Não resuma, não reescreva o estilo, não mude o significado, o tom nem o tamanho da mensagem: apenas corrija a gramática, a ortografia e a pontuação, mantendo as mesmas palavras sempre que possível. Responda APENAS com a mensagem corrigida, sem explicações, aspas, comentários extras ou qualquer texto adicional."
 }
 
--- ✅ CONFIG DA IA (GERADOR DE TEXTO)
-local IA_GERADOR={
-    ApiKey="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",
-    Endpoint="https://api.groq.com/openai/v1/chat/completions",
-    Modelo="openai/gpt-oss-120b",
-    Timeout=20,
-    SystemPrompt="Você é um gerador de textos curtos para um jogo de Roblox de roleplay militar do Exército Brasileiro (EB). Regras obrigatórias: (1) Escreva 100% em português do Brasil, sobre o tema exato que o usuário mandar, sem fugir do assunto. (2) O texto final deve ter entre 150 e 250 caracteres, em 2 a 3 frases curtas, tom sério, humano e patriótico, sem exageros nem clichês. (3) Nunca escreva raciocínio, explicações, introduções, saudações, aspas ou emojis. (4) A ÚNICA coisa que aparece na sua resposta é o texto final, envolto EXATAMENTE assim: <<<texto aqui>>>. Nada antes dos <<<, nada depois dos >>>."
+-- ✅ CONFIG DA IA (GERADOR DE TEXTO) — ESTRUTURA FUNCIONAL
+local IA_GERADOR = {
+    ApiKey = "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",
+    Endpoint = "https://api.groq.com/openai/v1/chat/completions",
+    Modelo = "openai/gpt-oss-120b",
+    Timeout = 20,
+    SystemPrompt = "Você é um gerador de textos curtos para um jogo de Roblox de roleplay militar do Exército Brasileiro (EB). Regras obrigatórias: (1) Escreva 100% em português do Brasil, sobre o tema exato que o usuário mandar, sem fugir do assunto. (2) O texto final deve ter entre 150 e 250 caracteres, em 2 a 3 frases curtas, tom sério, humano e patriótico, sem exageros nem clichês. (3) Nunca escreva raciocínio, explicações, introduções, saudações, aspas ou emojis. (4) A ÚNICA coisa que aparece na sua resposta é o texto final, envolto EXATAMENTE assim: <<<texto aqui>>>. Nada antes dos <<<, nada depois dos >>>."
 }
 
 local httpRequest = request or (syn and syn.request) or (http and http.request) or http_request
@@ -367,7 +369,7 @@ local function GetRotation(f)
     if f.rx and f.ry and f.rz then return CFrame.Angles(f.rx,f.ry,f.rz) end
 end
 
--- ✅ MOVIMENTO NATURAL
+-- ✅ MOVIMENTO NATURAL (sem PivotTo — só humanoid:Move para animar caminhada)
 local function ApplyPosition(pos,rot)
     if not pos or not RefreshCharacter() then return false end
     local corrected = pos + Vector3.new(0, CONFIG.GroundOffset, 0)
@@ -667,6 +669,7 @@ local function EnviarNoChat(msg)
     return false
 end
 
+-- ✅ CORRETOR GRAMATICAL (usado na aba IA CHAT)
 local function CorrigirTexto(texto)
     if not httpRequest then return nil,"Executor sem suporte a HTTP" end
     local corpo=HS:JSONEncode({
@@ -706,9 +709,10 @@ local function CorrigirTexto(texto)
     return txt
 end
 
--- ✅ FUNÇÃO QUE CHAMA A IA (GERADOR)
+-- ✅ GERADOR DE TEXTO (estrutura idêntica ao CorrigirTexto, formato <<<>>>)
 local function GerarTextoIA(tema)
     if not httpRequest then return nil,"Executor sem suporte a HTTP" end
+    if not tema or tema=="" then return nil,"Tema vazio" end
     local corpo=HS:JSONEncode({
         model=IA_GERADOR.Modelo,
         messages={
@@ -722,12 +726,8 @@ local function GerarTextoIA(tema)
     task.spawn(function()
         local ok,res=pcall(function()
             return httpRequest({
-                Url=IA_GERADOR.Endpoint,
-                Method="POST",
-                Headers={
-                    ["Content-Type"]="application/json",
-                    ["Authorization"]="Bearer "..IA_GERADOR.ApiKey
-                },
+                Url=IA_GERADOR.Endpoint, Method="POST",
+                Headers={["Content-Type"]="application/json",["Authorization"]="Bearer "..IA_GERADOR.ApiKey},
                 Body=corpo
             })
         end)
@@ -795,7 +795,7 @@ Subtitle.TextSize=9 Subtitle.Font=_GM Subtitle.TextXAlignment=_XL Subtitle.ZInde
 
 local Version=_I("TextLabel")
 Version.BackgroundColor3=_K.Card Version.AnchorPoint=_V2(.5,.5)
-Version.Position=_U2(.5,0,.5,0) Version.Size=_UO(55,25) Version.Text="V2.4"
+Version.Position=_U2(.5,0,.5,0) Version.Size=_UO(55,25) Version.Text="V2.5"
 Version.TextColor3=_K.Gray Version.TextSize=10 Version.Font=_GB
 Version.ZIndex=22 Version.Parent=Header Corner(Version,8) Stroke(Version,_K.Stroke)
 
@@ -1570,6 +1570,7 @@ do
         btnToggleRef.Text = ligado and "Parar Auto JJS" or "Iniciar Auto JJS"
     end
 
+    -- ✅ JJs: clique com 4 métodos
     local function clicarFiresignal(obj)
         if firesignal then
             pcall(function()
@@ -1589,6 +1590,7 @@ do
         end)
     end
 
+    -- ✅ JJs: detecção ampla (nome, tamanho, hierarquia)
     local function ehBolha(obj)
         if not obj or not obj.Parent then return false end
         if not obj.Visible then return false end
@@ -1625,6 +1627,7 @@ do
         return false
     end
 
+    -- ✅ JJs: ID único por instância
     local function gerarID(obj)
         return tostring(obj)
     end
@@ -1924,7 +1927,7 @@ local function ShowVolvers()
 end
 
 -- =========================================================================
--- IA CHAT
+-- IA CHAT (CORRETOR)
 -- =========================================================================
 local iaOcupado=false
 local function ShowAutoCorrecao()
@@ -2082,7 +2085,7 @@ local function ShowCreditos()
 end
 
 -- =========================================================================
--- TEXTOS PRONTOS + IA
+-- TEXTOS PRONTOS + IA GERADOR
 -- =========================================================================
 do
     local CARD_COLORS = {
@@ -2290,13 +2293,16 @@ do
             if btnCopiarIA.BackgroundColor3 == C.VerdeHover then btnCopiarIA.BackgroundColor3 = C.Verde end
         end)
         local textoAtual = nil
+        local ocupado = false
         btnGerar.MouseButton1Click:Connect(function()
-            local temaDigitado = inputBox.Text
+            if ocupado then return end
+            local temaDigitado = inputBox.Text:gsub("^%s+",""):gsub("%s+$","")
             if temaDigitado == "" then
                 outputLabel.Text = "⚠️ Por favor, digite um tema primeiro."
                 outputLabel.TextColor3 = _RGB(245, 158, 11)
                 return
             end
+            ocupado = true
             outputLabel.Text = "⏳ Gerando texto... aguarde."
             outputLabel.TextColor3 = _RGB(245, 158, 11)
             btnCopiarIA.BackgroundColor3 = C.Painel
@@ -2310,10 +2316,13 @@ do
                     outputLabel.TextColor3 = C.Texto
                     btnCopiarIA.BackgroundColor3 = C.Verde
                     btnCopiarIA.TextColor3 = C.Texto
+                    Notify("GERADOR","Texto gerado com sucesso!","Success")
                 else
-                    outputLabel.Text = "❌ Erro: " .. tostring(erro)
+                    outputLabel.Text = "❌ " .. tostring(erro)
                     outputLabel.TextColor3 = _RGB(239, 68, 68)
+                    Notify("GERADOR","Erro: " .. tostring(erro),"Error")
                 end
+                ocupado = false
             end)
         end)
         btnCopiarIA.MouseButton1Click:Connect(function()
@@ -2901,4 +2910,4 @@ task.defer(function()
         loaded==4 and lt1 and lt2==4 and "Success" or "Error")
 end)
 
-print("AKIRA MENU V2.4 carregado com sucesso!")
+print("AKIRA MENU V2.5 carregado com sucesso!")
