@@ -1,8 +1,8 @@
 -- =========================================================================
--- AKIRA MENU V2.6 — Arquivo completo
+-- AKIRA MENU V2.7 — Arquivo completo
 --  • Abre por padrão em CRÉDITOS
---  • Auto JJS (versão original completa: toggle + botão + meta + delay + reset)
---  • Combate completo (Hitbox + Aim, versão original)
+--  • Auto JJS completo (7 elementos: toggle + meta + caixa + delay + contador + botão + reset)
+--  • Combate completo (Hitbox com 5 elementos + Aim com 6 elementos)
 --  • Animação de andar só quando realmente anda
 --  • TAFFS sem aviso de menu secundário
 --  • Aba EXTRAS com Zoom Unlock
@@ -879,7 +879,7 @@ Subtitle.TextSize=9 Subtitle.Font=_GM Subtitle.TextXAlignment=_XL Subtitle.ZInde
 
 local Version=_I("TextLabel")
 Version.BackgroundColor3=_K.Card Version.AnchorPoint=_V2(.5,.5)
-Version.Position=_U2(.5,0,.5,0) Version.Size=_UO(55,25) Version.Text="V2.6"
+Version.Position=_U2(.5,0,.5,0) Version.Size=_UO(55,25) Version.Text="V2.7"
 Version.TextColor3=_K.Gray Version.TextSize=10 Version.Font=_GB
 Version.ZIndex=22 Version.Parent=Header Corner(Version,8) Stroke(Version,_K.Stroke)
 
@@ -1365,7 +1365,7 @@ local function CreateTwoColumns(parent, ordem)
 end
 
 -- =========================================================================
--- TAFFS (sem aviso de menu secundário)
+-- TAFFS
 -- =========================================================================
 local TAFFS_DATA = {
     { Name="TAF (CIGS)", Emoji="🐅", Color=_RGB(255, 180, 50), Fields={
@@ -1493,7 +1493,6 @@ end
 local function ShowTAFFS()
     CurrentPage="TAFFS"
     ClearContent()
-
     local header=_I("Frame")
     header.Size=_U2(1,0,0,58) header.BackgroundColor3=_K.Card header.BorderSizePixel=0
     header.LayoutOrder=0 header.Parent=_CH Corner(header,9) Stroke(header,_K.StrokeLight,1)
@@ -1534,7 +1533,7 @@ local function ShowTAFFS()
 end
 
 -- =========================================================================
--- EXTRAS (Zoom Unlock)
+-- EXTRAS
 -- =========================================================================
 local zoomUnlockAtivo = false
 local zoomOriginalMax = Pl.CameraMaxZoomDistance
@@ -1662,14 +1661,13 @@ local function ShowTowersContent()
 end
 
 -- =========================================================================
--- ABA AUTOMAÇÃO — Auto JJS (versão original completa)
+-- ABA AUTOMAÇÃO — Auto JJS (completo, 7 elementos)
 -- =========================================================================
 local ShowAutomacaoContent
 do
     local ativo,VELOCIDADE,MAX_CLIQUES,META,META_ATIVA=false,53,2,308,true
     local jjsFeitos,bolhasVistas,cliquesTotal,ultimaBolhaVista=0,{},0,0
     local btnToggleRef,infoLbl
-    local SESSION = os.clock()
 
     local function setBtnEstado(ligado)
         if not btnToggleRef or not btnToggleRef.Parent then return end
@@ -2490,7 +2488,7 @@ do
 end
 
 -- =========================================================================
--- COMBATE — Aim (só mira) + Hitbox nos outros (versão original completa)
+-- COMBATE — Aim + Hitbox (completo)
 -- =========================================================================
 local Cam = workspace.CurrentCamera
 
@@ -2695,10 +2693,10 @@ function ShowCombate()
     presetFrame.Size = _U2(1,0,0,18)
     presetFrame.BackgroundTransparency = 1
     presetFrame.LayoutOrder = 5
-    local pl = _I("UIListLayout", presetFrame)
-    pl.FillDirection = Enum.FillDirection.Horizontal
-    pl.Padding = _UD(0,4)
-    pl.Parent = presetFrame
+    local presetList = _I("UIListLayout", presetFrame)
+    presetList.FillDirection = Enum.FillDirection.Horizontal
+    presetList.Padding = _UD(0,4)
+    presetList.Parent = presetFrame
     for _,cor in ipairs(HB_Presets) do
         local b = _I("TextButton", presetFrame)
         b.Size = _UO(16,16)
@@ -3062,4 +3060,4 @@ task.defer(function()
         loaded==4 and lt1 and lt2==4 and "Success" or "Error")
 end)
 
-print("AKIRA MENU V2.6 carregado com sucesso!")
+print("AKIRA MENU V2.7 carregado com sucesso!")
