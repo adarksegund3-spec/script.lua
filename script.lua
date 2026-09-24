@@ -134,13 +134,13 @@ local IA_CONFIG = {
     SystemPrompt = "Você é um corretor gramatical extremamente rigoroso de português do Brasil. Corrija TODOS os erros da mensagem do usuário, sem deixar passar nenhum, incluindo: letras maiúsculas no início de frases e em nomes próprios; todos os acentos gráficos (agudo, circunflexo, til, crase) e a cedilha; toda a pontuação, como vírgulas, pontos finais, pontos de interrogação e de exclamação; concordância verbal e nominal; ortografia e separação de palavras. Não deixe nenhuma palavra sem acento ou sem maiúscula onde for necessário, nem nenhuma frase sem pontuação final. Não resuma, não reescreva o estilo, não mude o significado, o tom nem o tamanho da mensagem: apenas corrija a gramática, a ortografia e a pontuação, mantendo as mesmas palavras sempre que possível. Responda APENAS com a mensagem corrigida, sem explicações, aspas, comentários extras ou qualquer texto adicional."
 }
 
--- ✅ GERADOR DE TEXTO (formato <<<>>> — funciona 100%)
-local IA_TEXTOS = {
-    ApiKey = "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",
-    Endpoint = "https://api.groq.com/openai/v1/chat/completions",
-    Modelo = "openai/gpt-oss-120b",
-    Timeout = 20,
-    SystemPrompt = "Você é um gerador de textos curtos para um jogo de Roblox de roleplay militar do Exército Brasileiro (EB). Regras obrigatórias: (1) Escreva 100% em português do Brasil, sobre o tema exato que o usuário mandar, sem fugir do assunto. (2) O texto final deve ter entre 150 e 250 caracteres, em 2 a 3 frases curtas, tom sério, humano e patriótico, sem exageros nem clichês. (3) Nunca escreva raciocínio, explicações, introduções, saudações, aspas ou emojis. (4) A ÚNICA coisa que aparece na sua resposta é o texto final, envolto EXATAMENTE assim: <<<texto aqui>>>. Nada antes dos <<<, nada depois dos >>>."
+-- ✅ CONFIG DA IA (GERADOR DE TEXTO)
+local IA_GERADOR={
+    ApiKey="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",
+    Endpoint="https://api.groq.com/openai/v1/chat/completions",
+    Modelo="openai/gpt-oss-120b",
+    Timeout=20,
+    SystemPrompt="Você é um gerador de textos curtos para um jogo de Roblox de roleplay militar do Exército Brasileiro (EB). Regras obrigatórias: (1) Escreva 100% em português do Brasil, sobre o tema exato que o usuário mandar, sem fugir do assunto. (2) O texto final deve ter entre 150 e 250 caracteres, em 2 a 3 frases curtas, tom sério, humano e patriótico, sem exageros nem clichês. (3) Nunca escreva raciocínio, explicações, introduções, saudações, aspas ou emojis. (4) A ÚNICA coisa que aparece na sua resposta é o texto final, envolto EXATAMENTE assim: <<<texto aqui>>>. Nada antes dos <<<, nada depois dos >>>."
 }
 
 local httpRequest = request or (syn and syn.request) or (http and http.request) or http_request
@@ -262,7 +262,6 @@ end
 Pl.CharacterAdded:Connect(function() task.wait(.2); RefreshCharacter() end)
 RefreshCharacter()
 
--- ✅ Movimento NATURAL: humanoid:Move() já toca a animação padrão automaticamente
 local function Number(v) return v and tonumber(v) end
 
 local function ParseRoutes(raw)
@@ -368,7 +367,7 @@ local function GetRotation(f)
     if f.rx and f.ry and f.rz then return CFrame.Angles(f.rx,f.ry,f.rz) end
 end
 
--- ✅ MOVIMENTO NATURAL (humanoid:Move() toca a animação de caminhada automaticamente)
+-- ✅ MOVIMENTO NATURAL
 local function ApplyPosition(pos,rot)
     if not pos or not RefreshCharacter() then return false end
     local corrected = pos + Vector3.new(0, CONFIG.GroundOffset, 0)
@@ -707,14 +706,13 @@ local function CorrigirTexto(texto)
     return txt
 end
 
--- ✅ GERADOR DE TEXTO (mesma estrutura do CorrigirTexto, formato <<<>>>)
+-- ✅ FUNÇÃO QUE CHAMA A IA (GERADOR)
 local function GerarTextoIA(tema)
     if not httpRequest then return nil,"Executor sem suporte a HTTP" end
-    if not tema or tema=="" then return nil,"Tema vazio" end
     local corpo=HS:JSONEncode({
-        model=IA_TEXTOS.Modelo,
+        model=IA_GERADOR.Modelo,
         messages={
-            {role="system",content=IA_TEXTOS.SystemPrompt},
+            {role="system",content=IA_GERADOR.SystemPrompt},
             {role="user",content="Tema: "..tema}
         },
         temperature=.6,
@@ -724,8 +722,12 @@ local function GerarTextoIA(tema)
     task.spawn(function()
         local ok,res=pcall(function()
             return httpRequest({
-                Url=IA_TEXTOS.Endpoint, Method="POST",
-                Headers={["Content-Type"]="application/json",["Authorization"]="Bearer "..IA_TEXTOS.ApiKey},
+                Url=IA_GERADOR.Endpoint,
+                Method="POST",
+                Headers={
+                    ["Content-Type"]="application/json",
+                    ["Authorization"]="Bearer "..IA_GERADOR.ApiKey
+                },
                 Body=corpo
             })
         end)
@@ -733,7 +735,7 @@ local function GerarTextoIA(tema)
         terminou=true
     end)
     local inicio=tick()
-    while not terminou and (tick()-inicio)<IA_TEXTOS.Timeout do task.wait(.1) end
+    while not terminou and (tick()-inicio)<IA_GERADOR.Timeout do task.wait(.1) end
     if not terminou then return nil,"Tempo esgotado" end
     if not resposta then return nil,"Falha na requisição" end
     if resposta.StatusCode~=200 then return nil,"HTTP "..tostring(resposta.StatusCode) end
@@ -793,7 +795,7 @@ Subtitle.TextSize=9 Subtitle.Font=_GM Subtitle.TextXAlignment=_XL Subtitle.ZInde
 
 local Version=_I("TextLabel")
 Version.BackgroundColor3=_K.Card Version.AnchorPoint=_V2(.5,.5)
-Version.Position=_U2(.5,0,.5,0) Version.Size=_UO(55,25) Version.Text="V2.3"
+Version.Position=_U2(.5,0,.5,0) Version.Size=_UO(55,25) Version.Text="V2.4"
 Version.TextColor3=_K.Gray Version.TextSize=10 Version.Font=_GB
 Version.ZIndex=22 Version.Parent=Header Corner(Version,8) Stroke(Version,_K.Stroke)
 
@@ -1277,7 +1279,7 @@ local function CreateTwoColumns(parent, ordem)
 end
 
 -- =========================================================================
--- TAFFS
+-- TAFFS (ATUALIZADO — TAF, CIE, REC MEC, BPE, BFE, BIP, BSE, BAC, CYBER, CAATINGA)
 -- =========================================================================
 local TAFFS_DATA = {
     { Name="TAF (CIGS)", Emoji="🐅", Color=_RGB(255, 180, 50), Fields={
@@ -1568,7 +1570,6 @@ do
         btnToggleRef.Text = ligado and "Parar Auto JJS" or "Iniciar Auto JJS"
     end
 
-    -- ✅ JJs: 4 métodos de clique
     local function clicarFiresignal(obj)
         if firesignal then
             pcall(function()
@@ -1588,7 +1589,6 @@ do
         end)
     end
 
-    -- ✅ JJs: detecção ampla (nome, tamanho, hierarquia)
     local function ehBolha(obj)
         if not obj or not obj.Parent then return false end
         if not obj.Visible then return false end
@@ -1625,7 +1625,6 @@ do
         return false
     end
 
-    -- ✅ JJs: ID único por instância
     local function gerarID(obj)
         return tostring(obj)
     end
@@ -2902,4 +2901,4 @@ task.defer(function()
         loaded==4 and lt1 and lt2==4 and "Success" or "Error")
 end)
 
-print("AKIRA MENU V2.3 carregado com sucesso!")
+print("AKIRA MENU V2.4 carregado com sucesso!")
