@@ -1,10 +1,11 @@
 -- =========================================================================
--- AKIRA MENU V2.4 — Arquivo completo
---  • Animação de andar só toca se o personagem realmente andar
+-- AKIRA MENU V2.5 — Arquivo completo
+--  • Abre por padrão em CRÉDITOS
+--  • Auto JJS completo (todos os controles)
+--  • Combate completo (Hitbox + Aim inteiros)
+--  • Animação de andar só quando realmente anda
 --  • TAFFS sem aviso de menu secundário
---  • Auto JJS com um único controle (toggle do topo)
---  • Nova aba EXTRAS com Zoom Unlock
---  • Abre em EXTRAS por padrão
+--  • Aba EXTRAS com Zoom Unlock
 -- =========================================================================
 
 -- Kill-switch global
@@ -184,7 +185,7 @@ local towerRoutes = {["Torre 1"]={},["Torre 2"]={Frente={},["Atrás"]={},Esquerd
 local selectedCategory = {}
 for i=1,4 do selectedCategory[i]="Lento" end
 local selectedTower2Route = "Frente"
-local CurrentPage = "Extras"   -- ✅ abre em EXTRAS
+local CurrentPage = "Creditos"  -- ✅ abre em CRÉDITOS
 local lineFolder
 local linesVisible = true
 local mostrarLinhas = true
@@ -326,7 +327,6 @@ local function pararAnimacaoAndar()
     end
 end
 
--- ✅ Animação só toca quando o personagem REALMENTE se movimenta na rota
 local ultimaPosAnim
 local ultimoTempoMov = 0
 task.spawn(function()
@@ -753,7 +753,6 @@ end
 -- FUNÇÕES DA IA
 -- =========================================================================
 
--- ========== CORRETOR GRAMATICAL ==========
 local function CorrigirTexto(texto)
     if not httpRequest then return nil,"Executor sem suporte a HTTP" end
     local corpo=HS:JSONEncode({
@@ -796,7 +795,6 @@ local function CorrigirTexto(texto)
     return txt
 end
 
--- ========== GERADOR DE TEXTOS EB ==========
 local function GerarTextoPronto(tema)
     if not httpRequest then return nil,"Executor sem suporte a HTTP" end
     if not tema or tema=="" then return nil,"Tema vazio" end
@@ -887,7 +885,7 @@ Subtitle.TextSize=9 Subtitle.Font=_GM Subtitle.TextXAlignment=_XL Subtitle.ZInde
 
 local Version=_I("TextLabel")
 Version.BackgroundColor3=_K.Card Version.AnchorPoint=_V2(.5,.5)
-Version.Position=_U2(.5,0,.5,0) Version.Size=_UO(55,25) Version.Text="V2.4"
+Version.Position=_U2(.5,0,.5,0) Version.Size=_UO(55,25) Version.Text="V2.5"
 Version.TextColor3=_K.Gray Version.TextSize=10 Version.Font=_GB
 Version.ZIndex=22 Version.Parent=Header Corner(Version,8) Stroke(Version,_K.Stroke)
 
@@ -920,16 +918,17 @@ local function SideButton(text,selected)
     return b
 end
 
-local creditosButton = SideButton("👑 CRÉDITOS", false)
+-- ✅ CRÉDITOS é a aba selecionada por padrão
+local creditosButton = SideButton("👑 CRÉDITOS", true)
 local ebDeltaButton  = SideButton("🚀 EB DELTA", false)
-local taffsButton    = SideButton("📝 TAFFS")
+local taffsButton    = SideButton("📝 TAFFS", false)
 local volversButton  = SideButton("↪ VOLVERS", false)
 local iaButton       = SideButton("🤖 IA CHAT", false)
 local combateButton  = SideButton("🎯 COMBATE", false)
 local textosButton   = SideButton("📚 TEXTOS PRONTOS", false)
 local lojaButton     = SideButton("🔫 LOJA", false)
-local extrasButton   = SideButton("🔓 EXTRAS", true)
-local selectedButton = extrasButton
+local extrasButton   = SideButton("🔓 EXTRAS", false)
+local selectedButton = creditosButton
 
 local Content=_I("ScrollingFrame")
 Content.Size=_U2(1,-134,1,-78) Content.Position=_U2(0,126,0,70)
@@ -1502,8 +1501,6 @@ local function ShowTAFFS()
     CurrentPage="TAFFS"
     ClearContent()
 
-    -- (Aviso de menu secundário removido)
-
     local header=_I("Frame")
     header.Size=_U2(1,0,0,58) header.BackgroundColor3=_K.Card header.BorderSizePixel=0
     header.LayoutOrder=0 header.Parent=_CH Corner(header,9) Stroke(header,_K.StrokeLight,1)
@@ -1544,7 +1541,7 @@ local function ShowTAFFS()
 end
 
 -- =========================================================================
--- EXTRAS
+-- EXTRAS (Zoom Unlock)
 -- =========================================================================
 local zoomUnlockAtivo = false
 local zoomOriginalMax = Pl.CameraMaxZoomDistance
@@ -1671,12 +1668,14 @@ local function ShowTowersContent()
     end
 end
 
+-- =========================================================================
+-- AUTO JJS (completo)
+-- =========================================================================
 local ShowAutomacaoContent
 do
     local ativo,VELOCIDADE,MAX_CLIQUES,META,META_ATIVA=false,53,2,308,true
     local jjsFeitos,bolhasVistas,cliquesTotal,ultimaBolhaVista=0,{},0,0
     local toggleRowRef,infoLbl
-    local SESSION = os.clock()
 
     local function setBtnEstado(ligado)
         if toggleRowRef and toggleRowRef.SetToggle then
@@ -2007,7 +2006,7 @@ local function ShowVolvers()
 end
 
 -- =========================================================================
--- IA CHAT (CORRIGIR E ENVIAR NO CHAT)
+-- IA CHAT
 -- =========================================================================
 local iaOcupado=false
 local function ShowAutoCorrecao()
@@ -2391,11 +2390,6 @@ do
         aiHeader.BorderSizePixel = 0
         aiHeader.LayoutOrder = 1
         Corner(aiHeader, 8)
-        local aiMask = _I("Frame", aiHeader)
-        aiMask.Size = _U2(1, 0, 0.5, 0)
-        aiMask.Position = _U2(0, 0.5, 0, 0)
-        aiMask.BackgroundColor3 = _RGB(139, 92, 246)
-        aiMask.BorderSizePixel = 0
         local aiTitle = _I("TextLabel", aiHeader)
         aiTitle.Size = _U2(1, -20, 0, 20)
         aiTitle.Position = _UO(10, 8)
@@ -2432,9 +2426,6 @@ do
         btnGerar.TextSize = 12 btnGerar.BorderSizePixel = 0
         btnGerar.AutoButtonColor = false Corner(btnGerar, 8)
         Stroke(btnGerar, _RGB(167, 139, 250), 1, 0.2)
-        local btnGrad = _I("UIGradient", btnGerar)
-        btnGrad.Color = ColorSequence.new(_RGB(139, 92, 246), _RGB(109, 40, 217))
-        btnGrad.Rotation = 90
         btnGerar.MouseEnter:Connect(function() btnGerar.BackgroundColor3 = _RGB(167, 139, 250) end)
         btnGerar.MouseLeave:Connect(function() btnGerar.BackgroundColor3 = _RGB(139, 92, 246) end)
         local outputLabel = _I("TextLabel", aiBody)
@@ -2667,6 +2658,7 @@ function ShowCombate()
 
     local col1, col2 = CreateTwoColumns(_CH, 0)
 
+    -- COLUNA 1: Hitbox Modificador
     local hbCard = UI.Card(col1, 1, "🎯 Hitbox Modificador")
     UI.Toggle(hbCard, 1, "Ativar Hitbox", HB_CONFIG.Ativo, function(v)
         HB_CONFIG.Ativo = v
@@ -2728,6 +2720,7 @@ function ShowCombate()
         end)
     end
 
+    -- COLUNA 2: Aim
     local aimCard = UI.Card(col2, 1, "🎯 Aim")
     UI.Toggle(aimCard, 1, "Ativar Aimbot", AIM_CONFIG.Ativo, function(v)
         AIM_CONFIG.Ativo = v
@@ -3060,7 +3053,7 @@ end)
 Close.MouseButton1Click:Connect(CloseMenu)
 
 -- =========================================================================
--- CARREGAR ROTAS (abre em EXTRAS)
+-- CARREGAR ROTAS (abre em CRÉDITOS)
 -- =========================================================================
 task.defer(function()
     local loaded=0
@@ -3072,9 +3065,9 @@ task.defer(function()
     for _,rn in ipairs(Tower2RouteOrder) do
         if LoadTowerRoute("Torre 2",rn) then lt2+=1 end
     end
-    ShowExtras()   -- ✅ aba inicial
+    ShowCreditos()   -- ✅ aba inicial
     Notify("ZKY PARKOUR",loaded.."/4 parkours • Torre 1: "..(lt1 and "OK" or "ERRO").." • Torre 2: "..lt2.."/4",
         loaded==4 and lt1 and lt2==4 and "Success" or "Error")
 end)
 
-print("AKIRA MENU V2.4 carregado com sucesso!")
+print("AKIRA MENU V2.5 carregado com sucesso!")
