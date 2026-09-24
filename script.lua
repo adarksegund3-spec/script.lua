@@ -136,7 +136,7 @@ local IA_TEXTOS = {
     Endpoint = "https://api.groq.com/openai/v1/chat/completions",
     Modelo = "openai/gpt-oss-120b",
     Timeout = 15,
-    SystemPrompt = "Você é um militar do Exército Brasileiro em um roleplay de Roblox.\n\nINSTRUÇÕES:\n- Escreva UM texto curto sobre o tema que o usuário mandar.\n- Use entre 150 e 210 caracteres.\n- Máximo 3 frases curtas.\n- Português do Brasil, tom patriótico e realista.\n- NÃO escreva em inglês. NÃO pense em voz alta. NÃO explique.\n- Responda APENAS o texto final, sem aspas, sem emojis, sem introdução.\n\nExemplo de resposta correta:\nServir ao Exército é defender nossa pátria com honra e disciplina. É fazer parte de uma instituição que forma cidadãos e protege nossa soberania todos os dias."
+    SystemPrompt = "Você é um gerador de textos do Exército Brasileiro em um jogo de Roblox (roleplay militar). O usuário vai te dar um TEMA. Você deve escrever um texto curto, humano, gramaticalmente perfeito e patriótico sobre exatamente esse tema. REGRAS OBRIGATÓRIAS: (1) O texto DEVE ter entre 150 e 210 caracteres, contando espaços. (2) Máximo 3 frases curtas. (3) Fique 100% fiel ao tema pedido, sem fugir do assunto. (4) Tom militar realista, natural e humano, sem exageros nem clichês. (5) Sem saudações, sem aspas, sem emojis, sem formatação, sem introduções. (6) Responda APENAS com o texto final, nada mais."
 }
 
 local httpRequest = request or (syn and syn.request) or (http and http.request) or http_request
@@ -258,8 +258,10 @@ end
 Pl.CharacterAdded:Connect(function() task.wait(.2); RefreshCharacter() end)
 RefreshCharacter()
 
--- ✅ Animação de andar — SÓ roda quando a rota está ATIVA
+-- ✅ Animação de andar: SÓ toca se Playback.Running E não estiver esperando no dummy
+-- E só enquanto o personagem realmente está em movimento
 local walkTrack
+local ultimaPosAnim = nil
 local function iniciarAnimacaoAndar()
     if not RefreshCharacter() then return end
     if walkTrack and walkTrack.IsPlaying then return end
@@ -298,15 +300,32 @@ local function pararAnimacaoAndar()
     end
 end
 
--- ✅ Loop de verificação: garante que animação SÓ roda com rota ativa
-R.Heartbeat:Connect(function()
-    if Playback.Running and not Playback.WalkingToStart then
-        if not walkTrack or not walkTrack.IsPlaying then
-            iniciarAnimacaoAndar()
-        end
-    else
-        if walkTrack and walkTrack.IsPlaying then
-            pararAnimacaoAndar()
+-- Loop que SÓ anima se: rota em execução REAL + personagem se moveu
+task.spawn(function()
+    while true do
+        task.wait(0.1)
+        -- Condição 1: precisa estar rodando rota E não estar esperando no dummy
+        if Playback.Running and not Playback.WalkingToStart and RefreshCharacter() then
+            -- Condição 2: precisa ter se movido no último tick
+            local posAtual = rootPart.Position
+            if ultimaPosAnim then
+                local dist = (posAtual - ultimaPosAnim).Magnitude
+                if dist > 0.15 then
+                    if not walkTrack or not walkTrack.IsPlaying then
+                        iniciarAnimacaoAndar()
+                    end
+                else
+                    if walkTrack and walkTrack.IsPlaying then
+                        pararAnimacaoAndar()
+                    end
+                end
+            end
+            ultimaPosAnim = posAtual
+        else
+            ultimaPosAnim = nil
+            if walkTrack and walkTrack.IsPlaying then
+                pararAnimacaoAndar()
+            end
         end
     end
 end)
@@ -735,13 +754,13 @@ local function CorrigirTexto(texto)
     return txt
 end
 
--- ✅ GerarTextoIA — max_tokens alto + rejeita inglês + retry
+-- ✅ GerarTextoIA: max_tokens 800 + só content + rejeita inglês
 local function _chamarGroq(tema)
     local corpo = HS:JSONEncode({
         model = IA_TEXTOS.Modelo,
         messages = {
             { role = "system", content = IA_TEXTOS.SystemPrompt },
-            { role = "user", content = "Tema: " .. tema .. "\n\nEscreva SOMENTE o texto final em português, 150-210 caracteres, sem explicar nada." }
+            { role = "user", content = "Tema: " .. tema }
         },
         temperature = 0.9,
         max_tokens = 800
@@ -769,7 +788,6 @@ local function _chamarGroq(tema)
     if not okJson or not dados.choices or not dados.choices[1] then return nil end
     local msg = dados.choices[1].message
     if not msg then return nil end
-    -- Só content (não reasoning)
     if msg.content and msg.content ~= "" then return msg.content end
     return nil
 end
@@ -784,10 +802,9 @@ local function GerarTextoIA(tema)
             txt = txt:gsub("^%s+",""):gsub("%s+$","")
             txt = txt:gsub('^["\']+',""):gsub('["\']+$',"")
             txt = txt:gsub("^Tema:%s*",""):gsub("^Texto:%s*","")
-            -- Rejeita respostas com cara de raciocínio/instrução vazada
             local bad = false
-            if txt:find("150%-210") or txt:find("characters") or txt:find("char, ")
-               or txt:find("counting spaces") or txt:find("Must be") or txt:find("sentences")
+            if txt:find("150%-210") or txt:find("characters") or txt:find("counting spaces")
+               or txt:find("Must be") or txt:find("sentences") or txt:find("OK, ")
                or txt:match("^We ") or txt:match("^The ") or txt:match("^I ")
                or txt:match("^Let ") or txt:match("^First") or txt:match("^Here")
                or txt:match("^OK") or txt:match("^Okay") or txt:match("^Alright") then
@@ -2336,7 +2353,7 @@ do
 end
 
 -- =========================================================================
--- COMBATE — Hitbox apenas (aimbot intacto = só mira, sem auto-atacar)
+-- COMBATE — Aimbot normal (só mira) + Hitbox nos outros
 -- =========================================================================
 local Cam = workspace.CurrentCamera
 
@@ -2417,6 +2434,7 @@ local function AIM_lookAtComOffset(target)
     Cam.CFrame = cf
 end
 
+-- Aimbot normal: apenas puxa a câmera, sem atirar
 R.RenderStepped:Connect(function()
     if AimFOVring then
         AimFOVring.Visible = AIM_CONFIG.MostrarFOV or AIM_CONFIG.Ativo
@@ -2430,11 +2448,11 @@ R.RenderStepped:Connect(function()
     local closest = AIM_getClosest()
     if closest then
         local part = AIM_pegarParteAlvo(closest.Character)
-        if part then AIM_lookAtComOffset(part.Position) end
+        if part then AIM_lookAtParteComOffset(part.Position) end
     end
 end)
 
--- ===== HITBOX: aplica APENAS nos OUTROS =====
+-- Hitbox: aplica APENAS nos OUTROS jogadores (nunca em você)
 local function HB_Salvar(char)
     if HB_Original[char] then return end
     local hrp = char:FindFirstChild("HumanoidRootPart")
@@ -2485,9 +2503,7 @@ HB_Conn = R.Heartbeat:Connect(function()
             end
         end
         for char in pairs(HB_Original) do
-            if not char.Parent or P:GetPlayerFromCharacter(char) == Pl then
-                HB_Restaurar(char)
-            end
+            if not char.Parent then HB_Restaurar(char) end
         end
     else
         for char in pairs(HB_Original) do HB_Restaurar(char) end
