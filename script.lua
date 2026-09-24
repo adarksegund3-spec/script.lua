@@ -1342,83 +1342,96 @@ local function CreateTwoColumns(parent, ordem)
 end
 
 -- =========================================================================
--- TAFFS
+-- TAFFS (ATUALIZADO)
 -- =========================================================================
 local TAFFS_DATA = {
+    { Name="TAF (CIGS)", Emoji="🐅", Color=_RGB(255, 180, 50), Fields={
+        {"🐅 TAF", "Teste de Aptidão Física: CIGS"},
+        {"🎖️ Comandante", "Sagas"},
+        {"🎖️ Subcomandante", "Deselegant"},
+        {"📜 Lema", "Treinar para resistir & Combater para vencer."},
+        {"🫡 Pronomes", "Saudações, senhor Guerreiro de Selva. / Saudações, senhores Guerreiros de Selva."},
+        {"🌿 Início", "Retirar boina, dar saudações ao instrutor e passar pelos escudos."}
+    }},
     { Name="CIE", Emoji="🕵️‍♂️", Color=_RGB(70,130,180), Fields={
-        {"🕵️‍♂️ CIE","Centro de Inteligência do Exército"},
-        {"👤 Criador","vicofjgfhf"},
-        {"👤 Sub criador","RIP_dabfj8w"},
-        {"👤 Comandante","eriqurrr."},
-        {"👤 Subcomandante","nohanrtop"},
-        {"📜 Lema","Inteligência para Vitória & Saber para Prever."},
-        {"💬 Saudação","Saudações, senhores Agentes."},
-        {"💬 Saudação","Saudações, senhores Fantasmas."},
-        {"💬 Saudação","Saudações, senhor Agente."},
-        {"💬 Saudação","Saudações, senhor Fantasma."}
+        {"🕵️‍♂️ CIE", "Agente."},
+        {"👤 Criador", "vicofjgfhf"},
+        {"👤 Sub criador", "RIP_dabfj8w"},
+        {"🎖️ Comandante", "eriqurrr."},
+        {"🎖️ Subcomandante", "Rodrigopao8"},
+        {"🫡 Saudações", "Saudações, senhores Agentes. / Saudações, senhores Fantasmas. / Saudações, senhor Agente. / Saudações, senhor Fantasma."},
+        {"📜 Lema CIE", "Inteligência para Vitória & Saber para Prever."}
     }},
     { Name="REC MEC", Emoji="🐎", Color=_RGB(220,180,60), Fields={
-        {"🐎 REC MEC","Regimento de Cavalaria Mecanizado"},
-        {"👤 Comandante","terro_2433."},
-        {"👤 Subcomandante","Contanum5bl"},
-        {"📜 Lema","Haverá sempre uma Cavalaria!, Aço na mente, motor no peito e honra na missão!"},
-        {"💬 Saudação","Saudações, senhores Cavaleiros."},
-        {"💬 Saudação","Saudações, senhor Cavaleiro."},
-        {"📋 Licença","Licença, senhores Cavaleiros."},
-        {"📋 Licença","Licença, senhor Cavaleiro."},
-        {"📋 Licença","Com licença, senhores Cavaleiros."},
-        {"📋 Licença","Com licença, senhor Cavaleiro."},
-        {"📢 Comando","ATENÇÃO TURNO, PREPARAR PARA MARCHAR!"},
-        {"📢 Comando","ATENÇÃO TURNO, MARCHEM!"},
-        {"📢 Comando","ATENÇÃO PELOTÃO, PREPARAR PARA MARCHAR!"},
-        {"📢 Comando","ATENÇÃO PELOTÃO, MARCHEM!"}
+        {"🐎 REC MEC", "Cavaleiros."},
+        {"👤 Comandante", "terro_2433."},
+        {"🎖️ Subcomandante", "Contanum5bl"},
+        {"📜 Lema", "Haverá sempre uma Cavalaria!, Aço na mente, motor no peito e honra na missão!"},
+        {"🫡 Saudações", "Saudações, senhores Cavaleiros. / Saudações, senhor Cavaleiro."},
+        {"🎖️ Licença", "Licença, senhores Cavaleiros. / Licença, senhor Cavaleiro."},
+        {"🫡 Com licença", "Com licença, senhores Cavaleiros. / Com licença, senhor Cavaleiro."},
+        {"📢 Comandos", "ATENÇÃO TURNO, PREPARAR PARA MARCHAR! / ATENÇÃO TURNO, MARCHEM! / ATENÇÃO PELOTÃO, PREPARAR PARA MARCHAR! / ATENÇÃO PELOTÃO, MARCHEM!"}
     }},
-    { Name="BPE", Emoji="👮‍♂️", Color=_RGB(60,180,120), Fields={
-        {"👮‍♂️ BPE","Batalhão de Polícia do Exército"},
-        {"👤 Comandante","zCostasz."},
-        {"👤 Subcomandante","Matheuslindo587."},
-        {"📜 Lema","Orientar o Responsável, Corrigir o Irresponsável, Prender o Incorrigível."},
-        {"💬 Saudação","Saudações, senhores Policiais."},
-        {"💬 Saudação","Saudações, senhor Policial."}
+    { Name="BPE", Emoji="🛡️", Color=_RGB(60,180,120), Fields={
+        {"🛡️ BPE", "Polícia do Exército"},
+        {"👤 Comandante", "zCostasz."},
+        {"🎖️ Subcomandante", "Matheuslindo587."},
+        {"📜 Lema", "Orientar o Responsável, Corrigir o Irresponsável, Prender o Incorrigível."},
+        {"🫡 Pronomes / Saudações", "Saudações, senhores Policiais. / Saudações, senhor Policial."}
     }},
-    { Name="BFE", Emoji="👻", Color=_RGB(200,70,70), Fields={
-        {"👻 BFE","Batalhão de Forças Especiais"},
-        {"👤 Criador","NATANHMELLO4."},
-        {"📅 Criado","1983"},
-        {"👤 Comandante","RenanFoxiy."},
-        {"👤 Subcomandante","TILAPIA_PROFISSIONAL."},
-        {"🛡️ Escudo","Fundo preto com bordas amarelas. No centro um paraquedas branco junto de uma faca vermelha."},
-        {"📜 Lema","Qualquer missão, em qualquer lugar, a qualquer hora, de qualquer maneira."},
-        {"💬 Saudação","Saudações, senhores Fantasmas."},
-        {"💬 Saudação","Saudações, senhor Fantasma."},
-        {"📋 Licença","Com licença, senhor Fantasma."},
-        {"📋 Licença","Licença, senhor Fantasma."}
+    { Name="BFE (Fantasma)", Emoji="👻", Color=_RGB(200,70,70), Fields={
+        {"👻 BFE", "Fantasma."},
+        {"👤 Criador", "NATANHMELLO4."},
+        {"📅 Criado", "1983."},
+        {"🛡️ Escudo", "O escudo do BFE possui fundo preto com bordas amarelas. No centro, há um paraquedas branco junto de uma faca vermelha, simbolizando operações especiais e combate. Na parte inferior, aparece a faixa de Forças Especiais."},
+        {"👤 Comandante", "RenanFoxiy."},
+        {"🎖️ Subcomandante", "TILAPIA_PROFISSIONAL."},
+        {"📜 Lema", "Qualquer missão, em qualquer lugar, a qualquer hora, de qualquer maneira."},
+        {"🫡 Saudações", "Saudações, senhores Fantasmas. / Saudações, senhor Fantasma."},
+        {"🎖️ Licença", "Com licença, senhores Fantasmas. / Com licença, senhor Fantasma."}
     }},
-    { Name="CYBER", Emoji="💻", Color=_RGB(150,100,200), Fields={
-        {"💻 CYBER","Comando de Defesa Cibernética"},
-        {"👤 Criador","wAnTee16j5156."},
-        {"👤 Donos","MaxTheJp1 | ItsMeLyrio | Gabriel2444q."},
-        {"👤 Comandante","highanddry98"},
-        {"👤 Subcomandante","Não tem."},
-        {"📜 Lema","Segurança no ciberespaço, soberania para a Nação."},
-        {"📜 Juramento","JURO GUARDAR SIGILO SOBRE TUDO QUE VER E OUVIR NO COMDCIBER!"},
-        {"💬 Saudação","Saudações, senhores Analistas."}
+    { Name="BIP", Emoji="🪂", Color=_RGB(200, 200, 100), Fields={
+        {"🪂 BIP", "Batalhão de Infantaria Paraquedista."},
+        {"👤 Comandante", ""},
+        {"🎖️ Subcomandante", ""},
+        {"📜 Lema", "Paraquedistas, sempre prontos para a missão, do céu ao chão."},
+        {"🎯 Missão", "Manter a tropa pronta para atuar em missões aeroterrestres, com disciplina, coragem e prontidão."},
+        {"🫡 Saudações", "Saudações, senhores Paraquedistas. / Saudações, senhor Paraquedista."},
+        {"🎖️ Licença", "Com licença, senhores Paraquedistas. / Com licença, senhor Paraquedista."},
+        {"🪂 Grito de Guerra", "PARAQUEDISTA!"}
+    }},
+    { Name="BSE", Emoji="🦉", Color=_RGB(100, 150, 200), Fields={
+        {"🦉 BSE", "Batalhão Sentinela De Elite"},
+        {"👤 Comandante", "aizedamanga9149"},
+        {"🎖️ Subcomandante", "davisilva0194"},
+        {"📜 Lema", "Sentinela de Elite, firmes na missão; honra e disciplina, nossa tradição!"},
+        {"🫡 Saudações", "Saudações, senhores sentinelas! / Saudações, senhor sentinela! / Saudações, nobres sentinelas! / Saudações, nobre sentinela!"},
+        {"🎖️ Com licença", "Com licença, senhor sentinela! / Com licença, nobres sentinelas! / Com licença, nobre sentinela!"}
     }},
     { Name="BAC", Emoji="💀", Color=_RGB(220,100,50), Fields={
-        {"💀 BAC","Batalhão de Ações de Comandos"},
-        {"👤 Dono","MateusHgz."},
-        {"👤 Comandante","SasukePro202."},
-        {"👤 Subcomandante","DanielSxS2."},
-        {"📜 Lema","O máximo de confusão, morte e destruição na retaguarda do inimigo."},
-        {"💬 Saudação","Saudações, senhor Comando."},
-        {"💬 Saudação","Saudações, senhores Comandos."}
+        {"💀 INFORMAÇÕES BAC", "Batalhão de Ações de Comandos"},
+        {"👑 Dono", "MateusHgz"},
+        {"🎖️ Comandante", "SasukeePro202."},
+        {"🎖️ Subcomandante", "DanielSxS2."},
+        {"📜 Lema da BAC", "O máximo de confusão, morte e destruição na retaguarda do inimigo."},
+        {"🫡 Saudações", "Saudações, senhor Comando. / Saudações, senhores Comandos."}
     }},
-    { Name="CAAT", Emoji="🌵", Color=_RGB(50,150,80), Fields={
-        {"🌵 CAAT","Batalhão de Infantaria de Caatinga"},
-        {"👤 Comandante","Não tem."},
-        {"👤 Subcomandante","gabrielcm04."},
-        {"📜 Lema","O pai cria, a mãe educa e a Caatinga elimina."},
-        {"💬 Saudação","Saudações, senhores Guardiões da Caatinga."}
+    { Name="CYBER", Emoji="💻", Color=_RGB(150,100,200), Fields={
+        {"💻 CYBER", "Comando de Defesa Cibernética."},
+        {"🫡 Saudações", "Saudações, senhores Analistas."},
+        {"👤 Criador", "wAnTee16j5156."},
+        {"👑 Dono", "MaxTheJp1. / ItsMeLyrio. / Gabriel2444q."},
+        {"🎖️ Comandante", "highanddry98"},
+        {"🎖️ Subcomandante", "Não tem."},
+        {"📜 Lema", "Segurança no ciberespaço, soberania para a Nação."},
+        {"🛡️ JURAMENTO", "JURO GUARDAR SIGILO SOBRE TUDO QUE VER E OUVRIR NO COMDCIBER!"}
+    }},
+    { Name="CAATINGA", Emoji="🌵", Color=_RGB(50,150,80), Fields={
+        {"🌵 CAATINGA", "Guardiões da Caatinga."},
+        {"👤 Comandante", "Gabrielcm04"},
+        {"🎖️ Subcomandante", "Plk_Ln17"},
+        {"📜 Lema", "O pai cria, a mãe educa e a Caatinga elimina."},
+        {"🫡 Saudação", "Saudações, senhores guardiões da Caatinga."}
     }}
 }
 
