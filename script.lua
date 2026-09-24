@@ -105,6 +105,7 @@ local R = game:GetService("RunService")
 local HS = game:GetService("HttpService")
 local TCS = game:GetService("TextChatService")
 local RS = game:GetService("ReplicatedStorage")
+local VIM = game:GetService("VirtualInputManager")
 local Pl = P.LocalPlayer
 local PG = Pl:WaitForChild("PlayerGui")
 local character,humanoid,rootPart
@@ -136,7 +137,7 @@ local IA_TEXTOS = {
     Endpoint = "https://api.groq.com/openai/v1/chat/completions",
     Modelo = "openai/gpt-oss-120b",
     Timeout = 15,
-    SystemPrompt = "Você é um gerador de textos do Exército Brasileiro em um jogo de Roblox (roleplay militar). O usuário vai te dar um TEMA. Você deve escrever um texto curto, humano, gramaticalmente perfeito e patriótico sobre exatamente esse tema. REGRAS OBRIGATÓRIAS: (1) O texto DEVE ter entre 150 e 210 caracteres, contando espaços. (2) Máximo 3 frases curtas. (3) Fique 100% fiel ao tema pedido, sem fugir do assunto. (4) Tom militar realista, natural e humano, sem exageros nem clichês. (5) Sem saudações, sem aspas, sem emojis, sem formatação, sem introduções. (6) Responda APENAS com o texto final, nada mais."
+    SystemPrompt = "Gere um texto CURTO em português do Brasil sobre o tema do Exército Brasileiro que o usuário pedir.\n\nREGRAS OBRIGATÓRIAS:\n(1) Tenha entre 150 e 210 caracteres contando espaços.\n(2) Máximo 3 frases curtas.\n(3) Tom militar, humano, patriótico.\n(4) NÃO explique nada. NÃO escreva em inglês. NÃO pense em voz alta. NÃO use aspas nem emojis.\n(5) Responda APENAS com o texto final."
 }
 
 local httpRequest = request or (syn and syn.request) or (http and http.request) or http_request
@@ -258,10 +259,11 @@ end
 Pl.CharacterAdded:Connect(function() task.wait(.2); RefreshCharacter() end)
 RefreshCharacter()
 
--- ✅ Animação de andar durante a rota (via Animator manual — visual local, seguro)
+-- ===== Animação de andar NATURAL: só toca quando o personagem está no chão =====
 local walkTrack
 local function iniciarAnimacaoAndar()
     if not RefreshCharacter() then return end
+    if walkTrack and walkTrack.IsPlaying then return end
     local animator = humanoid:FindFirstChildOfClass("Animator")
     if not animator then
         animator = _I("Animator")
@@ -281,7 +283,6 @@ local function iniciarAnimacaoAndar()
         animationId = isR15 and "rbxassetid://507777826" or "rbxassetid://180426354"
     end
     pcall(function()
-        if walkTrack then walkTrack:Stop() end
         local anim = _I("Animation")
         anim.AnimationId = animationId
         walkTrack = animator:LoadAnimation(anim)
@@ -297,6 +298,28 @@ local function pararAnimacaoAndar()
         walkTrack = nil
     end
 end
+
+-- Loop de animação: só toca quando está no chão (não voando, pulando ou caindo)
+R.Heartbeat:Connect(function()
+    if not Playback.Running then
+        if walkTrack then pararAnimacaoAndar() end
+        return
+    end
+    if not RefreshCharacter() then return end
+    local st = humanoid:GetState()
+    local noChao = (st == Enum.HumanoidStateType.Running
+                 or st == Enum.HumanoidStateType.Walking
+                 or st == Enum.HumanoidStateType.RunningNoPhysics)
+    if noChao then
+        if not walkTrack or not walkTrack.IsPlaying then
+            iniciarAnimacaoAndar()
+        end
+    else
+        if walkTrack and walkTrack.IsPlaying then
+            pararAnimacaoAndar()
+        end
+    end
+end)
 
 local function Number(v) return v and tonumber(v) end
 
@@ -403,7 +426,6 @@ local function GetRotation(f)
     if f.rx and f.ry and f.rz then return CFrame.Angles(f.rx,f.ry,f.rz) end
 end
 
--- ApplyPosition — modo pivot (original, seguro)
 local function ApplyPosition(pos,rot)
     if not pos or not RefreshCharacter() then return false end
     local corrected=pos+Vector3.new(0,CONFIG.GroundOffset,0)
@@ -537,7 +559,6 @@ local function IniciarExecucao(name)
         humanoid:Move(Vector3.zero, false)
         pcall(function() humanoid.AutoRotate = false end)
     end
-    iniciarAnimacaoAndar()
     Playback.StartClock = os.clock()
     Playback.CurrentIndex = 1
     Playback.LastJump = -math.huge
@@ -679,7 +700,7 @@ local function EnviarNoChat(msg)
         local canal=canais and canais:FindFirstChild("RBXGeneral")
         if canal then canal:SendAsync(msg); return true end
     end
-    local eventos=RS:FindFirstChild("DefaultChatSystemChatEvents")
+    local eventos=RS:FindFirstChild("DefaultDefaultChatSystemChatEvents")
     local say=eventos and eventos:FindFirstChild("SayMessageRequest")
     if say then say:FireServer(msg,"All"); return true end
     return false
@@ -724,30 +745,22 @@ local function CorrigirTexto(texto)
     return txt
 end
 
-local function GerarTextoIA(tema)
-    if not httpRequest then
-        return nil, "Executor sem suporte a HTTP"
-    end
-    if not tema or tema == "" then
-        return nil, "Tema vazio"
-    end
-
+-- ✅ GerarTextoIA com retry + rejeição de raciocínio em inglês
+local function _chamarGroq(tema)
     local corpo = HS:JSONEncode({
         model = IA_TEXTOS.Modelo,
         messages = {
             { role = "system", content = IA_TEXTOS.SystemPrompt },
             { role = "user", content = "Tema: " .. tema }
         },
-        temperature = 0.85,
-        max_tokens = 150
+        temperature = 0.9,
+        max_tokens = 800
     })
-
     local resposta, terminou = nil, false
     task.spawn(function()
         local ok, res = pcall(function()
             return httpRequest({
-                Url = IA_TEXTOS.Endpoint,
-                Method = "POST",
+                Url = IA_TEXTOS.Endpoint, Method = "POST",
                 Headers = {
                     ["Content-Type"] = "application/json",
                     ["Authorization"] = "Bearer " .. IA_TEXTOS.ApiKey
@@ -758,42 +771,54 @@ local function GerarTextoIA(tema)
         if ok then resposta = res end
         terminou = true
     end)
-
     local inicio = tick()
-    while not terminou and (tick() - inicio) < IA_TEXTOS.Timeout do
-        task.wait(0.1)
-    end
-
-    if not terminou then return nil, "Tempo esgotado" end
-    if not resposta then return nil, "Falha na requisição" end
-    if resposta.StatusCode ~= 200 then return nil, "HTTP " .. tostring(resposta.StatusCode) end
-
-    local okJson, dados = pcall(function()
-        return HS:JSONDecode(resposta.Body)
-    end)
-    if not okJson or not dados.choices or not dados.choices[1] then
-        return nil, "Resposta inválida"
-    end
-
+    while not terminou and (tick() - inicio) < IA_TEXTOS.Timeout do task.wait(0.1) end
+    if not terminou or not resposta then return nil end
+    if resposta.StatusCode ~= 200 then return nil end
+    local okJson, dados = pcall(function() return HS:JSONDecode(resposta.Body) end)
+    if not okJson or not dados.choices or not dados.choices[1] then return nil end
     local msg = dados.choices[1].message
-    if not msg then return nil, "Resposta vazia" end
+    if not msg then return nil end
+    return msg.content
+end
 
-    local txt = msg.content
-    if (not txt or txt == "") and msg.reasoning then
-        txt = msg.reasoning
+local function GerarTextoIA(tema)
+    if not httpRequest then return nil, "Executor sem suporte a HTTP" end
+    if not tema or tema == "" then return nil, "Tema vazio" end
+
+    for tentativa = 1, 3 do
+        local txt = _chamarGroq(tema)
+        if txt and txt ~= "" then
+            txt = txt:gsub("^%s+",""):gsub("%s+$","")
+            txt = txt:gsub('^["\']+',""):gsub('["\']+$',"")
+            txt = txt:gsub("^Tema:%s*",""):gsub("^Texto:%s*","")
+
+            -- ✅ Detecta raciocínio em inglês/instruções vazadas
+            local bad = false
+            if txt:match("^We ") or txt:match("^The user") or txt:match("^Let me")
+               or txt:match("^I ") or txt:match("^I'll") or txt:match("^I need")
+               or txt:match("^First") or txt:match("^The text") or txt:match("^Here")
+               or txt:find("150%-210") or txt:find("characters, counting")
+               or txt:find("Must be 3 sentences") or txt:find("counting spaces")
+               or txt:find("short sentences") or txt:match("[Aa]lright,")
+               or txt:match("^OK,") or txt:match("^Okay") then
+                bad = true
+            end
+            -- Rejeita se mais de 60% das letras estiverem em inglês comum
+            local ingles = 0
+            for _, p in ipairs({" the "," and "," we "," must "," should "," need "," with "," this "}) do
+                if txt:lower():find(p, 1, true) then ingles = ingles + 1 end
+            end
+            if ingles >= 2 then bad = true end
+
+            if not bad then
+                if #txt > 200 then txt = txt:sub(1, 200) end
+                return txt
+            end
+        end
+        task.wait(0.3)
     end
-    if not txt or txt == "" then return nil, "Resposta vazia" end
-
-    txt = txt:gsub("^%s+", ""):gsub("%s+$", "")
-    txt = txt:gsub('^["\']+', ""):gsub('["\']+$', "")
-    txt = txt:gsub("^Tema:%s*", "")
-    txt = txt:gsub("^Texto:%s*", "")
-
-    if #txt > 200 then
-        txt = txt:sub(1, 200)
-    end
-
-    return txt
+    return nil, "IA não conseguiu gerar. Clique novamente."
 end
 
 -- =========================================================================
@@ -970,7 +995,6 @@ function UI.Toggle(parent, ordem, texto, inicial, callback)
     return row
 end
 
--- Dropdown inline (empurra o conteúdo de baixo, fecha ao escolher)
 function UI.Dropdown(parent, ordem, label, opcoes, atual, callback)
     local wrap = _I("Frame", parent)
     wrap.Size = _U2(1,0,0,0)
@@ -1584,10 +1608,17 @@ local function ShowTowersContent()
     end
 end
 
+-- ✅ AUTOMAÇÃO: Auto JJS melhorado (WeakTable + scan rápido)
 local ShowAutomacaoContent
 do
-    local ativo,VELOCIDADE,MAX_CLIQUES,META,META_ATIVA=false,53,2,308,true
-    local jjsFeitos,bolhasVistas,cliquesTotal,ultimaBolhaVista=0,{},0,0
+    local ativo = false
+    local VELOCIDADE = 53
+    local META = 308
+    local META_ATIVA = true
+    local jjsFeitos = 0
+    local cliquesTotal = 0
+    local ultimaBolhaVista = 0
+    local bolhasVistas = setmetatable({}, {__mode = "k"})  -- ✅ por Instance
     local btnToggleRef,infoLbl
 
     local function setBtnEstado(ligado)
@@ -1610,24 +1641,20 @@ do
         end)
     end
     local function ehBolha(obj)
+        if not obj or not obj.Parent then return false end
         if obj.ClassName~="ImageButton" then return false end
         if obj.Name~="InputTemplate" then return false end
         if not obj.Visible then return false end
-        local s=obj.AbsoluteSize
-        if s.X<20 or s.Y<20 or s.X>200 or s.Y>200 then return false end
-        local p=obj.AbsolutePosition
-        if p.X<=0 or p.Y<=0 then return false end
+        local s = obj.AbsoluteSize
+        if s.X < 20 or s.Y < 20 or s.X > 250 or s.Y > 250 then return false end
+        local p = obj.AbsolutePosition
+        if p.X <= 0 or p.Y <= 0 then return false end
         return true
-    end
-    local function gerarID(obj)
-        local pos=obj.AbsolutePosition local size=obj.AbsoluteSize
-        local cx=pos.X+size.X/2 local cy=pos.Y+size.Y/2
-        return math.floor(cx/40).."_"..math.floor(cy/40)
     end
 
     task.spawn(function()
         while true do
-            task.wait(0.1)
+            task.wait(0.03)  -- ✅ loop rápido
             if not ativo then continue end
             if META_ATIVA and jjsFeitos >= META then
                 ativo = false
@@ -1635,30 +1662,23 @@ do
                 Notify("AUTO JJS","Meta atingida: "..jjsFeitos.."/"..META,"Success")
                 continue
             end
-            local delayAtual=VELOCIDADE/100
-            local agora=tick()
-            for id,dados in pairs(bolhasVistas) do
-                if agora-dados.t>2.5 then bolhasVistas[id]=nil end
-            end
-            local clicou=false
+            local clicou = false
             for _,gui in ipairs(PG:GetChildren()) do
-                if gui:IsA("ScreenGui") and gui~=Gui then
+                if gui:IsA("ScreenGui") and gui ~= Gui then
                     for _,obj in ipairs(gui:GetDescendants()) do
                         if ehBolha(obj) then
-                            ultimaBolhaVista=tick()
-                            local id=gerarID(obj)
-                            local dados=bolhasVistas[id]
+                            ultimaBolhaVista = tick()
+                            local dados = bolhasVistas[obj]
                             if not dados then
-                                bolhasVistas[id]={count=0,t=tick()}
-                                dados=bolhasVistas[id]
+                                dados = {count=0}
+                                bolhasVistas[obj] = dados
                             end
-                            dados.t=tick()
-                            if dados.count<MAX_CLIQUES then
+                            if dados.count < 1 then
                                 clicarFiresignal(obj)
-                                dados.count=dados.count+1
-                                cliquesTotal=cliquesTotal+1
-                                clicou=true
-                                if dados.count==1 then jjsFeitos=jjsFeitos+1 end
+                                dados.count = dados.count + 1
+                                cliquesTotal = cliquesTotal + 1
+                                clicou = true
+                                jjsFeitos = jjsFeitos + 1
                                 break
                             end
                         end
@@ -1666,7 +1686,9 @@ do
                     if clicou then break end
                 end
             end
-            if clicou then task.wait(delayAtual) else task.wait(0.02) end
+            if clicou then
+                task.wait(VELOCIDADE/100)
+            end
         end
     end)
 
@@ -1735,20 +1757,20 @@ do
         infoLbl.LayoutOrder = 5
 
         btnToggleRef = UI.ActionButton(card, 6, "Iniciar Auto JJS", _RGB(28,28,36), function()
-            if not ativo and jjsFeitos >= META then
+            if not ativo and META_ATIVA and jjsFeitos >= META then
                 jjsFeitos = 0
                 cliquesTotal = 0
-                bolhasVistas = {}
+                bolhasVistas = setmetatable({}, {__mode="k"})
             end
             ativo = not ativo
             setBtnEstado(ativo)
-            if ativo then ultimaBolhaVista=tick() end
+            if ativo then ultimaBolhaVista = tick() end
         end)
 
         UI.ActionButton(card, 7, "Resetar Contador", _RGB(24,24,30), function()
             jjsFeitos = 0
             cliquesTotal = 0
-            bolhasVistas = {}
+            bolhasVistas = setmetatable({}, {__mode="k"})
             Notify("AUTO JJS","Contador resetado.","Success")
         end)
     end
@@ -2332,19 +2354,85 @@ end
 -- =========================================================================
 -- COMBATE
 -- =========================================================================
-local AIM_CONFIG = {
-    Ativo=false, MostrarFOV=false, FOV=43, RingTransparency=0.3,
-    Cor=Color3.fromRGB(150,80,255), Thickness=2,
-    OffsetX=0, OffsetY=-47, ParteAlvo="Cabeça"
-}
+local Cam = workspace.CurrentCamera
+
+-- ===== HITBOX: aplica APENAS nos outros jogadores (NUNCA em você) =====
 local HB_CONFIG = {
     Ativo=false, Visual=true, Tamanho=2, Transparencia=0.5,
-    Cor=_RGB(255,0,0), Material="Neon"
+    Cor=_RGB(255,0,0)
 }
 local HB_Original = {}
 local HB_Tok = os.clock()
 PG:SetAttribute("ZKYHitbox", HB_Tok)
 
+local function HB_Salvar(char)
+    if HB_Original[char] then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    HB_Original[char] = {Size=hrp.Size, Transparency=hrp.Transparency,
+        Color=hrp.Color, Material=hrp.Material, CanCollide=hrp.CanCollide}
+end
+local function HB_Aplicar(char)
+    if not char then return end
+    if char == character then return end  -- ✅ NUNCA aplica em você
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    HB_Salvar(char)
+    pcall(function()
+        hrp.Size = Vector3.new(HB_CONFIG.Tamanho,HB_CONFIG.Tamanho,HB_CONFIG.Tamanho)
+        hrp.Transparency = HB_CONFIG.Visual and HB_CONFIG.Transparencia or 1
+        hrp.Color = HB_CONFIG.Cor
+        hrp.Material = Enum.Material.Neon
+        hrp.CanCollide = false
+    end)
+end
+local function HB_Restaurar(char)
+    if not char then return end
+    local orig = HB_Original[char]
+    if not orig then return end
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if hrp then
+        pcall(function()
+            hrp.Size = orig.Size hrp.Transparency = orig.Transparency
+            hrp.Color = orig.Color hrp.Material = orig.Material
+            hrp.CanCollide = orig.CanCollide
+        end)
+    end
+    HB_Original[char] = nil
+end
+
+local HB_Conn
+HB_Conn = R.Heartbeat:Connect(function()
+    if PG:GetAttribute("ZKYHitbox") ~= HB_Tok then
+        HB_Conn:Disconnect()
+        for c in pairs(HB_Original) do HB_Restaurar(c) end
+        return
+    end
+    if HB_CONFIG.Ativo then
+        -- ✅ Aplica SOMENTE nos outros jogadores
+        for _, p in ipairs(P:GetPlayers()) do
+            if p ~= Pl and p.Character and p.Character.Parent then
+                HB_Aplicar(p.Character)
+            end
+        end
+        -- ✅ Limpeza: se a char não é mais de outro jogador, restaura
+        for char in pairs(HB_Original) do
+            local dono = P:GetPlayerFromCharacter(char)
+            if not char.Parent or dono == nil or dono == Pl then
+                HB_Restaurar(char)
+            end
+        end
+    else
+        for char in pairs(HB_Original) do HB_Restaurar(char) end
+    end
+end)
+
+-- ===== AIM: mira + dano automático =====
+local AIM_CONFIG = {
+    Ativo=false, MostrarFOV=false, FOV=43, RingTransparency=0.3,
+    Cor=Color3.fromRGB(150,80,255), Thickness=2,
+    OffsetX=0, OffsetY=-47, ParteAlvo="Cabeça"
+}
 local AimFOVring
 pcall(function()
     AimFOVring = Drawing.new("Circle")
@@ -2354,7 +2442,6 @@ pcall(function()
     AimFOVring.Filled=false
     AimFOVring.Radius=AIM_CONFIG.FOV
 end)
-local Cam = workspace.CurrentCamera
 
 local function AIM_getCentro()
     return Vector2.new(
@@ -2410,6 +2497,23 @@ local function AIM_lookAtComOffset(target)
     Cam.CFrame = cf
 end
 
+local function AIM_atacar()
+    if not RefreshCharacter() then return end
+    pcall(function()
+        VIM:SendMouseButtonEvent(0, 0, 0, true, game, 1)
+        VIM:SendMouseButtonEvent(0, 0, 0, false, game, 1)
+    end)
+    local tool = character:FindFirstChildOfClass("Tool")
+    if tool then
+        pcall(function() tool:Activate() end)
+    end
+    if mouse1click then pcall(mouse1click) end
+    if mouse1press and mouse1release then
+        pcall(function() mouse1press() mouse1release() end)
+    end
+end
+
+local ultimoAtaque = 0
 R.RenderStepped:Connect(function()
     if AimFOVring then
         AimFOVring.Visible = AIM_CONFIG.MostrarFOV or AIM_CONFIG.Ativo
@@ -2423,61 +2527,13 @@ R.RenderStepped:Connect(function()
     local closest = AIM_getClosest()
     if closest then
         local part = AIM_pegarParteAlvo(closest.Character)
-        if part then AIM_lookAtComOffset(part.Position) end
-    end
-end)
-
-local function HB_Salvar(char)
-    if HB_Original[char] then return end
-    local hrp = char:FindFirstChild("HumanoidRootPart")
-    if not hrp then return end
-    HB_Original[char] = {Size=hrp.Size, Transparency=hrp.Transparency,
-        Color=hrp.Color, Material=hrp.Material, CanCollide=hrp.CanCollide}
-end
-local function HB_Aplicar(char)
-    if not char then return end
-    local hrp = char:FindFirstChild("HumanoidRootPart")
-    if not hrp then return end
-    HB_Salvar(char)
-    pcall(function()
-        hrp.Size = Vector3.new(HB_CONFIG.Tamanho,HB_CONFIG.Tamanho,HB_CONFIG.Tamanho)
-        hrp.Transparency = HB_CONFIG.Visual and HB_CONFIG.Transparencia or 1
-        hrp.Color = HB_CONFIG.Cor
-        hrp.Material = Enum.Material.Neon
-        hrp.CanCollide = false
-    end)
-end
-local function HB_Restaurar(char)
-    if not char then return end
-    local orig = HB_Original[char]
-    if not orig then return end
-    local hrp = char:FindFirstChild("HumanoidRootPart")
-    if hrp then
-        pcall(function()
-            hrp.Size = orig.Size hrp.Transparency = orig.Transparency
-            hrp.Color = orig.Color hrp.Material = orig.Material
-            hrp.CanCollide = orig.CanCollide
-        end)
-    end
-    HB_Original[char] = nil
-end
-
-local HB_Conn
-HB_Conn = R.Heartbeat:Connect(function()
-    if PG:GetAttribute("ZKYHitbox") ~= HB_Tok then
-        HB_Conn:Disconnect()
-        for c in pairs(HB_Original) do HB_Restaurar(c) end
-        return
-    end
-    if HB_CONFIG.Ativo then
-        for _,p in ipairs(P:GetPlayers()) do
-            if p ~= Pl and p.Character then HB_Aplicar(p.Character) end
+        if part then
+            AIM_lookAtComOffset(part.Position)
+            if tick() - ultimoAtaque > 0.08 then
+                AIM_atacar()
+                ultimoAtaque = tick()
+            end
         end
-        for char in pairs(HB_Original) do
-            if not char.Parent then HB_Original[char] = nil end
-        end
-    else
-        for char in pairs(HB_Original) do HB_Restaurar(char) end
     end
 end)
 
@@ -2891,7 +2947,7 @@ task.defer(function()
         if LoadTowerRoute("Torre 2",rn) then lt2+=1 end
     end
     ShowEBDelta()
-    Notify("ZKY PARKOUR",loaded.."/4 parkours • Torre 1: "..(lt1 and "OK" or "ERRO").." • Torre 2: "..lt2.."/4",
+    Notify("AKIRA MENU",loaded.."/4 parkours • Torre 1: "..(lt1 and "OK" or "ERRO").." • Torre 2: "..lt2.."/4",
         loaded==4 and lt1 and lt2==4 and "Success" or "Error")
 end)
 
