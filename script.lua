@@ -258,10 +258,8 @@ end
 Pl.CharacterAdded:Connect(function() task.wait(.2); RefreshCharacter() end)
 RefreshCharacter()
 
--- ✅ Animação de andar: SÓ toca se Playback.Running E não estiver esperando no dummy
--- E só enquanto o personagem realmente está em movimento
+-- ✅ Animação de andar NATURAL — só toca quando estiver no CHÃO durante a rota
 local walkTrack
-local ultimaPosAnim = nil
 local function iniciarAnimacaoAndar()
     if not RefreshCharacter() then return end
     if walkTrack and walkTrack.IsPlaying then return end
@@ -300,29 +298,27 @@ local function pararAnimacaoAndar()
     end
 end
 
--- Loop que SÓ anima se: rota em execução REAL + personagem se moveu
+-- ✅ Loop: só toca animação se estiver em execução de rota E no CHÃO (FloorMaterial ~= Air)
 task.spawn(function()
     while true do
-        task.wait(0.1)
-        -- Condição 1: precisa estar rodando rota E não estar esperando no dummy
+        task.wait(0.08)
         if Playback.Running and not Playback.WalkingToStart and RefreshCharacter() then
-            -- Condição 2: precisa ter se movido no último tick
-            local posAtual = rootPart.Position
-            if ultimaPosAnim then
-                local dist = (posAtual - ultimaPosAnim).Magnitude
-                if dist > 0.15 then
-                    if not walkTrack or not walkTrack.IsPlaying then
-                        iniciarAnimacaoAndar()
-                    end
-                else
-                    if walkTrack and walkTrack.IsPlaying then
-                        pararAnimacaoAndar()
-                    end
+            local noChao = humanoid.FloorMaterial ~= Enum.Material.Air
+            local st = humanoid:GetState()
+            local estadoChao = (st == Enum.HumanoidStateType.Running
+                             or st == Enum.HumanoidStateType.Walking
+                             or st == Enum.HumanoidStateType.RunningNoPhysics
+                             or st == Enum.HumanoidStateType.Landed)
+            if noChao and estadoChao then
+                if not walkTrack or not walkTrack.IsPlaying then
+                    iniciarAnimacaoAndar()
+                end
+            else
+                if walkTrack and walkTrack.IsPlaying then
+                    pararAnimacaoAndar()
                 end
             end
-            ultimaPosAnim = posAtual
         else
-            ultimaPosAnim = nil
             if walkTrack and walkTrack.IsPlaying then
                 pararAnimacaoAndar()
             end
@@ -754,22 +750,30 @@ local function CorrigirTexto(texto)
     return txt
 end
 
--- ✅ GerarTextoIA: max_tokens 800 + só content + rejeita inglês
-local function _chamarGroq(tema)
+local function GerarTextoIA(tema)
+    if not httpRequest then
+        return nil, "Executor sem suporte a HTTP"
+    end
+    if not tema or tema == "" then
+        return nil, "Tema vazio"
+    end
+
     local corpo = HS:JSONEncode({
         model = IA_TEXTOS.Modelo,
         messages = {
             { role = "system", content = IA_TEXTOS.SystemPrompt },
             { role = "user", content = "Tema: " .. tema }
         },
-        temperature = 0.9,
-        max_tokens = 800
+        temperature = 0.85,
+        max_tokens = 150
     })
+
     local resposta, terminou = nil, false
     task.spawn(function()
         local ok, res = pcall(function()
             return httpRequest({
-                Url = IA_TEXTOS.Endpoint, Method = "POST",
+                Url = IA_TEXTOS.Endpoint,
+                Method = "POST",
                 Headers = {
                     ["Content-Type"] = "application/json",
                     ["Authorization"] = "Bearer " .. IA_TEXTOS.ApiKey
@@ -780,44 +784,42 @@ local function _chamarGroq(tema)
         if ok then resposta = res end
         terminou = true
     end)
+
     local inicio = tick()
-    while not terminou and (tick() - inicio) < IA_TEXTOS.Timeout do task.wait(0.1) end
-    if not terminou or not resposta then return nil end
-    if resposta.StatusCode ~= 200 then return nil end
-    local okJson, dados = pcall(function() return HS:JSONDecode(resposta.Body) end)
-    if not okJson or not dados.choices or not dados.choices[1] then return nil end
-    local msg = dados.choices[1].message
-    if not msg then return nil end
-    if msg.content and msg.content ~= "" then return msg.content end
-    return nil
-end
-
-local function GerarTextoIA(tema)
-    if not httpRequest then return nil, "Executor sem suporte a HTTP" end
-    if not tema or tema == "" then return nil, "Tema vazio" end
-
-    for _ = 1, 3 do
-        local txt = _chamarGroq(tema)
-        if txt and txt ~= "" then
-            txt = txt:gsub("^%s+",""):gsub("%s+$","")
-            txt = txt:gsub('^["\']+',""):gsub('["\']+$',"")
-            txt = txt:gsub("^Tema:%s*",""):gsub("^Texto:%s*","")
-            local bad = false
-            if txt:find("150%-210") or txt:find("characters") or txt:find("counting spaces")
-               or txt:find("Must be") or txt:find("sentences") or txt:find("OK, ")
-               or txt:match("^We ") or txt:match("^The ") or txt:match("^I ")
-               or txt:match("^Let ") or txt:match("^First") or txt:match("^Here")
-               or txt:match("^OK") or txt:match("^Okay") or txt:match("^Alright") then
-                bad = true
-            end
-            if not bad then
-                if #txt > 200 then txt = txt:sub(1, 200) end
-                return txt
-            end
-        end
-        task.wait(0.4)
+    while not terminou and (tick() - inicio) < IA_TEXTOS.Timeout do
+        task.wait(0.1)
     end
-    return nil, "IA não formatou. Clique novamente."
+
+    if not terminou then return nil, "Tempo esgotado" end
+    if not resposta then return nil, "Falha na requisição" end
+    if resposta.StatusCode ~= 200 then return nil, "HTTP " .. tostring(resposta.StatusCode) end
+
+    local okJson, dados = pcall(function()
+        return HS:JSONDecode(resposta.Body)
+    end)
+    if not okJson or not dados.choices or not dados.choices[1] then
+        return nil, "Resposta inválida"
+    end
+
+    local msg = dados.choices[1].message
+    if not msg then return nil, "Resposta vazia" end
+
+    local txt = msg.content
+    if (not txt or txt == "") and msg.reasoning then
+        txt = msg.reasoning
+    end
+    if not txt or txt == "" then return nil, "Resposta vazia" end
+
+    txt = txt:gsub("^%s+", ""):gsub("%s+$", "")
+    txt = txt:gsub('^["\']+', ""):gsub('["\']+$', "")
+    txt = txt:gsub("^Tema:%s*", "")
+    txt = txt:gsub("^Texto:%s*", "")
+
+    if #txt > 200 then
+        txt = txt:sub(1, 200)
+    end
+
+    return txt
 end
 
 -- =========================================================================
@@ -2353,7 +2355,7 @@ do
 end
 
 -- =========================================================================
--- COMBATE — Aimbot normal (só mira) + Hitbox nos outros
+-- COMBATE — Aim (só mira) + Hitbox nos outros
 -- =========================================================================
 local Cam = workspace.CurrentCamera
 
@@ -2434,7 +2436,7 @@ local function AIM_lookAtComOffset(target)
     Cam.CFrame = cf
 end
 
--- Aimbot normal: apenas puxa a câmera, sem atirar
+-- ✅ Aimbot: só mira (sem auto-atirar)
 R.RenderStepped:Connect(function()
     if AimFOVring then
         AimFOVring.Visible = AIM_CONFIG.MostrarFOV or AIM_CONFIG.Ativo
@@ -2448,11 +2450,11 @@ R.RenderStepped:Connect(function()
     local closest = AIM_getClosest()
     if closest then
         local part = AIM_pegarParteAlvo(closest.Character)
-        if part then AIM_lookAtParteComOffset(part.Position) end
+        if part then AIM_lookAtComOffset(part.Position) end
     end
 end)
 
--- Hitbox: aplica APENAS nos OUTROS jogadores (nunca em você)
+-- ✅ Hitbox: aplica apenas nos OUTROS (nunca em você)
 local function HB_Salvar(char)
     if HB_Original[char] then return end
     local hrp = char:FindFirstChild("HumanoidRootPart")
