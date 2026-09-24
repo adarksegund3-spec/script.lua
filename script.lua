@@ -1,20 +1,9 @@
 -- =========================================================================
--- AKIRA MENU V2.7.1 — Arquivo completo
---  • Abre por padrão em CRÉDITOS
---  • Auto JJS (bloco extraído V2.3)
---  • Combate completo (bloco extraído V2.3)
---  • ✅ UI.Card corrigido (AutomaticSize travando na 1ª linha)
---  • Animação de andar só quando realmente anda
---  • TAFFS sem aviso de menu secundário
---  • Aba EXTRAS com Zoom Unlock
+-- AKIRA MENU V2.2.1 — Bugs corrigidos
+--  • Auto JJS: firesignal em pcalls separados + clica todas as bolhas
+--  • Gerador IA: max_tokens alto + não usa reasoning como fallback
+--  • Animação de andar: cacheada + detecta movimento por delta de posição
 -- =========================================================================
-
-if _G.ZKY_KILL and type(_G.ZKY_KILL) == "function" then
-    pcall(_G.ZKY_KILL)
-end
-local _KILLED = false
-_G.ZKY_KILL = function() _KILLED = true end
-local function alive() return not _KILLED end
 
 _G.ZKY_OK = false
 do
@@ -112,6 +101,9 @@ do
 end
 repeat task.wait() until _G.ZKY_OK
 
+-- =========================================================================
+-- SERVIÇOS E ATALHOS
+-- =========================================================================
 local _I,_U2,_UO,_UD,_RGB,_V2,_GB,_GM,_XL,_XC = Instance.new,UDim2.new,UDim2.fromOffset,UDim.new,Color3.fromRGB,Vector2.new,Enum.Font.GothamBold,Enum.Font.GothamMedium,Enum.TextXAlignment.Left,Enum.TextXAlignment.Center
 local P = game:GetService("Players")
 local T = game:GetService("TweenService")
@@ -124,6 +116,9 @@ local Pl = P.LocalPlayer
 local PG = Pl:WaitForChild("PlayerGui")
 local character,humanoid,rootPart
 
+-- =========================================================================
+-- CONFIGURAÇÃO
+-- =========================================================================
 local CONFIG = {
     LineThickness = .15,
     LineTransparency = .2,
@@ -135,21 +130,24 @@ local CONFIG = {
 }
 local MovementConfig = { Modo = "Dummy" }
 
-local IA_CONFIG={
-    ApiKey="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",
-    Endpoint="https://api.groq.com/openai/v1/chat/completions",
-    Modelo="openai/gpt-oss-120b",
-    Timeout=15,
-    MaxTokens=2048,
-    SystemPrompt="Você é um corretor gramatical. Corrija a mensagem do usuário para português do Brasil, mantendo o significado e o tom original. Responda APENAS com a mensagem corrigida, sem explicações, aspas ou comentários extras."
+-- ✅ CORRIGIDO: corretor com MaxTokens explícito (evita resposta vazia)
+local IA_CONFIG = {
+    ApiKey = "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",
+    Endpoint = "https://api.groq.com/openai/v1/chat/completions",
+    Modelo = "openai/gpt-oss-120b",
+    Timeout = 15,
+    MaxTokens = 2048,
+    SystemPrompt = "Você é um corretor gramatical extremamente rigoroso de português do Brasil. Corrija TODOS os erros da mensagem do usuário, sem deixar passar nenhum, incluindo: letras maiúsculas no início de frases e em nomes próprios; todos os acentos gráficos (agudo, circunflexo, til, crase) e a cedilha; toda a pontuação, como vírgulas, pontos finais, pontos de interrogação e de exclamação; concordância verbal e nominal; ortografia e separação de palavras. Não deixe nenhuma palavra sem acento ou sem maiúscula onde for necessário, nem nenhuma frase sem pontuação final. Não resuma, não reescreva o estilo, não mude o significado, o tom nem o tamanho da mensagem: apenas corrija a gramática, a ortografia e a pontuação, mantendo as mesmas palavras sempre que possível. Responda APENAS com a mensagem corrigida, sem explicações, aspas, comentários extras ou qualquer texto adicional."
 }
 
-local IA_TEXTOS_CONFIG={
-    ApiKey="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",
-    Endpoint="https://api.groq.com/openai/v1/chat/completions",
-    Modelo="openai/gpt-oss-120b",
-    Timeout=20,
-    SystemPrompt="Você é um gerador de textos curtos para um jogo de Roblox de roleplay militar do Exército Brasileiro (EB). Regras obrigatórias: (1) Escreva 100% em português do Brasil, sobre o tema exato que o usuário mandar, sem fugir do assunto. (2) O texto final deve ter entre 150 e 250 caracteres, em 2 a 3 frases curtas, tom sério, humano e patriótico, sem exageros nem clichês. (3) Nunca escreva raciocínio, explicações, introduções, saudações, aspas ou emojis. (4) A ÚNICA coisa que aparece na sua resposta é o texto final, envolto EXATAMENTE assim: <<<texto aqui>>>. Nada antes dos <<<, nada depois do >>>."
+-- ✅ CORRIGIDO: gerador com MaxTokens alto (150 é pouco p/ reasoning model)
+local IA_TEXTOS = {
+    ApiKey = "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",
+    Endpoint = "https://api.groq.com/openai/v1/chat/completions",
+    Modelo = "openai/gpt-oss-120b",
+    Timeout = 20,
+    MaxTokens = 2048,
+    SystemPrompt = "Você é um gerador de textos do Exército Brasileiro em um jogo de Roblox (roleplay militar). O usuário vai te dar um TEMA. Você deve escrever um texto curto, humano, gramaticalmente perfeito e patriótico sobre exatamente esse tema. REGRAS OBRIGATÓRIAS: (1) O texto DEVE ter entre 150 e 210 caracteres, contando espaços. (2) Máximo 3 frases curtas. (3) Fique 100% fiel ao tema pedido, sem fugir do assunto. (4) Tom militar realista, natural e humano, sem exageros nem clichês. (5) Sem saudações, sem aspas, sem emojis, sem formatação, sem introduções. (6) Responda APENAS com o texto final, nada mais."
 }
 
 local httpRequest = request or (syn and syn.request) or (http and http.request) or http_request
@@ -177,7 +175,7 @@ local towerRoutes = {["Torre 1"]={},["Torre 2"]={Frente={},["Atrás"]={},Esquerd
 local selectedCategory = {}
 for i=1,4 do selectedCategory[i]="Lento" end
 local selectedTower2Route = "Frente"
-local CurrentPage = "Creditos"
+local CurrentPage = "EBDelta"
 local lineFolder
 local linesVisible = true
 local mostrarLinhas = true
@@ -212,6 +210,9 @@ local function Padding(o,t,b,l,rr)
     p.Parent=o
 end
 
+-- =========================================================================
+-- NOTIFICAÇÕES
+-- =========================================================================
 local NH = _I("Frame")
 NH.Name="Notifications" NH.AnchorPoint=_V2(1,1) NH.Position=_U2(1,-15,1,-15)
 NH.Size=_UO(270,300) NH.BackgroundTransparency=1 NH.ZIndex=200 NH.Parent=PG
@@ -240,12 +241,13 @@ local function Notify(tt,msg,nt)
     msgL.Text=msg msgL.TextColor3=_K.Gray msgL.TextSize=9 msgL.Font=_GM
     msgL.TextWrapped=true msgL.TextXAlignment=_XL msgL.TextYAlignment=Enum.TextYAlignment.Center
     msgL.ZIndex=203 msgL.Parent=n
-    T:Create(n,TweenInfo.new(.35,Enum.EasingStyle.Quart,Enum.EasingDirection.Out),{BackgroundTransparency=0}):Play()
+    n.Position=_U2(1,270,0,0)
+    T:Create(n,TweenInfo.new(.35,Enum.EasingStyle.Quart,Enum.EasingDirection.Out),{Position=_U2(),BackgroundTransparency=0}):Play()
     T:Create(ns,TweenInfo.new(.25),{Transparency=0}):Play()
     T:Create(a,TweenInfo.new(.25),{BackgroundTransparency=0}):Play()
     task.delay(2.8,function()
         if not n.Parent then return end
-        local o=T:Create(n,TweenInfo.new(.3,Enum.EasingStyle.Quart,Enum.EasingDirection.In),{BackgroundTransparency=1})
+        local o=T:Create(n,TweenInfo.new(.3,Enum.EasingStyle.Quart,Enum.EasingDirection.In),{Position=_U2(1,270),BackgroundTransparency=1})
         o:Play()
         T:Create(ns,TweenInfo.new(.2),{Transparency=1}):Play()
         T:Create(a,TweenInfo.new(.2),{BackgroundTransparency=1}):Play()
@@ -254,6 +256,9 @@ local function Notify(tt,msg,nt)
     end)
 end
 
+-- =========================================================================
+-- PERSONAGEM
+-- =========================================================================
 local function RefreshCharacter()
     character=Pl.Character
     if not character or not character.Parent then return false end
@@ -262,8 +267,10 @@ local function RefreshCharacter()
     return humanoid~=nil and rootPart~=nil
 end
 
+-- ✅ CORRIGIDO: animação cacheada (não recria toda hora) + detecta movimento por delta
 local walkTrack
 local walkAnimCache
+
 Pl.CharacterAdded:Connect(function()
     task.wait(.2)
     RefreshCharacter()
@@ -294,9 +301,11 @@ local function iniciarAnimacaoAndar()
             local isR15 = humanoid.RigType == Enum.HumanoidRigType.R15
             animationId = isR15 and "rbxassetid://507777826" or "rbxassetid://180426354"
         end
-        local anim = _I("Animation")
-        anim.AnimationId = animationId
-        local ok, track = pcall(function() return animator:LoadAnimation(anim) end)
+        local ok, track = pcall(function()
+            local anim = _I("Animation")
+            anim.AnimationId = animationId
+            return animator:LoadAnimation(anim)
+        end)
         if not ok or not track then return end
         track.Looped = true
         track.Priority = Enum.AnimationPriority.Movement
@@ -313,10 +322,11 @@ local function pararAnimacaoAndar()
     end
 end
 
+-- ✅ CORRIGIDO: usa delta de posição em vez de GetState() (que não responde a PivotTo)
 local ultimaPosAnim
 local ultimoTempoMov = 0
 task.spawn(function()
-    while alive() do
+    while true do
         task.wait(0.08)
         if RefreshCharacter() then
             local pos = rootPart.Position
@@ -496,7 +506,7 @@ local function AndarAte(destino,estaCancelado,aoTerminar)
     humanoid.WalkSpeed=CONFIG.WalkToSpeed
     humanoid:MoveTo(destino)
     local started=os.clock() local sucesso=false
-    while not estaCancelado() and alive() do
+    while not estaCancelado() do
         if not RefreshCharacter() then break end
         if (rootPart.Position-destino).Magnitude<=4 then sucesso=true break end
         if os.clock()-started>60 then break end
@@ -593,7 +603,7 @@ local function IniciarExecucao(name)
     Playback.LastJump = -math.huge
     Notify("EXECUTANDO", name, "Success")
     task.spawn(function()
-        while Playback.Running and not Playback.WalkingToStart and alive() do
+        while Playback.Running and not Playback.WalkingToStart do
             if not RefreshCharacter() then StopPlayback("error"); break end
             local frames = Playback.Route
             if not frames or #frames < 2 then StopPlayback("error"); break end
@@ -735,6 +745,11 @@ local function EnviarNoChat(msg)
     return false
 end
 
+-- =========================================================================
+-- FUNÇÕES IA
+-- =========================================================================
+
+-- ✅ CORRIGIDO: MaxTokens explícito + NÃO usa reasoning como fallback
 local function CorrigirTexto(texto)
     if not httpRequest then return nil,"Executor sem suporte a HTTP" end
     local corpo=HS:JSONEncode({
@@ -750,12 +765,8 @@ local function CorrigirTexto(texto)
     task.spawn(function()
         local ok,res=pcall(function()
             return httpRequest({
-                Url=IA_CONFIG.Endpoint,
-                Method="POST",
-                Headers={
-                    ["Content-Type"]="application/json",
-                    ["Authorization"]="Bearer "..IA_CONFIG.ApiKey
-                },
+                Url=IA_CONFIG.Endpoint, Method="POST",
+                Headers={["Content-Type"]="application/json",["Authorization"]="Bearer "..IA_CONFIG.ApiKey},
                 Body=corpo
             })
         end)
@@ -770,67 +781,86 @@ local function CorrigirTexto(texto)
     if resposta.StatusCode~=200 then return nil,"HTTP "..tostring(resposta.StatusCode) end
     local okJson,dados=pcall(function() return HS:JSONDecode(resposta.Body) end)
     if not okJson or not dados.choices or not dados.choices[1] then return nil,"Resposta inválida" end
-    local txt=dados.choices[1].message and dados.choices[1].message.content
+    local msg = dados.choices[1].message
+    if not msg then return nil,"Resposta vazia" end
+    local txt = msg.content
     if not txt or txt=="" then return nil,"Resposta vazia (aumente MaxTokens)" end
     txt=txt:gsub("^%s+",""):gsub("%s+$","")
     txt=txt:gsub('^["\']+',""):gsub('["\']+$',"")
     return txt
 end
 
-local function GerarTextoPronto(tema)
+-- ✅ CORRIGIDO: max_tokens alto + não usa reasoning
+local function GerarTextoIA(tema)
     if not httpRequest then return nil,"Executor sem suporte a HTTP" end
     if not tema or tema=="" then return nil,"Tema vazio" end
-    local corpo=HS:JSONEncode({
-        model=IA_TEXTOS_CONFIG.Modelo,
-        messages={
-            {role="system",content=IA_TEXTOS_CONFIG.SystemPrompt},
-            {role="user",content="Tema: "..tema}
+
+    local corpo = HS:JSONEncode({
+        model = IA_TEXTOS.Modelo,
+        messages = {
+            { role = "system", content = IA_TEXTOS.SystemPrompt },
+            { role = "user", content = "Tema: " .. tema }
         },
-        temperature=.6,
-        max_tokens=1200
+        temperature = 0.85,
+        max_tokens = IA_TEXTOS.MaxTokens or 2048
     })
-    local resposta,terminou=nil,false
+
+    local resposta, terminou = nil, false
     task.spawn(function()
-        local ok,res=pcall(function()
+        local ok, res = pcall(function()
             return httpRequest({
-                Url=IA_TEXTOS_CONFIG.Endpoint,
-                Method="POST",
-                Headers={
-                    ["Content-Type"]="application/json",
-                    ["Authorization"]="Bearer "..IA_TEXTOS_CONFIG.ApiKey
+                Url = IA_TEXTOS.Endpoint,
+                Method = "POST",
+                Headers = {
+                    ["Content-Type"] = "application/json",
+                    ["Authorization"] = "Bearer " .. IA_TEXTOS.ApiKey
                 },
-                Body=corpo
+                Body = corpo
             })
         end)
-        if ok then resposta=res end
-        terminou=true
+        if ok then resposta = res end
+        terminou = true
     end)
-    local inicio=os.clock()
-    while not terminou and (os.clock()-inicio)<IA_TEXTOS_CONFIG.Timeout do task.wait(.1) end
-    if not terminou then return nil,"Tempo esgotado" end
-    if not resposta then return nil,"Falha na requisição" end
-    if not resposta.Body then return nil,"Resposta vazia do servidor" end
-    if resposta.StatusCode~=200 then return nil,"HTTP "..tostring(resposta.StatusCode) end
-    local okJson,dados=pcall(function() return HS:JSONDecode(resposta.Body) end)
-    if not okJson or not dados.choices or not dados.choices[1] then return nil,"Resposta inválida" end
-    local msg=dados.choices[1].message
-    if not msg then return nil,"Resposta vazia" end
-    local txt=msg.content or ""
-    local extraido=txt:match("<<<(.-)>>>")
-    if not extraido and msg.reasoning then
-        extraido=msg.reasoning:match("<<<(.-)>>>")
+
+    local inicio = os.clock()
+    while not terminou and (os.clock() - inicio) < IA_TEXTOS.Timeout do
+        task.wait(0.1)
     end
-    if not extraido or extraido:gsub("%s+","")=="" then
-        return nil,"A IA não formatou a resposta corretamente. Tente gerar de novo."
+
+    if not terminou then return nil, "Tempo esgotado" end
+    if not resposta then return nil, "Falha na requisição" end
+    if not resposta.Body then return nil, "Resposta vazia do servidor" end
+    if resposta.StatusCode ~= 200 then return nil, "HTTP " .. tostring(resposta.StatusCode) end
+
+    local okJson, dados = pcall(function()
+        return HS:JSONDecode(resposta.Body)
+    end)
+    if not okJson or not dados.choices or not dados.choices[1] then
+        return nil, "Resposta inválida"
     end
-    local final=extraido:gsub("^%s+",""):gsub("%s+$","")
-    final=final:gsub('^["\']+',""):gsub('["\']+$',"")
-    if final=="" or #final>400 then
-        return nil,"A IA não formatou a resposta corretamente. Tente gerar de novo."
+
+    local msg = dados.choices[1].message
+    if not msg then return nil, "Resposta vazia" end
+
+    -- ✅ NÃO usa reasoning (isso é o "pensamento" do modelo, não a resposta)
+    local txt = msg.content
+    if not txt or txt == "" then return nil, "Resposta vazia (aumente MaxTokens)" end
+
+    txt = txt:gsub("^%s+", ""):gsub("%s+$", "")
+    txt = txt:gsub('^["\']+', ""):gsub('["\']+$', "")
+    txt = txt:gsub("^Tema:%s*", "")
+    txt = txt:gsub("^Texto:%s*", "")
+
+    if #txt > 220 then
+        txt = txt:sub(1, 220)
     end
-    return final
+
+    return txt
 end
 
+-- =========================================================================
+-- GUI PRINCIPAL
+-- =========================================================================
 local Gui=_I("ScreenGui")
 Gui.Name="ZKY_PARKOUR" Gui.ResetOnSpawn=false Gui.IgnoreGuiInset=true
 Gui.ZIndexBehavior=Enum.ZIndexBehavior.Sibling Gui.Parent=PG
@@ -864,7 +894,7 @@ Subtitle.TextSize=9 Subtitle.Font=_GM Subtitle.TextXAlignment=_XL Subtitle.ZInde
 
 local Version=_I("TextLabel")
 Version.BackgroundColor3=_K.Card Version.AnchorPoint=_V2(.5,.5)
-Version.Position=_U2(.5,0,.5,0) Version.Size=_UO(55,25) Version.Text="V2.7"
+Version.Position=_U2(.5,0,.5,0) Version.Size=_UO(55,25) Version.Text="V2.2.1"
 Version.TextColor3=_K.Gray Version.TextSize=10 Version.Font=_GB
 Version.ZIndex=22 Version.Parent=Header Corner(Version,8) Stroke(Version,_K.Stroke)
 
@@ -897,16 +927,15 @@ local function SideButton(text,selected)
     return b
 end
 
-local creditosButton = SideButton("👑 CRÉDITOS", true)
-local ebDeltaButton  = SideButton("🚀 EB DELTA", false)
-local taffsButton    = SideButton("📝 TAFFS", false)
+local creditosButton = SideButton("👑 CRÉDITOS", false)
+local ebDeltaButton  = SideButton("🚀 EB DELTA", true)
+local taffsButton    = SideButton("📝 TAFFS")
 local volversButton  = SideButton("↪ VOLVERS", false)
 local iaButton       = SideButton("🤖 IA CHAT", false)
 local combateButton  = SideButton("🎯 COMBATE", false)
 local textosButton   = SideButton("📚 TEXTOS PRONTOS", false)
 local lojaButton     = SideButton("🔫 LOJA", false)
-local extrasButton   = SideButton("🔓 EXTRAS", false)
-local selectedButton = creditosButton
+local selectedButton = ebDeltaButton
 
 local Content=_I("ScrollingFrame")
 Content.Size=_U2(1,-134,1,-78) Content.Position=_U2(0,126,0,70)
@@ -928,6 +957,9 @@ local function ClearContent()
     end
 end
 
+-- =========================================================================
+-- COMPONENTES
+-- =========================================================================
 local UI = {}
 
 function UI.Help(parent)
@@ -997,7 +1029,6 @@ function UI.Toggle(parent, ordem, texto, inicial, callback)
     end
     aplicar(est)
     sw.MouseButton1Click:Connect(function() aplicar(not est) callback(est) end)
-    row.SetToggle = aplicar
     return row
 end
 
@@ -1268,46 +1299,32 @@ function UI.ActionButton(parent, ordem, texto, corBg, callback)
     return b
 end
 
--- =========================================================================
--- ✅ UI.Card CORRIGIDO — força recálculo de altura após novos filhos
--- =========================================================================
 function UI.Card(parent, ordem, titulo)
     local card = _I("Frame", parent)
-    card.Size = _U2(1, 0, 0, 0)
+    card.Size = _U2(1,0,0,0)
     card.AutomaticSize = Enum.AutomaticSize.Y
     card.BackgroundColor3 = _RGB(22,22,28)
     card.BorderSizePixel = 0
     card.LayoutOrder = ordem
     Corner(card, 8)
 
-    local pad = _I("UIPadding", card)
-    pad.PaddingTop = _UD(0,14)
-    pad.PaddingBottom = _UD(0,14)
-    pad.PaddingLeft = _UD(0,14)
-    pad.PaddingRight = _UD(0,14)
+    Padding(card, 14, 14, 14, 14)
 
     local lay = _I("UIListLayout", card)
     lay.Padding = _UD(0,12)
     lay.SortOrder = Enum.SortOrder.LayoutOrder
-    lay.HorizontalAlignment = Enum.HorizontalAlignment.Left
-    lay.VerticalAlignment = Enum.VerticalAlignment.Top
     lay.Parent = card
-
-    -- Força o card a acompanhar a altura real do conteúdo
-    lay:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
-        card.Size = UDim2.new(1, 0, 0, lay.AbsoluteContentSize.Y + 28)
-    end)
 
     if titulo then
         local hwrap = _I("Frame", card)
-        hwrap.Size = _U2(1, 0, 0, 20)
+        hwrap.Size = _U2(1,0,0,20)
         hwrap.BackgroundTransparency = 1
         hwrap.LayoutOrder = -1
 
         local h = _I("TextLabel", hwrap)
         h.BackgroundTransparency = 1
         h.Position = _UO(0,0)
-        h.Size = _U2(1, 0, 0, 16)
+        h.Size = _U2(1,0,0,16)
         h.Text = titulo
         h.TextColor3 = _K.White
         h.Font = _GB
@@ -1315,8 +1332,8 @@ function UI.Card(parent, ordem, titulo)
         h.TextXAlignment = _XL
 
         local line = _I("Frame", hwrap)
-        line.Position = _UO(0, 18)
-        line.Size = _U2(0, 36, 0, 2)
+        line.Position = _UO(0,18)
+        line.Size = _U2(0,36,0,2)
         line.BackgroundColor3 = _K.Purple
         line.BorderSizePixel = 0
         Corner(line, 1)
@@ -1360,6 +1377,9 @@ local function CreateTwoColumns(parent, ordem)
     return col1, col2
 end
 
+-- =========================================================================
+-- TAFFS
+-- =========================================================================
 local TAFFS_DATA = {
     { Name="TAF (CIGS)", Emoji="🐅", Color=_RGB(255, 180, 50), Fields={
         {"🐅 TAF", "Teste de Aptidão Física: CIGS"},
@@ -1486,10 +1506,38 @@ end
 local function ShowTAFFS()
     CurrentPage="TAFFS"
     ClearContent()
-
+    local warningCard=_I("Frame")
+    warningCard.Size=_U2(1,0,0,70) warningCard.BackgroundColor3=_RGB(45,35,20)
+    warningCard.BorderSizePixel=0 warningCard.LayoutOrder=0 warningCard.Parent=_CH
+    Corner(warningCard,8) Stroke(warningCard,_K.Orange,1.5)
+    local warnIcon=_I("TextLabel")
+    warnIcon.BackgroundTransparency=1 warnIcon.Position=_UO(12,8) warnIcon.Size=_UO(30,30)
+    warnIcon.Text="⚠️" warnIcon.TextSize=20 warnIcon.TextColor3=_K.White
+    warnIcon.Font=_GB warnIcon.TextXAlignment=_XC
+    warnIcon.TextYAlignment=Enum.TextYAlignment.Center warnIcon.Parent=warningCard
+    local warnText=_I("TextLabel")
+    warnText.BackgroundTransparency=1 warnText.Position=_UO(48,8)
+    warnText.Size=_U2(1,-130,0,35)
+    warnText.Text="Deseja adicionar as informações TAFFS em um menu secundário?"
+    warnText.TextColor3=_K.White warnText.TextSize=10 warnText.Font=_GB
+    warnText.TextWrapped=true warnText.TextXAlignment=_XL
+    warnText.TextYAlignment=Enum.TextYAlignment.Top warnText.Parent=warningCard
+    local simBtn=_I("TextButton")
+    simBtn.AnchorPoint=_V2(1,.5) simBtn.Position=_U2(1,-12,.5,0)
+    simBtn.Size=_UO(70,34) simBtn.BackgroundColor3=_K.Success
+    simBtn.BorderSizePixel=0 simBtn.Text="▶ SIM" simBtn.TextColor3=_K.White
+    simBtn.TextSize=10 simBtn.Font=_GB simBtn.AutoButtonColor=false simBtn.Parent=warningCard
+    Corner(simBtn,8)
+    simBtn.MouseButton1Click:Connect(function()
+        local ok = pcall(function()
+            loadstring(game:HttpGet("https://pastebin.com/raw/yyp8u4Xt"))()
+        end)
+        if ok then Notify("MENU SECUNDÁRIO","TAFFS adicionado com sucesso!","Success")
+        else Notify("ERRO","Falha ao carregar o menu secundário.","Error") end
+    end)
     local header=_I("Frame")
     header.Size=_U2(1,0,0,58) header.BackgroundColor3=_K.Card header.BorderSizePixel=0
-    header.LayoutOrder=0 header.Parent=_CH Corner(header,9) Stroke(header,_K.StrokeLight,1)
+    header.LayoutOrder=1 header.Parent=_CH Corner(header,9) Stroke(header,_K.StrokeLight,1)
     local title=_I("TextLabel")
     title.BackgroundTransparency=1 title.Position=_UO(12,7) title.Size=_U2(1,-24,0,25)
     title.Text="📝 TAFFS" title.TextColor3=_K.White title.TextSize=16
@@ -1502,7 +1550,7 @@ local function ShowTAFFS()
         local section=_I("Frame")
         section.Size=_U2(1,0,0,0) section.AutomaticSize=Enum.AutomaticSize.Y
         section.BackgroundColor3=_K.Card section.BorderSizePixel=0
-        section.LayoutOrder=idx section.Parent=_CH
+        section.LayoutOrder=idx+1 section.Parent=_CH
         Corner(section,8) Stroke(section,div.Color,2)
         local sectionLayout=_I("UIListLayout")
         sectionLayout.FillDirection=Enum.FillDirection.Vertical
@@ -1526,47 +1574,9 @@ local function ShowTAFFS()
     Content.CanvasPosition=_V2()
 end
 
-local zoomUnlockAtivo = false
-local zoomOriginalMax = Pl.CameraMaxZoomDistance
-
-local function setZoomUnlock(ligado)
-    zoomUnlockAtivo = ligado
-    if ligado then
-        Pl.CameraMaxZoomDistance = 1000
-    else
-        Pl.CameraMaxZoomDistance = zoomOriginalMax
-    end
-end
-
-local function ShowExtras()
-    CurrentPage = "Extras"
-    ClearContent()
-
-    local col1, col2 = CreateTwoColumns(_CH, 1)
-
-    local card = UI.Card(col1, 1, "🔍 Zoom Unlock")
-
-    UI.Toggle(card, 1, "Tirar limite de zoom", zoomUnlockAtivo, function(v)
-        setZoomUnlock(v)
-        if v then Notify("ZOOM","Limite de zoom removido (máx 1000).","Success")
-        else Notify("ZOOM","Zoom restaurado ao padrão.","Orange") end
-    end)
-
-    local desc = _I("TextLabel", card)
-    desc.Size = _U2(1, 0, 0, 50)
-    desc.BackgroundTransparency = 1
-    desc.Text = "Permite afastar a câmera muito mais do que o normal, para enxergar o mapa todo."
-    desc.TextColor3 = _K.Gray
-    desc.Font = _GM
-    desc.TextSize = 10
-    desc.TextWrapped = true
-    desc.TextXAlignment = _XL
-    desc.TextYAlignment = Enum.TextYAlignment.Top
-    desc.LayoutOrder = 2
-
-    Content.CanvasPosition = _V2()
-end
-
+-- =========================================================================
+-- EB DELTA
+-- =========================================================================
 local EBDeltaSubPage = "Parkour"
 
 local function ShowParkoursContent()
@@ -1648,18 +1658,23 @@ local function ShowTowersContent()
     end
 end
 
+-- =========================================================================
+-- ✅ AUTO JJS CORRIGIDO
+--  - firesignal separado em pcalls individuais (um falhar não cancela os outros)
+--  - não para de varrer as bolhas ao clicar (clicava só 1 por ciclo antes)
+-- =========================================================================
 local ShowAutomacaoContent
 do
     local ativo,VELOCIDADE,MAX_CLIQUES,META,META_ATIVA=false,53,2,308,true
     local jjsFeitos,bolhasVistas,cliquesTotal,ultimaBolhaVista=0,{},0,0
     local btnToggleRef,infoLbl
-    local SESSION = os.clock()
 
     local function setBtnEstado(ligado)
         if not btnToggleRef or not btnToggleRef.Parent then return end
         btnToggleRef.Text = ligado and "Parar Auto JJS" or "Iniciar Auto JJS"
     end
 
+    -- ✅ CORRIGIDO: cada firesignal no próprio pcall
     local function clicarFiresignal(obj)
         if firesignal then
             pcall(firesignal, obj.MouseButton1Down)
@@ -1673,14 +1688,14 @@ do
     end
 
     local function ehBolha(obj)
-        if not obj:IsA("ImageButton") then return false end
+        if obj.ClassName~="ImageButton" then return false end
+        if obj.Name~="InputTemplate" then return false end
         if not obj.Visible then return false end
         local s=obj.AbsoluteSize
         if s.X<20 or s.Y<20 or s.X>200 or s.Y>200 then return false end
         local p=obj.AbsolutePosition
         if p.X<=0 or p.Y<=0 then return false end
-        if obj.Name=="InputTemplate" then return true end
-        return false
+        return true
     end
 
     local function gerarID(obj)
@@ -1689,8 +1704,9 @@ do
         return math.floor(cx/40).."_"..math.floor(cy/40)
     end
 
+    -- ✅ CORRIGIDO: clica TODAS as bolhas visíveis, sem "break"
     task.spawn(function()
-        while alive() do
+        while true do
             task.wait(0.08)
             if not ativo then continue end
             if META_ATIVA and jjsFeitos >= META then
@@ -1733,7 +1749,7 @@ do
     end)
 
     task.spawn(function()
-        while alive() do
+        while true do
             task.wait(0.3)
             if infoLbl and infoLbl.Parent then
                 if META_ATIVA then
@@ -1899,6 +1915,9 @@ function ShowEBDelta()
     Content.CanvasPosition=_V2()
 end
 
+-- =========================================================================
+-- VOLVERS
+-- =========================================================================
 local function ShowVolvers()
     CurrentPage="Volvers"
     ClearContent()
@@ -1980,160 +1999,74 @@ local function ShowVolvers()
     Content.CanvasPosition=_V2()
 end
 
+-- =========================================================================
+-- IA CHAT
+-- =========================================================================
 local iaOcupado=false
 local function ShowAutoCorrecao()
     CurrentPage="AutoCorrecao"
     ClearContent()
-    local header=_I("Frame")
-    header.Size=_U2(1,0,0,58)
-    header.BackgroundColor3=_K.Card
-    header.BorderSizePixel=0
-    header.LayoutOrder=0
-    header.Parent=_CH
-    Corner(header,9)
-    Stroke(header,_K.StrokeLight,1)
-    local title=_I("TextLabel")
-    title.BackgroundTransparency=1
-    title.Position=_UO(12,7)
-    title.Size=_U2(1,-24,0,25)
-    title.Text="🤖 IA CHAT"
-    title.TextColor3=_K.White
-    title.TextSize=16
-    title.Font=_GB
-    title.TextXAlignment=_XL
-    title.Parent=header
-    local sub=_I("TextLabel")
-    sub.BackgroundTransparency=1
-    sub.Position=_UO(13,34)
-    sub.Size=_U2(1,-26,0,15)
-    sub.Text="Corrige o texto em português e envia no chat"
-    sub.TextColor3=_K.DarkGray
-    sub.TextSize=9
-    sub.Font=_GM
-    sub.TextXAlignment=_XL
-    sub.Parent=header
+    local card = UI.Card(_CH, 1, "🤖 IA CHAT")
 
-    local warningCard=_I("Frame")
-    warningCard.Size=_U2(1,0,0,70)
-    warningCard.BackgroundColor3=_RGB(45,35,20)
-    warningCard.BorderSizePixel=0
-    warningCard.LayoutOrder=1
-    warningCard.Parent=_CH
-    Corner(warningCard,8)
-    Stroke(warningCard,_K.Orange,1.5)
-    local warnIcon=_I("TextLabel")
-    warnIcon.BackgroundTransparency=1
-    warnIcon.Position=_UO(12,8)
-    warnIcon.Size=_UO(30,30)
-    warnIcon.Text="⚠️"
-    warnIcon.TextSize=20
-    warnIcon.TextColor3=_K.White
-    warnIcon.Font=_GB
-    warnIcon.TextXAlignment=_XC
-    warnIcon.TextYAlignment=Enum.TextYAlignment.Center
-    warnIcon.Parent=warningCard
-    local warnText=_I("TextLabel")
-    warnText.BackgroundTransparency=1
-    warnText.Position=_UO(48,8)
-    warnText.Size=_U2(1,-130,0,35)
-    warnText.Text="Deseja abrir a IA CHAT em um menu secundário?"
-    warnText.TextColor3=_K.White
-    warnText.TextSize=10
-    warnText.Font=_GB
-    warnText.TextWrapped=true
-    warnText.TextXAlignment=_XL
-    warnText.TextYAlignment=Enum.TextYAlignment.Top
-    warnText.Parent=warningCard
-    local simBtn=_I("TextButton")
-    simBtn.AnchorPoint=_V2(1,.5)
-    simBtn.Position=_U2(1,-12,.5,0)
-    simBtn.Size=_UO(70,34)
-    simBtn.BackgroundColor3=_K.Success
-    simBtn.BorderSizePixel=0
-    simBtn.Text="▶ SIM"
-    simBtn.TextColor3=_K.White
-    simBtn.TextSize=10
-    simBtn.Font=_GB
-    simBtn.AutoButtonColor=false
-    simBtn.Parent=warningCard
-    Corner(simBtn,8)
-    simBtn.MouseButton1Click:Connect(function()
-        local success,err=pcall(function()
-            loadstring(game:HttpGet("https://pastebin.com/raw/pp41hZjb"))()
-        end)
-        if success then
-            Notify("MENU SECUNDÁRIO","IA CHAT aberta com sucesso!","Success")
-        else
-            Notify("ERRO","Falha ao carregar o menu secundário.","Error")
-        end
-    end)
+    local inputCard = _I("Frame", card)
+    inputCard.Size = _U2(1,0,0,140)
+    inputCard.BackgroundColor3 = _RGB(18,18,24)
+    inputCard.BorderSizePixel = 0
+    inputCard.LayoutOrder = 1
+    Corner(inputCard, 6)
+    Stroke(inputCard, _K.Stroke, 1)
 
-    local card=_I("Frame")
-    card.Size=_U2(1,0,0,140)
-    card.BackgroundColor3=_K.Card
-    card.BorderSizePixel=0
-    card.LayoutOrder=2
-    card.Parent=_CH
-    Corner(card,8)
-    Stroke(card,_K.Stroke,1)
+    local box = _I("TextBox", inputCard)
+    box.Position = _UO(10,10)
+    box.Size = _U2(1,-20,0,60)
+    box.BackgroundColor3 = _RGB(14,14,18)
+    box.BorderSizePixel = 0
+    box.PlaceholderText = "Digite sua mensagem..."
+    box.PlaceholderColor3 = _K.DarkGray
+    box.Text = ""
+    box.TextColor3 = _K.White
+    box.TextSize = 11
+    box.Font = _GM
+    box.TextWrapped = true
+    box.TextXAlignment = _XL
+    box.TextYAlignment = Enum.TextYAlignment.Top
+    box.ClearTextOnFocus = false
+    box.MultiLine = false
+    Corner(box, 6)
+    Padding(box, 6,6,8,8)
 
-    local box=_I("TextBox")
-    box.Position=_UO(10,10)
-    box.Size=_U2(1,-20,0,56)
-    box.BackgroundColor3=_K.Panel
-    box.BorderSizePixel=0
-    box.PlaceholderText="Digite sua mensagem..."
-    box.PlaceholderColor3=_K.DarkGray
-    box.Text=""
-    box.TextColor3=_K.White
-    box.TextSize=11
-    box.Font=_GM
-    box.TextWrapped=true
-    box.TextXAlignment=_XL
-    box.TextYAlignment=Enum.TextYAlignment.Top
-    box.ClearTextOnFocus=false
-    box.MultiLine=false
-    box.Parent=card
-    Corner(box,7)
-    Stroke(box,_K.Stroke,1)
-    Padding(box,6,6,8,8)
+    local send = _I("TextButton", inputCard)
+    send.Position = _UO(10,78)
+    send.Size = _U2(1,-20,0,32)
+    send.BackgroundColor3 = _K.Purple
+    send.BorderSizePixel = 0
+    send.Text = "✨ Corrigir e Enviar"
+    send.TextColor3 = _K.White
+    send.TextSize = 10
+    send.Font = _GB
+    send.AutoButtonColor = false
+    Corner(send, 6)
 
-    local send=_I("TextButton")
-    send.Position=_UO(10,74)
-    send.Size=_U2(1,-20,0,34)
-    send.BackgroundColor3=_K.Success
-    send.BorderSizePixel=0
-    send.Text="✨ CORRIGIR E ENVIAR"
-    send.TextColor3=_K.White
-    send.TextSize=10
-    send.Font=_GB
-    send.AutoButtonColor=false
-    send.Parent=card
-    Corner(send,7)
-
-    local status=_I("TextLabel")
-    status.BackgroundTransparency=1
-    status.Position=_UO(10,114)
-    status.Size=_U2(1,-20,0,18)
-    status.Text=""
-    status.TextColor3=_K.Gray
-    status.TextSize=10
-    status.Font=_GM
-    status.TextXAlignment=_XL
-    status.Parent=card
+    local status = _I("TextLabel", inputCard)
+    status.BackgroundTransparency = 1
+    status.Position = _UO(10,116)
+    status.Size = _U2(1,-20,0,18)
+    status.Text = ""
+    status.TextColor3 = _K.Gray
+    status.TextSize = 10
+    status.Font = _GM
+    status.TextXAlignment = _XL
 
     local function setStatus(t,c) status.Text=t status.TextColor3=c end
     send.MouseButton1Click:Connect(function()
         if iaOcupado then return end
         local texto=box.Text:gsub("^%s+",""):gsub("%s+$","")
         if texto=="" then setStatus("⚠️ Digite algo primeiro",_K.Orange) return end
-        iaOcupado=true
-        send.Text="⏳ AGUARDE..."
-        setStatus("🧠 Pensando...",_K.Gray)
+        iaOcupado=true send.Text="⏳ Aguarde..." setStatus("🧠 Pensando...",_K.Gray)
         task.spawn(function()
             local corrigido,erro=CorrigirTexto(texto)
             if corrigido then
-                if EnviarNoChat(corrigido)then
+                if EnviarNoChat(corrigido) then
                     setStatus("✅ Corrigido e enviado!",_K.Success)
                     box.Text=""
                     Notify("IA CHAT","Mensagem enviada.","Success")
@@ -2143,13 +2076,15 @@ local function ShowAutoCorrecao()
             else
                 setStatus("❌ "..tostring(erro),_K.Error)
             end
-            send.Text="✨ CORRIGIR E ENVIAR"
-            iaOcupado=false
+            send.Text="✨ Corrigir e Enviar" iaOcupado=false
         end)
     end)
     Content.CanvasPosition=_V2()
 end
 
+-- =========================================================================
+-- CRÉDITOS
+-- =========================================================================
 local function ShowCreditos()
     CurrentPage="Creditos"
     ClearContent()
@@ -2222,6 +2157,9 @@ local function ShowCreditos()
     Content.CanvasPosition=_V2()
 end
 
+-- =========================================================================
+-- TEXTOS PRONTOS + IA
+-- =========================================================================
 do
     local CARD_COLORS = {
         { Header = _RGB(59, 130, 246), Body = _RGB(35, 35, 35) },
@@ -2356,6 +2294,11 @@ do
         aiHeader.BorderSizePixel = 0
         aiHeader.LayoutOrder = 1
         Corner(aiHeader, 8)
+        local aiMask = _I("Frame", aiHeader)
+        aiMask.Size = _U2(1, 0, 0.5, 0)
+        aiMask.Position = _U2(0, 0.5, 0, 0)
+        aiMask.BackgroundColor3 = _RGB(139, 92, 246)
+        aiMask.BorderSizePixel = 0
         local aiTitle = _I("TextLabel", aiHeader)
         aiTitle.Size = _U2(1, -20, 0, 20)
         aiTitle.Position = _UO(10, 8)
@@ -2392,6 +2335,9 @@ do
         btnGerar.TextSize = 12 btnGerar.BorderSizePixel = 0
         btnGerar.AutoButtonColor = false Corner(btnGerar, 8)
         Stroke(btnGerar, _RGB(167, 139, 250), 1, 0.2)
+        local btnGrad = _I("UIGradient", btnGerar)
+        btnGrad.Color = ColorSequence.new(_RGB(139, 92, 246), _RGB(109, 40, 217))
+        btnGrad.Rotation = 90
         btnGerar.MouseEnter:Connect(function() btnGerar.BackgroundColor3 = _RGB(167, 139, 250) end)
         btnGerar.MouseLeave:Connect(function() btnGerar.BackgroundColor3 = _RGB(139, 92, 246) end)
         local outputLabel = _I("TextLabel", aiBody)
@@ -2433,7 +2379,7 @@ do
             btnCopiarIA.TextColor3 = C.TextoDim
             textoAtual = nil
             task.spawn(function()
-                local textoGerado, erro = GerarTextoPronto(temaDigitado)
+                local textoGerado, erro = GerarTextoIA(temaDigitado)
                 if textoGerado then
                     textoAtual = textoGerado
                     outputLabel.Text = textoGerado
@@ -2461,6 +2407,9 @@ do
     end
 end
 
+-- =========================================================================
+-- COMBATE — Aim (só mira) + Hitbox nos outros
+-- =========================================================================
 local Cam = workspace.CurrentCamera
 
 local AIM_CONFIG = {
@@ -2664,10 +2613,10 @@ function ShowCombate()
     presetFrame.Size = _U2(1,0,0,18)
     presetFrame.BackgroundTransparency = 1
     presetFrame.LayoutOrder = 5
-    local pl = _I("UIListLayout", presetFrame)
-    pl.FillDirection = Enum.FillDirection.Horizontal
-    pl.Padding = _UD(0,4)
-    pl.Parent = presetFrame
+    local presetList = _I("UIListLayout", presetFrame)
+    presetList.FillDirection = Enum.FillDirection.Horizontal
+    presetList.Padding = _UD(0,4)
+    presetList.Parent = presetFrame
     for _,cor in ipairs(HB_Presets) do
         local b = _I("TextButton", presetFrame)
         b.Size = _UO(16,16)
@@ -2795,6 +2744,9 @@ function ShowCombate()
     Content.CanvasPosition = _V2()
 end
 
+-- =========================================================================
+-- LOJA
+-- =========================================================================
 local ShowLoja
 do
     local AC={Fundo=_RGB(10,10,14),Card=_RGB(20,20,28),Borda=_RGB(0,220,255),
@@ -2802,7 +2754,7 @@ do
         Amarelo=_RGB(255,200,0),Cinza=_RGB(80,80,95)}
     local tok=os.clock()
     PG:SetAttribute("ZKYArm",tok)
-    local function vivo() return PG:GetAttribute("ZKYArm")==tok and alive() end
+    local function vivo() return PG:GetAttribute("ZKYArm")==tok end
     local function ehVerde(c)
         if not c then return false end
         return c.G>0.2 and c.G>c.R*1.1 and c.G>c.B*1.1
@@ -2908,6 +2860,9 @@ do
     end
 end
 
+-- =========================================================================
+-- SELEÇÃO DE ABA
+-- =========================================================================
 local function SelectButton(b)
     if selectedButton then
         selectedButton.BackgroundColor3=_K.Card
@@ -2918,9 +2873,6 @@ local function SelectButton(b)
     b.TextColor3=_K.White
 end
 
-extrasButton.MouseButton1Click:Connect(function()
-    SelectButton(extrasButton) ShowExtras()
-end)
 ebDeltaButton.MouseButton1Click:Connect(function()
     SelectButton(ebDeltaButton) ShowEBDelta()
 end)
@@ -2946,6 +2898,9 @@ lojaButton.MouseButton1Click:Connect(function()
     SelectButton(lojaButton) ShowLoja()
 end)
 
+-- =========================================================================
+-- ARRASTAR LOGO / MENU
+-- =========================================================================
 local LogoDragging=false
 local LogoDragStart,LogoStartPosition
 Logo.InputBegan:Connect(function(i)
@@ -3004,6 +2959,9 @@ Logo.MouseButton1Click:Connect(function()
 end)
 Close.MouseButton1Click:Connect(CloseMenu)
 
+-- =========================================================================
+-- CARREGAR ROTAS
+-- =========================================================================
 task.defer(function()
     local loaded=0
     for _,cat in ipairs(CategoryOrder) do
@@ -3014,9 +2972,9 @@ task.defer(function()
     for _,rn in ipairs(Tower2RouteOrder) do
         if LoadTowerRoute("Torre 2",rn) then lt2+=1 end
     end
-    ShowCreditos()
+    ShowEBDelta()
     Notify("ZKY PARKOUR",loaded.."/4 parkours • Torre 1: "..(lt1 and "OK" or "ERRO").." • Torre 2: "..lt2.."/4",
         loaded==4 and lt1 and lt2==4 and "Success" or "Error")
 end)
 
-print("AKIRA MENU V2.7 carregado com sucesso!")
+print("AKIRA MENU V2.2.1 carregado com sucesso!")
