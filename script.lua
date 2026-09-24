@@ -1,8 +1,8 @@
 -- =========================================================================
--- AKIRA MENU V2.6 — Arquivo completo
+-- AKIRA MENU V2.7 — Arquivo completo
 --  • Abre por padrão em CRÉDITOS
---  • Auto JJS (versão original completa: toggle + botão + meta + delay + reset)
---  • Combate completo (Hitbox + Aim, versão original)
+--  • Auto JJS completo (todos os controles)
+--  • Combate completo (Hitbox + Aim inteiros)
 --  • Animação de andar só quando realmente anda
 --  • TAFFS sem aviso de menu secundário
 --  • Aba EXTRAS com Zoom Unlock
@@ -141,6 +141,7 @@ local CONFIG = {
 }
 local MovementConfig = { Modo = "Dummy" }
 
+-- ========== CONFIG DA IA (CORRETOR GRAMATICAL) ==========
 local IA_CONFIG={
     ApiKey="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",
     Endpoint="https://api.groq.com/openai/v1/chat/completions",
@@ -150,6 +151,7 @@ local IA_CONFIG={
     SystemPrompt="Você é um corretor gramatical. Corrija a mensagem do usuário para português do Brasil, mantendo o significado e o tom original. Responda APENAS com a mensagem corrigida, sem explicações, aspas ou comentários extras."
 }
 
+-- ========== CONFIG DA IA (GERADOR DE TEXTOS EB) ==========
 local IA_TEXTOS_CONFIG={
     ApiKey="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",
     Endpoint="https://api.groq.com/openai/v1/chat/completions",
@@ -183,7 +185,7 @@ local towerRoutes = {["Torre 1"]={},["Torre 2"]={Frente={},["Atrás"]={},Esquerd
 local selectedCategory = {}
 for i=1,4 do selectedCategory[i]="Lento" end
 local selectedTower2Route = "Frente"
-local CurrentPage = "Creditos"
+local CurrentPage = "Creditos"  -- ✅ abre em CRÉDITOS
 local lineFolder
 local linesVisible = true
 local mostrarLinhas = true
@@ -747,6 +749,10 @@ local function EnviarNoChat(msg)
     return false
 end
 
+-- =========================================================================
+-- FUNÇÕES DA IA
+-- =========================================================================
+
 local function CorrigirTexto(texto)
     if not httpRequest then return nil,"Executor sem suporte a HTTP" end
     local corpo=HS:JSONEncode({
@@ -879,7 +885,7 @@ Subtitle.TextSize=9 Subtitle.Font=_GM Subtitle.TextXAlignment=_XL Subtitle.ZInde
 
 local Version=_I("TextLabel")
 Version.BackgroundColor3=_K.Card Version.AnchorPoint=_V2(.5,.5)
-Version.Position=_U2(.5,0,.5,0) Version.Size=_UO(55,25) Version.Text="V2.6"
+Version.Position=_U2(.5,0,.5,0) Version.Size=_UO(55,25) Version.Text="V2.7"
 Version.TextColor3=_K.Gray Version.TextSize=10 Version.Font=_GB
 Version.ZIndex=22 Version.Parent=Header Corner(Version,8) Stroke(Version,_K.Stroke)
 
@@ -912,6 +918,7 @@ local function SideButton(text,selected)
     return b
 end
 
+-- ✅ CRÉDITOS é a aba selecionada por padrão
 local creditosButton = SideButton("👑 CRÉDITOS", true)
 local ebDeltaButton  = SideButton("🚀 EB DELTA", false)
 local taffsButton    = SideButton("📝 TAFFS", false)
@@ -1662,20 +1669,21 @@ local function ShowTowersContent()
 end
 
 -- =========================================================================
--- ABA AUTOMAÇÃO — Auto JJS (versão original completa)
+-- AUTO JJS (completo)
 -- =========================================================================
 local ShowAutomacaoContent
 do
     local ativo,VELOCIDADE,MAX_CLIQUES,META,META_ATIVA=false,53,2,308,true
     local jjsFeitos,bolhasVistas,cliquesTotal,ultimaBolhaVista=0,{},0,0
     local btnToggleRef,infoLbl
-    local SESSION = os.clock()
+    local SESSION = os.clock()   -- marca esta sessão p/ auto JJS
 
     local function setBtnEstado(ligado)
         if not btnToggleRef or not btnToggleRef.Parent then return end
         btnToggleRef.Text = ligado and "Parar Auto JJS" or "Iniciar Auto JJS"
     end
 
+    -- ✅ firesignal seguro: tenta cada signal individualmente
     local function clicarFiresignal(obj)
         if firesignal then
             pcall(firesignal, obj.MouseButton1Down)
@@ -1688,6 +1696,7 @@ do
         pcall(function() obj.MouseButton1Click:Fire() end)
     end
 
+    -- ✅ Detecção mais tolerante: nome OU heurística de posição/tamanho
     local function ehBolha(obj)
         if not obj:IsA("ImageButton") then return false end
         if not obj.Visible then return false end
@@ -1695,6 +1704,7 @@ do
         if s.X<20 or s.Y<20 or s.X>200 or s.Y>200 then return false end
         local p=obj.AbsolutePosition
         if p.X<=0 or p.Y<=0 then return false end
+        -- aceita nome "InputTemplate" (jogo atual) ou qualquer botão nessa faixa
         if obj.Name=="InputTemplate" then return true end
         return false
     end
@@ -1705,6 +1715,7 @@ do
         return math.floor(cx/40).."_"..math.floor(cy/40)
     end
 
+    -- ✅ Loop principal: clica TODAS as bolhas visíveis (não só 1 por frame)
     task.spawn(function()
         while alive() do
             task.wait(0.08)
@@ -1717,6 +1728,7 @@ do
             end
             local delayAtual=VELOCIDADE/100
             local agora=tick()
+            -- limpa bolhas antigas
             for id,dados in pairs(bolhasVistas) do
                 if agora-dados.t>2.5 then bolhasVistas[id]=nil end
             end
@@ -2490,7 +2502,7 @@ do
 end
 
 -- =========================================================================
--- COMBATE — Aim (só mira) + Hitbox nos outros (versão original completa)
+-- COMBATE — Aim (só mira) + Hitbox nos outros
 -- =========================================================================
 local Cam = workspace.CurrentCamera
 
@@ -3057,9 +3069,9 @@ task.defer(function()
     for _,rn in ipairs(Tower2RouteOrder) do
         if LoadTowerRoute("Torre 2",rn) then lt2+=1 end
     end
-    ShowCreditos()
+    ShowCreditos()   -- ✅ aba inicial
     Notify("ZKY PARKOUR",loaded.."/4 parkours • Torre 1: "..(lt1 and "OK" or "ERRO").." • Torre 2: "..lt2.."/4",
         loaded==4 and lt1 and lt2==4 and "Success" or "Error")
 end)
 
-print("AKIRA MENU V2.6 carregado com sucesso!")
+print("AKIRA MENU V2.7 carregado com sucesso!")
