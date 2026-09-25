@@ -1,105 +1,37 @@
 -- =========================================================================
--- AKIRA MENU V2.2.1 — Bugs corrigidos
---  • Auto JJS: firesignal em pcalls separados + clica todas as bolhas
---  • Gerador IA: max_tokens alto + não usa reasoning como fallback
---  • Animação de andar: cacheada + detecta movimento por delta de posição
+-- AKIRA MENU V2.2.8 — Gravar Rota (velocidade = ferramenta de gravação)
+--  • Slider de velocidade controla WalkSpeed APENAS durante a gravação
+--  • Reprodução usa velocidade normal do Roblox (sem mexer em WalkSpeed)
+--  • Reprodução suave: só PivotTo + animação manual (sem conflito de física)
 -- =========================================================================
 
-_G.ZKY_OK = false
+-- =========================================================================
+-- LIMPEZA TOTAL
+-- =========================================================================
 do
-    local KEY_CORRETA = "Akira007"
-    local LINK_DISCORD = "https://discord.gg/NY2RfC7Kx"
+    local PL = game:GetService("Players")
+    local LPl = PL.LocalPlayer
+    local LPG = LPl:WaitForChild("PlayerGui")
+    local alvos = {"ZKY_PARKOUR", "ZKYKey", "ZKY_Logo", "Notifications"}
 
-    local gui = Instance.new("ScreenGui")
-    gui.Name = "ZKYKey"
-    gui.ResetOnSpawn = false
-    pcall(function() gui.Parent = (gethui and gethui()) or game:GetService("CoreGui") end)
-    if not gui.Parent then
-        gui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+    local function limparEm(pai)
+        if not pai then return end
+        for _, g in ipairs(pai:GetChildren()) do
+            if g:IsA("ScreenGui") then
+                for _, nome in ipairs(alvos) do
+                    if g.Name == nome then
+                        pcall(function() g:Destroy() end)
+                        break
+                    end
+                end
+            end
+        end
     end
 
-    local f = Instance.new("Frame", gui)
-    f.Size = UDim2.new(0, 280, 0, 220)
-    f.Position = UDim2.new(0.5, -140, 0.5, -110)
-    f.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-    Instance.new("UICorner", f).CornerRadius = UDim.new(0, 10)
-
-    local t = Instance.new("TextLabel", f)
-    t.Size = UDim2.new(1, 0, 0, 36)
-    t.BackgroundTransparency = 1
-    t.Text = "AKIRA MENU - KEY"
-    t.TextColor3 = Color3.new(1, 1, 1)
-    t.Font = Enum.Font.GothamBold
-    t.TextSize = 16
-
-    local box = Instance.new("TextBox", f)
-    box.Size = UDim2.new(1, -30, 0, 34)
-    box.Position = UDim2.new(0, 15, 0, 42)
-    box.BackgroundColor3 = Color3.fromRGB(35, 35, 42)
-    box.TextColor3 = Color3.new(1, 1, 1)
-    box.PlaceholderText = "Cole a key aqui"
-    box.Text = ""
-    box.ClearTextOnFocus = false
-    box.Font = Enum.Font.Gotham
-    box.TextSize = 14
-    Instance.new("UICorner", box).CornerRadius = UDim.new(0, 8)
-
-    local aviso = Instance.new("TextLabel", f)
-    aviso.Size = UDim2.new(1, -30, 0, 40)
-    aviso.Position = UDim2.new(0, 15, 0, 84)
-    aviso.BackgroundTransparency = 1
-    aviso.Text = "Pra pegar a key, entre no Discord"
-    aviso.TextColor3 = Color3.fromRGB(180, 180, 180)
-    aviso.Font = Enum.Font.Gotham
-    aviso.TextSize = 12
-    aviso.TextWrapped = true
-
-    local bPegar = Instance.new("TextButton", f)
-    bPegar.Size = UDim2.new(1, -30, 0, 34)
-    bPegar.Position = UDim2.new(0, 15, 0, 128)
-    bPegar.BackgroundColor3 = Color3.fromRGB(88, 101, 242)
-    bPegar.Text = "Pegar Key"
-    bPegar.TextColor3 = Color3.new(1, 1, 1)
-    bPegar.Font = Enum.Font.GothamBold
-    bPegar.TextSize = 14
-    Instance.new("UICorner", bPegar).CornerRadius = UDim.new(0, 8)
-
-    local bChk = Instance.new("TextButton", f)
-    bChk.Size = UDim2.new(1, -30, 0, 34)
-    bChk.Position = UDim2.new(0, 15, 0, 168)
-    bChk.BackgroundColor3 = Color3.fromRGB(50, 170, 90)
-    bChk.Text = "Check Key"
-    bChk.TextColor3 = Color3.new(1, 1, 1)
-    bChk.Font = Enum.Font.GothamBold
-    bChk.TextSize = 14
-    Instance.new("UICorner", bChk).CornerRadius = UDim.new(0, 8)
-
-    local st = Instance.new("TextLabel", f)
-    st.Size = UDim2.new(1, -20, 0, 18)
-    st.Position = UDim2.new(0, 10, 1, -20)
-    st.BackgroundTransparency = 1
-    st.Text = ""
-    st.TextColor3 = Color3.fromRGB(200, 200, 200)
-    st.Font = Enum.Font.Gotham
-    st.TextSize = 11
-
-    bPegar.MouseButton1Click:Connect(function()
-        pcall(function() setclipboard(LINK_DISCORD) end)
-        pcall(function() game:GetService("GuiService"):OpenBrowserWindow(LINK_DISCORD) end)
-        st.Text = "Link do Discord copiado!"
-    end)
-
-    bChk.MouseButton1Click:Connect(function()
-        local digitada = box.Text:gsub("%s", "")
-        if digitada:lower() == KEY_CORRETA:lower() then
-            _G.ZKY_OK = true
-            gui:Destroy()
-        else
-            st.Text = "Key inválida."
-        end
-    end)
+    limparEm(LPG)
+    pcall(function() limparEm(gethui and gethui() or nil) end)
+    pcall(function() limparEm(game:GetService("CoreGui")) end)
 end
-repeat task.wait() until _G.ZKY_OK
 
 -- =========================================================================
 -- SERVIÇOS E ATALHOS
@@ -130,9 +62,8 @@ local CONFIG = {
 }
 local MovementConfig = { Modo = "Dummy" }
 
--- ✅ CORRIGIDO: corretor com MaxTokens explícito (evita resposta vazia)
 local IA_CONFIG = {
-    ApiKey = "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",
+    ApiKey = "",
     Endpoint = "https://api.groq.com/openai/v1/chat/completions",
     Modelo = "openai/gpt-oss-120b",
     Timeout = 15,
@@ -140,9 +71,8 @@ local IA_CONFIG = {
     SystemPrompt = "Você é um corretor gramatical extremamente rigoroso de português do Brasil. Corrija TODOS os erros da mensagem do usuário, sem deixar passar nenhum, incluindo: letras maiúsculas no início de frases e em nomes próprios; todos os acentos gráficos (agudo, circunflexo, til, crase) e a cedilha; toda a pontuação, como vírgulas, pontos finais, pontos de interrogação e de exclamação; concordância verbal e nominal; ortografia e separação de palavras. Não deixe nenhuma palavra sem acento ou sem maiúscula onde for necessário, nem nenhuma frase sem pontuação final. Não resuma, não reescreva o estilo, não mude o significado, o tom nem o tamanho da mensagem: apenas corrija a gramática, a ortografia e a pontuação, mantendo as mesmas palavras sempre que possível. Responda APENAS com a mensagem corrigida, sem explicações, aspas, comentários extras ou qualquer texto adicional."
 }
 
--- ✅ CORRIGIDO: gerador com MaxTokens alto (150 é pouco p/ reasoning model)
 local IA_TEXTOS = {
-    ApiKey = "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",
+    ApiKey = "",
     Endpoint = "https://api.groq.com/openai/v1/chat/completions",
     Modelo = "openai/gpt-oss-120b",
     Timeout = 20,
@@ -150,8 +80,92 @@ local IA_TEXTOS = {
     SystemPrompt = "Você é um gerador de textos do Exército Brasileiro em um jogo de Roblox (roleplay militar). O usuário vai te dar um TEMA. Você deve escrever um texto curto, humano, gramaticalmente perfeito e patriótico sobre exatamente esse tema. REGRAS OBRIGATÓRIAS: (1) O texto DEVE ter entre 150 e 210 caracteres, contando espaços. (2) Máximo 3 frases curtas. (3) Fique 100% fiel ao tema pedido, sem fugir do assunto. (4) Tom militar realista, natural e humano, sem exageros nem clichês. (5) Sem saudações, sem aspas, sem emojis, sem formatação, sem introduções. (6) Responda APENAS com o texto final, nada mais."
 }
 
+local LINK_PEGAR_KEY = "https://console.groq.com/keys"
+
 local httpRequest = request or (syn and syn.request) or (http and http.request) or http_request
 
+-- =========================================================================
+-- PERSISTÊNCIA
+-- =========================================================================
+local ARQ_CONFIG = "Akira_Config.json"
+local SUPORTA_SALVAR = (type(writefile)=="function") and (type(readfile)=="function") and (type(isfile)=="function")
+
+local Persist = {
+    ia_key = "",
+    posicoes = {},
+    rotas_salvas = {},
+    limite_posicoes = 15
+}
+
+local function persistCarregar()
+    if not SUPORTA_SALVAR then return end
+    local ok, existe = pcall(function() return isfile(ARQ_CONFIG) end)
+    if not ok or not existe then return end
+    local ok2, conteudo = pcall(function() return readfile(ARQ_CONFIG) end)
+    if not ok2 or not conteudo or conteudo == "" then return end
+    local ok3, dados = pcall(function() return HS:JSONDecode(conteudo) end)
+    if not ok3 or type(dados) ~= "table" then return end
+
+    if type(dados.ia_key) == "string" and #dados.ia_key > 0 then
+        Persist.ia_key = dados.ia_key
+        IA_CONFIG.ApiKey = dados.ia_key
+        IA_TEXTOS.ApiKey = dados.ia_key
+    end
+    if type(dados.posicoes) == "table" then
+        local limpos = {}
+        for _, p in ipairs(dados.posicoes) do
+            if type(p) == "table" and type(p.nome) == "string"
+                and type(p.x) == "number" and type(p.y) == "number" and type(p.z) == "number" then
+                table.insert(limpos, {
+                    nome = p.nome,
+                    x = p.x, y = p.y, z = p.z,
+                    rx = tonumber(p.rx) or 0,
+                    ry = tonumber(p.ry) or 0,
+                    rz = tonumber(p.rz) or 0
+                })
+            end
+        end
+        Persist.posicoes = limpos
+    end
+    if type(dados.rotas_salvas) == "table" then
+        local limpas = {}
+        for _, r in ipairs(dados.rotas_salvas) do
+            if type(r) == "table" and type(r.nome) == "string" and type(r.frames) == "table" then
+                local framesValidos = {}
+                for _, f in ipairs(r.frames) do
+                    if type(f) == "table" and type(f.t) == "number"
+                        and type(f.x) == "number" and type(f.y) == "number" and type(f.z) == "number" then
+                        table.insert(framesValidos, {
+                            t = f.t,
+                            x = f.x, y = f.y, z = f.z,
+                            rx = tonumber(f.rx) or 0,
+                            ry = tonumber(f.ry) or 0,
+                            rz = tonumber(f.rz) or 0,
+                            j = f.j and true or false
+                        })
+                    end
+                end
+                if #framesValidos >= 2 then
+                    table.insert(limpas, { nome = r.nome, frames = framesValidos })
+                end
+            end
+        end
+        Persist.rotas_salvas = limpas
+    end
+end
+
+local function persistSalvar()
+    if not SUPORTA_SALVAR then return end
+    local ok, encoded = pcall(function() return HS:JSONEncode(Persist) end)
+    if not ok or not encoded then return end
+    pcall(function() writefile(ARQ_CONFIG, encoded) end)
+end
+
+persistCarregar()
+
+-- =========================================================================
+-- PASTEBINS
+-- =========================================================================
 local Pastebins = {
     Lento = "https://pastebin.com/raw/M7DvRgTc",
     ["Rápido"] = "https://pastebin.com/raw/pBk8vYXE",
@@ -188,9 +202,6 @@ local Playback = {
 }
 local SavedDirection = nil
 local Turning = false
-
-local Old = PG:FindFirstChild("ZKY_PARKOUR")
-if Old then Old:Destroy() end
 
 local _K = {
     Background = _RGB(15,15,18), Panel = _RGB(20,20,25), Card = _RGB(24,24,30),
@@ -267,7 +278,6 @@ local function RefreshCharacter()
     return humanoid~=nil and rootPart~=nil
 end
 
--- ✅ CORRIGIDO: animação cacheada (não recria toda hora) + detecta movimento por delta
 local walkTrack
 local walkAnimCache
 
@@ -322,7 +332,6 @@ local function pararAnimacaoAndar()
     end
 end
 
--- ✅ CORRIGIDO: usa delta de posição em vez de GetState() (que não responde a PivotTo)
 local ultimaPosAnim
 local ultimoTempoMov = 0
 task.spawn(function()
@@ -748,10 +757,11 @@ end
 -- =========================================================================
 -- FUNÇÕES IA
 -- =========================================================================
-
--- ✅ CORRIGIDO: MaxTokens explícito + NÃO usa reasoning como fallback
 local function CorrigirTexto(texto)
     if not httpRequest then return nil,"Executor sem suporte a HTTP" end
+    if not IA_CONFIG.ApiKey or IA_CONFIG.ApiKey == "" then
+        return nil, "Sem key — integre na aba Key 🔑"
+    end
     local corpo=HS:JSONEncode({
         model=IA_CONFIG.Modelo,
         messages={
@@ -790,9 +800,11 @@ local function CorrigirTexto(texto)
     return txt
 end
 
--- ✅ CORRIGIDO: max_tokens alto + não usa reasoning
 local function GerarTextoIA(tema)
     if not httpRequest then return nil,"Executor sem suporte a HTTP" end
+    if not IA_TEXTOS.ApiKey or IA_TEXTOS.ApiKey == "" then
+        return nil, "Sem key — integre na aba Key 🔑"
+    end
     if not tema or tema=="" then return nil,"Tema vazio" end
 
     local corpo = HS:JSONEncode({
@@ -842,7 +854,6 @@ local function GerarTextoIA(tema)
     local msg = dados.choices[1].message
     if not msg then return nil, "Resposta vazia" end
 
-    -- ✅ NÃO usa reasoning (isso é o "pensamento" do modelo, não a resposta)
     local txt = msg.content
     if not txt or txt == "" then return nil, "Resposta vazia (aumente MaxTokens)" end
 
@@ -869,7 +880,7 @@ local Logo=_I("TextButton")
 Logo.Name="ZKY_Logo" Logo.Size=_UO(58,58) Logo.Position=_UO(12,65)
 Logo.BackgroundColor3=_RGB(10,10,10) Logo.BorderSizePixel=0 Logo.Text="🚀"
 Logo.TextColor3=_K.White Logo.TextSize=26 Logo.Font=_GB
-Logo.AutoButtonColor=false Logo.Parent=Gui Corner(Logo,29) Stroke(Logo,_K.StrokeLight)
+Logo.AutoButtonColor=false Logo.Active=true Logo.Parent=Gui Corner(Logo,29) Stroke(Logo,_K.StrokeLight)
 
 local Main=_I("Frame")
 Main.Name="Main" Main.AnchorPoint=_V2(.5,.5) Main.Position=UDim2.fromScale(.5,.5)
@@ -894,7 +905,7 @@ Subtitle.TextSize=9 Subtitle.Font=_GM Subtitle.TextXAlignment=_XL Subtitle.ZInde
 
 local Version=_I("TextLabel")
 Version.BackgroundColor3=_K.Card Version.AnchorPoint=_V2(.5,.5)
-Version.Position=_U2(.5,0,.5,0) Version.Size=_UO(55,25) Version.Text="V2.2.1"
+Version.Position=_U2(.5,0,.5,0) Version.Size=_UO(55,25) Version.Text="V2.2.8"
 Version.TextColor3=_K.Gray Version.TextSize=10 Version.Font=_GB
 Version.ZIndex=22 Version.Parent=Header Corner(Version,8) Stroke(Version,_K.Stroke)
 
@@ -927,15 +938,17 @@ local function SideButton(text,selected)
     return b
 end
 
-local creditosButton = SideButton("👑 CRÉDITOS", false)
-local ebDeltaButton  = SideButton("🚀 EB DELTA", true)
-local taffsButton    = SideButton("📝 TAFFS")
-local volversButton  = SideButton("↪ VOLVERS", false)
-local iaButton       = SideButton("🤖 IA CHAT", false)
-local combateButton  = SideButton("🎯 COMBATE", false)
-local textosButton   = SideButton("📚 TEXTOS PRONTOS", false)
-local lojaButton     = SideButton("🔫 LOJA", false)
-local selectedButton = ebDeltaButton
+local creditosButton    = SideButton("👑 CRÉDITOS", false)
+local ebDeltaButton     = SideButton("🚀 EB DELTA", true)
+local gravarRotaButton  = SideButton("⏺️ GRAVAR ROTA", false)
+local taffsButton       = SideButton("📝 TAFFS")
+local volversButton     = SideButton("↪ VOLVERS", false)
+local iaButton          = SideButton("🤖 INTELIGÊNCIA", false)
+local combateButton     = SideButton("🎯 COMBATE", false)
+local textosButton      = SideButton("📚 TEXTOS PRONTOS", false)
+local lojaButton        = SideButton("🔫 LOJA", false)
+local extraButton       = SideButton("⚡ EXTRA", false)
+local selectedButton    = ebDeltaButton
 
 local Content=_I("ScrollingFrame")
 Content.Size=_U2(1,-134,1,-78) Content.Position=_U2(0,126,0,70)
@@ -1307,9 +1320,7 @@ function UI.Card(parent, ordem, titulo)
     card.BorderSizePixel = 0
     card.LayoutOrder = ordem
     Corner(card, 8)
-
     Padding(card, 14, 14, 14, 14)
-
     local lay = _I("UIListLayout", card)
     lay.Padding = _UD(0,12)
     lay.SortOrder = Enum.SortOrder.LayoutOrder
@@ -1320,7 +1331,6 @@ function UI.Card(parent, ordem, titulo)
         hwrap.Size = _U2(1,0,0,20)
         hwrap.BackgroundTransparency = 1
         hwrap.LayoutOrder = -1
-
         local h = _I("TextLabel", hwrap)
         h.BackgroundTransparency = 1
         h.Position = _UO(0,0)
@@ -1330,7 +1340,6 @@ function UI.Card(parent, ordem, titulo)
         h.Font = _GB
         h.TextSize = 12
         h.TextXAlignment = _XL
-
         local line = _I("Frame", hwrap)
         line.Position = _UO(0,18)
         line.Size = _U2(0,36,0,2)
@@ -1347,7 +1356,6 @@ local function CreateTwoColumns(parent, ordem)
     container.AutomaticSize = Enum.AutomaticSize.Y
     container.BackgroundTransparency = 1
     container.LayoutOrder = ordem
-
     local lay = _I("UIListLayout", container)
     lay.FillDirection = Enum.FillDirection.Horizontal
     lay.Padding = _UD(0, 10)
@@ -1355,7 +1363,7 @@ local function CreateTwoColumns(parent, ordem)
     lay.Parent = container
 
     local col1 = _I("Frame", container)
-    col1.Size = _U2(0.5, -5, 0, 0)
+    col1.Size = _U2(0.55, -5, 0, 0)
     col1.AutomaticSize = Enum.AutomaticSize.Y
     col1.BackgroundTransparency = 1
     col1.LayoutOrder = 1
@@ -1365,7 +1373,7 @@ local function CreateTwoColumns(parent, ordem)
     c1lay.Parent = col1
 
     local col2 = _I("Frame", container)
-    col2.Size = _U2(0.5, -5, 0, 0)
+    col2.Size = _U2(0.45, -5, 0, 0)
     col2.AutomaticSize = Enum.AutomaticSize.Y
     col2.BackgroundTransparency = 1
     col2.LayoutOrder = 2
@@ -1375,6 +1383,84 @@ local function CreateTwoColumns(parent, ordem)
     c2lay.Parent = col2
 
     return col1, col2
+end
+
+-- =========================================================================
+-- MODAL: EDITAR NOME
+-- =========================================================================
+local function abrirModalEditarNome(titulo, nomeAtual, aoConfirmar)
+    local modal = _I("Frame", Gui)
+    modal.Size = _UO(320, 160)
+    modal.Position = UDim2.fromScale(0.5, 0.5)
+    modal.AnchorPoint = _V2(0.5, 0.5)
+    modal.BackgroundColor3 = _K.Panel
+    modal.BorderSizePixel = 0
+    modal.ZIndex = 600
+    Corner(modal, 12)
+    Stroke(modal, _K.Purple, 2)
+
+    local t = _I("TextLabel", modal)
+    t.Size = _U2(1, 0, 0, 36)
+    t.BackgroundTransparency = 1
+    t.Text = titulo or "✏️ Editar nome"
+    t.TextColor3 = _K.White
+    t.Font = _GB
+    t.TextSize = 13
+
+    local box = _I("TextBox", modal)
+    box.Position = _UO(15, 48)
+    box.Size = _U2(1, -30, 0, 34)
+    box.BackgroundColor3 = _RGB(18,18,24)
+    box.BorderSizePixel = 0
+    box.Text = nomeAtual or ""
+    box.PlaceholderText = "Digite o nome..."
+    box.PlaceholderColor3 = _K.DarkGray
+    box.TextColor3 = _K.White
+    box.Font = _GM
+    box.TextSize = 12
+    box.TextXAlignment = _XL
+    box.ClearTextOnFocus = false
+    Corner(box, 6)
+    Stroke(box, _K.Stroke, 1)
+    Padding(box, 0,0,10,10)
+
+    local btnCancel = _I("TextButton", modal)
+    btnCancel.Position = _UO(15, 110)
+    btnCancel.Size = _U2(0.5, -20, 0, 34)
+    btnCancel.BackgroundColor3 = _RGB(50,50,60)
+    btnCancel.BorderSizePixel = 0
+    btnCancel.Text = "Cancelar"
+    btnCancel.TextColor3 = _K.White
+    btnCancel.Font = _GB
+    btnCancel.TextSize = 11
+    btnCancel.AutoButtonColor = false
+    Corner(btnCancel, 6)
+
+    local btnOk = _I("TextButton", modal)
+    btnOk.Position = _U2(0.5, 5, 0, 110)
+    btnOk.Size = _U2(0.5, -20, 0, 34)
+    btnOk.BackgroundColor3 = _K.Success
+    btnOk.BorderSizePixel = 0
+    btnOk.Text = "✓ Salvar"
+    btnOk.TextColor3 = _K.White
+    btnOk.Font = _GB
+    btnOk.TextSize = 11
+    btnOk.AutoButtonColor = false
+    Corner(btnOk, 6)
+
+    btnCancel.MouseButton1Click:Connect(function() modal:Destroy() end)
+
+    btnOk.MouseButton1Click:Connect(function()
+        local novo = box.Text:gsub("^%s+",""):gsub("%s+$","")
+        if novo == "" then
+            Notify("NOME","⚠️ Nome não pode ser vazio.","Error")
+            return
+        end
+        modal:Destroy()
+        aoConfirmar(novo)
+    end)
+
+    box:CaptureFocus()
 end
 
 -- =========================================================================
@@ -1581,15 +1667,12 @@ local EBDeltaSubPage = "Parkour"
 
 local function ShowParkoursContent()
     local col1, col2 = CreateTwoColumns(_CH, 1)
-
     local function makeParkourCard(parent, num)
         local card = UI.Card(parent, num, "Parkour "..num)
-
         local catAtual = selectedCategory[num] or "Lento"
         UI.Dropdown(card, 1, "Velocidade", CategoryOrder, catAtual, function(op)
             selectedCategory[num] = op
         end)
-
         local running = Playback.Running and Playback.Parkour==num and not Playback.Tower
         UI.ActionButton(card, 2, running and "Parar" or ("Iniciar Parkour "..num),
             _RGB(28,28,36), function()
@@ -1607,7 +1690,6 @@ local function ShowParkoursContent()
                 task.wait(.1) ShowEBDelta()
             end)
     end
-
     makeParkourCard(col1, 1)
     makeParkourCard(col2, 2)
     makeParkourCard(col1, 3)
@@ -1616,7 +1698,6 @@ end
 
 local function ShowTowersContent()
     local col1, col2 = CreateTwoColumns(_CH, 1)
-
     do
         local card = UI.Card(col1, 1, "Torre 1")
         UI.Dropdown(card, 1, "Versão", {"Única"}, "Única", function(op) end)
@@ -1635,7 +1716,6 @@ local function ShowTowersContent()
                 task.wait(.1) ShowEBDelta()
             end)
     end
-
     do
         local card = UI.Card(col2, 1, "Torre 2")
         UI.Dropdown(card, 1, "Versão", Tower2RouteOrder, selectedTower2Route, function(op)
@@ -1659,9 +1739,7 @@ local function ShowTowersContent()
 end
 
 -- =========================================================================
--- ✅ AUTO JJS CORRIGIDO
---  - firesignal separado em pcalls individuais (um falhar não cancela os outros)
---  - não para de varrer as bolhas ao clicar (clicava só 1 por ciclo antes)
+-- AUTO JJS
 -- =========================================================================
 local ShowAutomacaoContent
 do
@@ -1674,7 +1752,6 @@ do
         btnToggleRef.Text = ligado and "Parar Auto JJS" or "Iniciar Auto JJS"
     end
 
-    -- ✅ CORRIGIDO: cada firesignal no próprio pcall
     local function clicarFiresignal(obj)
         if firesignal then
             pcall(firesignal, obj.MouseButton1Down)
@@ -1704,7 +1781,6 @@ do
         return math.floor(cx/40).."_"..math.floor(cy/40)
     end
 
-    -- ✅ CORRIGIDO: clica TODAS as bolhas visíveis, sem "break"
     task.spawn(function()
         while true do
             task.wait(0.08)
@@ -1765,9 +1841,7 @@ do
 
     ShowAutomacaoContent=function()
         local card = UI.Card(_CH, 1, "Auto JJS")
-
         UI.Toggle(card, 1, "Ativar Auto JJS", ativo, function(v) ativo = v end)
-
         local metaBox
         local function updateMetaBoxState()
             if not metaBox then return end
@@ -1783,25 +1857,18 @@ do
                 metaBox.PlaceholderColor3 = _RGB(70,70,80)
             end
         end
-
         UI.Toggle(card, 2, "Ativar Meta", META_ATIVA, function(v)
             META_ATIVA = v
             updateMetaBoxState()
-            if v then
-                Notify("AUTO JJS","Meta ativada. Alvo: "..META,"Success")
-            else
-                Notify("AUTO JJS","Meta desativada. Campo bloqueado.","Orange")
-            end
+            if v then Notify("AUTO JJS","Meta ativada. Alvo: "..META,"Success")
+            else Notify("AUTO JJS","Meta desativada. Campo bloqueado.","Orange") end
         end)
-
         metaBox = UI.TextBox(card, 3, "Quantidade Limite Exata", "Ex: 308", tostring(META), function(txt)
             local v = tonumber(txt)
             if v and v>0 then META=v end
         end)
         updateMetaBoxState()
-
         UI.Slider(card, 4, "Delay", VELOCIDADE, 1, 100, false, function(v) VELOCIDADE = v end)
-
         infoLbl = _I("TextLabel", card)
         infoLbl.Size = _U2(1,0,0,14)
         infoLbl.BackgroundTransparency = 1
@@ -1811,7 +1878,6 @@ do
         infoLbl.TextSize = 10
         infoLbl.TextXAlignment = _XL
         infoLbl.LayoutOrder = 5
-
         btnToggleRef = UI.ActionButton(card, 6, "Iniciar Auto JJS", _RGB(28,28,36), function()
             if not ativo and jjsFeitos >= META then
                 jjsFeitos = 0
@@ -1822,7 +1888,6 @@ do
             setBtnEstado(ativo)
             if ativo then ultimaBolhaVista=tick() end
         end)
-
         UI.ActionButton(card, 7, "Resetar Contador", _RGB(24,24,30), function()
             jjsFeitos = 0
             cliquesTotal = 0
@@ -1834,17 +1899,14 @@ end
 
 local function ShowConfiguracaoContent()
     local card = UI.Card(_CH, 1, "Geral")
-
     UI.Toggle(card, 1, "Desativar Dummies (Ir Direto/MoveTo)", desativarDummies, function(v)
         desativarDummies = v
         MovementConfig.Modo = v and "Direto" or "Dummy"
     end)
-
     UI.Toggle(card, 2, "Mostrar Linhas (Apenas Parkour)", mostrarLinhas, function(v)
         mostrarLinhas = v
         linesVisible = v
     end)
-
     UI.ActionButton(card, 3, "Limpar Dummies e Rotas Pendentes", _RGB(30,30,40), function()
         if Playback.Running then StopPlayback("cancelled") end
         RemoverDummy()
@@ -1856,18 +1918,15 @@ end
 function ShowEBDelta()
     CurrentPage = "EBDelta"
     ClearContent()
-
     local hotbar = _I("Frame", _CH)
     hotbar.Size = _U2(1,0,0,30)
     hotbar.BackgroundTransparency = 1
     hotbar.LayoutOrder = 0
-
     local hbLay = _I("UIListLayout", hotbar)
     hbLay.FillDirection = Enum.FillDirection.Horizontal
     hbLay.Padding = _UD(0,18)
     hbLay.VerticalAlignment = Enum.VerticalAlignment.Center
     hbLay.Parent = hotbar
-
     local tabs = {
         {Nome="Parkours", Id="Parkour"},
         {Nome="Torres", Id="Torres"},
@@ -1885,12 +1944,10 @@ function ShowEBDelta()
         b.TextSize = 12
         b.AutoButtonColor = false
         b.TextXAlignment = Enum.TextXAlignment.Center
-
         b.MouseButton1Click:Connect(function()
             EBDeltaSubPage = tab.Id
             ShowEBDelta()
         end)
-
         if sel then
             local line = _I("Frame", b)
             line.AnchorPoint = _V2(0.5,1)
@@ -1901,17 +1958,10 @@ function ShowEBDelta()
             Corner(line,1)
         end
     end
-
-    if EBDeltaSubPage=="Torres" then
-        ShowTowersContent()
-    elseif EBDeltaSubPage=="Parkour" then
-        ShowParkoursContent()
-    elseif EBDeltaSubPage=="Automacao" then
-        ShowAutomacaoContent()
-    else
-        ShowConfiguracaoContent()
-    end
-
+    if EBDeltaSubPage=="Torres" then ShowTowersContent()
+    elseif EBDeltaSubPage=="Parkour" then ShowParkoursContent()
+    elseif EBDeltaSubPage=="Automacao" then ShowAutomacaoContent()
+    else ShowConfiguracaoContent() end
     Content.CanvasPosition=_V2()
 end
 
@@ -1932,7 +1982,6 @@ local function ShowVolvers()
     sub.BackgroundTransparency=1 sub.Position=_UO(13,34) sub.Size=_U2(1,-26,0,15)
     sub.Text="Comandos de formação – ZAYK VOLVERS V2" sub.TextColor3=_K.DarkGray
     sub.TextSize=9 sub.Font=_GM sub.TextXAlignment=_XL sub.Parent=header
-
     local warningCard=_I("Frame")
     warningCard.Size=_U2(1,0,0,70) warningCard.BackgroundColor3=_RGB(45,35,20)
     warningCard.BorderSizePixel=0 warningCard.LayoutOrder=1 warningCard.Parent=_CH
@@ -1962,7 +2011,6 @@ local function ShowVolvers()
         if ok then Notify("MENU SECUNDÁRIO","Volver aberto com sucesso!","Success")
         else Notify("ERRO","Falha ao carregar o menu secundário.","Error") end
     end)
-
     local commands={
         { name="◆ SALVAR POSIÇÃO", desc="Salva somente para onde o personagem está olhando.", highlight=true, action=SaveDirection },
         { name="DIREITA VOLVER!", desc="Gira 90° para a direita.", highlight=false, action=function() Turn("DIREITA") end },
@@ -2000,14 +2048,13 @@ local function ShowVolvers()
 end
 
 -- =========================================================================
--- IA CHAT
+-- INTELIGÊNCIA ARTIFICIAL
 -- =========================================================================
-local iaOcupado=false
-local function ShowAutoCorrecao()
-    CurrentPage="AutoCorrecao"
-    ClearContent()
-    local card = UI.Card(_CH, 1, "🤖 IA CHAT")
+local IASubPage = "Corrigir"
+local iaOcupado = false
 
+local function ShowIACorrigirSub()
+    local card = UI.Card(_CH, 1, "✨ Corrigir Português")
     local inputCard = _I("Frame", card)
     inputCard.Size = _U2(1,0,0,140)
     inputCard.BackgroundColor3 = _RGB(18,18,24)
@@ -2015,7 +2062,6 @@ local function ShowAutoCorrecao()
     inputCard.LayoutOrder = 1
     Corner(inputCard, 6)
     Stroke(inputCard, _K.Stroke, 1)
-
     local box = _I("TextBox", inputCard)
     box.Position = _UO(10,10)
     box.Size = _U2(1,-20,0,60)
@@ -2034,7 +2080,6 @@ local function ShowAutoCorrecao()
     box.MultiLine = false
     Corner(box, 6)
     Padding(box, 6,6,8,8)
-
     local send = _I("TextButton", inputCard)
     send.Position = _UO(10,78)
     send.Size = _U2(1,-20,0,32)
@@ -2046,7 +2091,6 @@ local function ShowAutoCorrecao()
     send.Font = _GB
     send.AutoButtonColor = false
     Corner(send, 6)
-
     local status = _I("TextLabel", inputCard)
     status.BackgroundTransparency = 1
     status.Position = _UO(10,116)
@@ -2056,7 +2100,6 @@ local function ShowAutoCorrecao()
     status.TextSize = 10
     status.Font = _GM
     status.TextXAlignment = _XL
-
     local function setStatus(t,c) status.Text=t status.TextColor3=c end
     send.MouseButton1Click:Connect(function()
         if iaOcupado then return end
@@ -2069,96 +2112,441 @@ local function ShowAutoCorrecao()
                 if EnviarNoChat(corrigido) then
                     setStatus("✅ Corrigido e enviado!",_K.Success)
                     box.Text=""
-                    Notify("IA CHAT","Mensagem enviada.","Success")
+                    Notify("IA","Mensagem enviada.","Success")
                 else
                     setStatus("❌ Chat não encontrado",_K.Error)
                 end
             else
                 setStatus("❌ "..tostring(erro),_K.Error)
+                if tostring(erro):find("401") then
+                    setStatus("❌ HTTP 401 — Vá na aba 'Key 🔑' e integre sua key",_K.Error)
+                end
             end
             send.Text="✨ Corrigir e Enviar" iaOcupado=false
         end)
     end)
-    Content.CanvasPosition=_V2()
+end
+
+local function ShowIAGerarSub()
+    local card = UI.Card(_CH, 1, "⚡ Gerar Texto (EB)")
+    local inputCard = _I("Frame", card)
+    inputCard.Size = _U2(1,0,0,0)
+    inputCard.AutomaticSize = Enum.AutomaticSize.Y
+    inputCard.BackgroundColor3 = _RGB(18,18,24)
+    inputCard.BorderSizePixel = 0
+    inputCard.LayoutOrder = 1
+    Corner(inputCard, 6)
+    Stroke(inputCard, _K.Stroke, 1)
+    local pad = _I("UIPadding", inputCard)
+    pad.PaddingTop = _UD(0,10) pad.PaddingBottom = _UD(0,10)
+    pad.PaddingLeft = _UD(0,10) pad.PaddingRight = _UD(0,10)
+    local lay = _I("UIListLayout", inputCard)
+    lay.Padding = _UD(0,10)
+    lay.SortOrder = Enum.SortOrder.LayoutOrder
+    lay.Parent = inputCard
+    local inputBox = _I("TextBox", inputCard)
+    inputBox.Size = _U2(1, 0, 0, 30)
+    inputBox.BackgroundColor3 = _RGB(14,14,18)
+    inputBox.PlaceholderText = "Digite o tema (ex: Por que servir ao EB?)"
+    inputBox.PlaceholderColor3 = _K.DarkGray
+    inputBox.Text = ""
+    inputBox.TextColor3 = _K.White
+    inputBox.Font = _GM
+    inputBox.TextSize = 11
+    inputBox.TextXAlignment = _XL
+    inputBox.BorderSizePixel = 0
+    Corner(inputBox, 6)
+    Stroke(inputBox, _K.Stroke, 1)
+    Padding(inputBox, 6,6,8,8)
+    inputBox.LayoutOrder = 1
+    local btnGerar = _I("TextButton", inputCard)
+    btnGerar.Size = _U2(1, 0, 0, 35)
+    btnGerar.BackgroundColor3 = _RGB(139, 92, 246)
+    btnGerar.Text = "⚡ GERAR TEXTO"
+    btnGerar.TextColor3 = _K.White
+    btnGerar.Font = _GB
+    btnGerar.TextSize = 12
+    btnGerar.BorderSizePixel = 0
+    btnGerar.AutoButtonColor = false
+    btnGerar.LayoutOrder = 2
+    Corner(btnGerar, 8)
+    Stroke(btnGerar, _RGB(167, 139, 250), 1, 0.2)
+    local outputLabel = _I("TextLabel", inputCard)
+    outputLabel.Size = _U2(1, 0, 0, 0)
+    outputLabel.AutomaticSize = Enum.AutomaticSize.Y
+    outputLabel.BackgroundTransparency = 1
+    outputLabel.Text = "A resposta da IA aparecerá aqui..."
+    outputLabel.TextColor3 = _K.Gray
+    outputLabel.Font = _GM
+    outputLabel.TextSize = 11
+    outputLabel.TextXAlignment = _XL
+    outputLabel.TextWrapped = true
+    outputLabel.LineHeight = 1.2
+    outputLabel.LayoutOrder = 3
+    local btnCopiarIA = _I("TextButton", inputCard)
+    btnCopiarIA.Size = _U2(1, 0, 0, 28)
+    btnCopiarIA.BackgroundColor3 = _K.Card
+    btnCopiarIA.Text = "📋 Copiar Texto"
+    btnCopiarIA.TextColor3 = _K.White
+    btnCopiarIA.Font = _GB
+    btnCopiarIA.TextSize = 10
+    btnCopiarIA.BorderSizePixel = 0
+    btnCopiarIA.AutoButtonColor = false
+    btnCopiarIA.LayoutOrder = 4
+    Corner(btnCopiarIA, 6)
+    Stroke(btnCopiarIA, _K.Stroke, 1)
+    local textoAtual = nil
+    btnGerar.MouseButton1Click:Connect(function()
+        local temaDigitado = inputBox.Text
+        if temaDigitado == "" then
+            outputLabel.Text = "⚠️ Por favor, digite um tema primeiro."
+            outputLabel.TextColor3 = _K.Orange
+            return
+        end
+        outputLabel.Text = "⏳ Gerando texto... aguarde."
+        outputLabel.TextColor3 = _K.Orange
+        btnCopiarIA.BackgroundColor3 = _K.Card
+        textoAtual = nil
+        task.spawn(function()
+            local textoGerado, erro = GerarTextoIA(temaDigitado)
+            if textoGerado then
+                textoAtual = textoGerado
+                outputLabel.Text = textoGerado
+                outputLabel.TextColor3 = _K.White
+                btnCopiarIA.BackgroundColor3 = _K.Success
+            else
+                outputLabel.Text = "❌ Erro: " .. tostring(erro)
+                outputLabel.TextColor3 = _K.Error
+                if tostring(erro):find("401") then
+                    outputLabel.Text = "❌ HTTP 401 — Vá na aba 'Key 🔑' e integre sua key"
+                end
+            end
+        end)
+    end)
+    btnCopiarIA.MouseButton1Click:Connect(function()
+        if not textoAtual then
+            Notify("IA","Nada pra copiar ainda.","Orange")
+            return
+        end
+        if setclipboard then
+            pcall(setclipboard, textoAtual)
+            btnCopiarIA.Text = "✅ Copiado!"
+            btnCopiarIA.BackgroundColor3 = _K.Success
+            task.wait(1.5)
+            btnCopiarIA.Text = "📋 Copiar Texto"
+            btnCopiarIA.BackgroundColor3 = _K.Card
+        end
+    end)
+end
+
+local function ShowIAKeySub()
+    local card = UI.Card(_CH, 1, "🔑 API Key")
+
+    local info = _I("TextLabel", card)
+    info.Size = _U2(1, 0, 0, 55)
+    info.BackgroundTransparency = 1
+    info.Text = "Cole aqui sua API Key da Groq.\nSem a key, as funções de IA não funcionam.\nPegue uma de graça clicando no botão abaixo."
+    info.TextColor3 = _K.Gray
+    info.Font = _GM
+    info.TextSize = 10
+    info.TextWrapped = true
+    info.TextXAlignment = _XL
+    info.TextYAlignment = Enum.TextYAlignment.Top
+    info.LayoutOrder = 1
+
+    UI.ActionButton(card, 2, "🔗 Pegar Key (Abrir Site)", _RGB(88,101,242), function()
+        pcall(function() setclipboard(LINK_PEGAR_KEY) end)
+        pcall(function() game:GetService("GuiService"):OpenBrowserWindow(LINK_PEGAR_KEY) end)
+        Notify("IA KEY","Site aberto + link copiado!","Success")
+    end)
+
+    local keyBox = UI.TextBox(card, 3, "Cole sua API Key aqui", "gsk_...",
+        (Persist.ia_key and #Persist.ia_key > 0) and Persist.ia_key or "", function() end)
+
+    local avisoLabel = _I("TextLabel", card)
+    avisoLabel.Size = _U2(1, 0, 0, 0)
+    avisoLabel.AutomaticSize = Enum.AutomaticSize.Y
+    avisoLabel.BackgroundTransparency = 1
+    local keyAtual = Persist.ia_key or ""
+    local mostrado = #keyAtual > 12 and (keyAtual:sub(1,8).."..."..keyAtual:sub(-4)) or keyAtual
+    if not SUPORTA_SALVAR then
+        avisoLabel.Text = "⚠️ Executor não suporta salvar — key só dura a sessão atual."
+        avisoLabel.TextColor3 = _K.Orange
+    elseif mostrado == "" then
+        avisoLabel.Text = "Nenhuma key salva ainda."
+        avisoLabel.TextColor3 = _K.DarkGray
+    else
+        avisoLabel.Text = "Key salva: " .. mostrado
+        avisoLabel.TextColor3 = _K.Success
+    end
+    avisoLabel.Font = _GM
+    avisoLabel.TextSize = 9
+    avisoLabel.TextWrapped = true
+    avisoLabel.TextXAlignment = _XL
+    avisoLabel.LayoutOrder = 4
+
+    UI.ActionButton(card, 5, "✓ Integrar Key", _K.Success, function()
+        local novaKey = keyBox.Text:gsub("^%s+",""):gsub("%s+$","")
+        if novaKey == "" then
+            Notify("IA KEY","⚠️ Cole uma key primeiro!","Error")
+            return
+        end
+        IA_CONFIG.ApiKey = novaKey
+        IA_TEXTOS.ApiKey = novaKey
+        Persist.ia_key = novaKey
+        persistSalvar()
+        if SUPORTA_SALVAR then
+            Notify("IA KEY","✅ Key integrada e salva permanentemente!","Success")
+        else
+            Notify("IA KEY","✅ Key integrada (só nesta sessão).","Success")
+        end
+        avisoLabel.Text = "Key salva: " .. (novaKey:sub(1,8).."..."..novaKey:sub(-4))
+        avisoLabel.TextColor3 = _K.Success
+    end)
+
+    if SUPORTA_SALVAR then
+        UI.ActionButton(card, 6, "🗑️ Apagar Key Salva", _RGB(180,60,60), function()
+            Persist.ia_key = ""
+            IA_CONFIG.ApiKey = ""
+            IA_TEXTOS.ApiKey = ""
+            persistSalvar()
+            keyBox.Text = ""
+            avisoLabel.Text = "Nenhuma key salva."
+            avisoLabel.TextColor3 = _K.DarkGray
+            Notify("IA KEY","Key apagada.","Orange")
+        end)
+    end
+end
+
+local function ShowIA()
+    CurrentPage = "IA"
+    ClearContent()
+    local hotbar = _I("Frame", _CH)
+    hotbar.Size = _U2(1,0,0,30)
+    hotbar.BackgroundTransparency = 1
+    hotbar.LayoutOrder = 0
+    local hbLay = _I("UIListLayout", hotbar)
+    hbLay.FillDirection = Enum.FillDirection.Horizontal
+    hbLay.Padding = _UD(0,18)
+    hbLay.VerticalAlignment = Enum.VerticalAlignment.Center
+    hbLay.Parent = hotbar
+    local tabs = {
+        {Nome="Corrigir", Id="Corrigir"},
+        {Nome="Gerar Texto", Id="Gerar"},
+        {Nome="Key 🔑", Id="Key"}
+    }
+    for _, tab in ipairs(tabs) do
+        local sel = IASubPage == tab.Id
+        local b = _I("TextButton", hotbar)
+        b.Size = _UO(110, 28)
+        b.BackgroundTransparency = 1
+        b.Text = tab.Nome
+        b.TextColor3 = sel and _K.White or _K.DarkGray
+        b.Font = _GB
+        b.TextSize = 12
+        b.AutoButtonColor = false
+        b.TextXAlignment = Enum.TextXAlignment.Center
+        b.MouseButton1Click:Connect(function()
+            IASubPage = tab.Id
+            ShowIA()
+        end)
+        if sel then
+            local line = _I("Frame", b)
+            line.AnchorPoint = _V2(0.5,1)
+            line.Position = _U2(0.5,0,1,-2)
+            line.Size = _U2(0.6,0,0,2)
+            line.BackgroundColor3 = _K.Purple
+            line.BorderSizePixel = 0
+            Corner(line,1)
+        end
+    end
+    if IASubPage == "Corrigir" then ShowIACorrigirSub()
+    elseif IASubPage == "Gerar" then ShowIAGerarSub()
+    else ShowIAKeySub() end
+    Content.CanvasPosition = _V2()
 end
 
 -- =========================================================================
 -- CRÉDITOS
 -- =========================================================================
 local function ShowCreditos()
-    CurrentPage="Creditos"
+    CurrentPage = "Creditos"
     ClearContent()
-    local link="https://discord.gg/NY2RfC7Kx"
-    local card = UI.Card(_CH, 1, "👑 CRÉDITOS")
-
-    local dev = _I("Frame", card)
-    dev.Size = _U2(1,0,0,50)
-    dev.BackgroundColor3 = _RGB(18,18,24)
-    dev.BorderSizePixel = 0
-    dev.LayoutOrder = 1
-    Corner(dev,6) Stroke(dev,_K.Stroke,1)
-
-    local devT = _I("TextLabel", dev)
-    devT.BackgroundTransparency = 1
-    devT.Position = _UO(12,0)
-    devT.Size = _U2(1,-24,1,0)
-    devT.Text = "Esse script foi desenvolvido pelo akira007p 🔵 discord"
-    devT.TextColor3 = _K.White
-    devT.Font = _GB
-    devT.TextSize = 11
-    devT.TextWrapped = true
-    devT.TextXAlignment = _XL
-    devT.TextYAlignment = Enum.TextYAlignment.Center
-
-    local srv = _I("Frame", card)
-    srv.Size = _U2(1,0,0,60)
-    srv.BackgroundColor3 = _RGB(18,18,24)
-    srv.BorderSizePixel = 0
-    srv.LayoutOrder = 2
-    Corner(srv,6) Stroke(srv,_K.Orange,1)
-
-    local srvT = _I("TextLabel", srv)
-    srvT.BackgroundTransparency = 1
-    srvT.Position = _UO(12,8)
-    srvT.Size = _U2(1,-100,0,20)
-    srvT.Text = "🔵 Servidor do Discord"
-    srvT.TextColor3 = _K.White
-    srvT.Font = _GB
-    srvT.TextSize = 11
-    srvT.TextXAlignment = _XL
-
-    local srvL = _I("TextLabel", srv)
-    srvL.BackgroundTransparency = 1
-    srvL.Position = _UO(12,30)
-    srvL.Size = _U2(1,-100,0,20)
-    srvL.Text = link
-    srvL.TextColor3 = _K.Gray
-    srvL.TextSize = 9
-    srvL.Font = _GM
-    srvL.TextXAlignment = _XL
-
-    local enter = _I("TextButton", srv)
-    enter.AnchorPoint = _V2(1,.5)
-    enter.Position = _U2(1,-10,.5,0)
-    enter.Size = _UO(75,32)
-    enter.BackgroundColor3 = _RGB(88,101,242)
-    enter.BorderSizePixel = 0
-    enter.Text = "▶ ENTRAR"
-    enter.TextColor3 = _K.White
-    enter.TextSize = 9
-    enter.Font = _GB
-    enter.AutoButtonColor = false
-    Corner(enter,6)
-    enter.MouseButton1Click:Connect(function()
+    local link = "https://discord.gg/NY2RfC7Kx"
+    local header = _I("Frame", _CH)
+    header.Size = _U2(1,0,0,58)
+    header.BackgroundColor3 = _K.Card
+    header.BorderSizePixel = 0
+    header.LayoutOrder = 0
+    Corner(header,9) Stroke(header,_K.StrokeLight,1)
+    local title = _I("TextLabel", header)
+    title.BackgroundTransparency = 1
+    title.Position = _UO(12,7)
+    title.Size = _U2(1,-24,0,25)
+    title.Text = "🚀 AKIRA MENU"
+    title.TextColor3 = _K.White
+    title.TextSize = 16
+    title.Font = _GB
+    title.TextXAlignment = _XL
+    local sub = _I("TextLabel", header)
+    sub.BackgroundTransparency = 1
+    sub.Position = _UO(13,34)
+    sub.Size = _U2(1,-26,0,15)
+    sub.Text = "Versão Free v1"
+    sub.TextColor3 = _K.DarkGray
+    sub.TextSize = 9
+    sub.Font = _GM
+    sub.TextXAlignment = _XL
+    local infoTitle = _I("TextLabel", _CH)
+    infoTitle.Size = _U2(1,0,0,18)
+    infoTitle.BackgroundTransparency = 1
+    infoTitle.Text = "Informações"
+    infoTitle.TextColor3 = _K.White
+    infoTitle.Font = _GB
+    infoTitle.TextSize = 13
+    infoTitle.TextXAlignment = _XL
+    infoTitle.LayoutOrder = 1
+    local col1, col2 = CreateTwoColumns(_CH, 2)
+    local dadosTitle = _I("TextLabel", col1)
+    dadosTitle.Size = _U2(1,0,0,18)
+    dadosTitle.BackgroundTransparency = 1
+    dadosTitle.Text = "Dados do Jogador"
+    dadosTitle.TextColor3 = _K.White
+    dadosTitle.Font = _GB
+    dadosTitle.TextSize = 11
+    dadosTitle.TextXAlignment = _XL
+    dadosTitle.LayoutOrder = 1
+    local function infoCard(parent, ordem, texto, corTexto)
+        local c = _I("Frame", parent)
+        c.Size = _U2(1,0,0,30)
+        c.BackgroundColor3 = _RGB(18,18,24)
+        c.BorderSizePixel = 0
+        c.LayoutOrder = ordem
+        Corner(c,6) Stroke(c,_K.Stroke,1)
+        local t = _I("TextLabel", c)
+        t.BackgroundTransparency = 1
+        t.Size = _U2(1,-20,1,0)
+        t.Position = _UO(10,0)
+        t.Text = texto
+        t.TextColor3 = corTexto or _K.Gray
+        t.Font = _GM
+        t.TextSize = 10
+        t.TextXAlignment = _XL
+        t.TextYAlignment = Enum.TextYAlignment.Center
+        return c
+    end
+    local executor = "Desconhecido"
+    pcall(function()
+        if identifyexecutor then executor = identifyexecutor() end
+    end)
+    infoCard(col1, 2, "👤 Jogador: " .. Pl.Name, _K.White)
+    infoCard(col1, 3, "⚙️ Executor: " .. executor, _K.White)
+    infoCard(col1, 4, "📦 Versão: Free v1", _K.White)
+    infoCard(col1, 5, "👑 Desenvolvedor: akira007p", _K.PurpleLight)
+    infoCard(col1, 6, "✅ Status: ● Ativo", _K.Success)
+    local uiTitle = _I("TextLabel", col2)
+    uiTitle.Size = _U2(1,0,0,18)
+    uiTitle.BackgroundTransparency = 1
+    uiTitle.Text = "UI Config"
+    uiTitle.TextColor3 = _K.White
+    uiTitle.Font = _GB
+    uiTitle.TextSize = 11
+    uiTitle.TextXAlignment = _XL
+    uiTitle.LayoutOrder = 1
+    local uiCard = _I("Frame", col2)
+    uiCard.Size = _U2(1,0,0,30)
+    uiCard.BackgroundColor3 = _RGB(18,18,24)
+    uiCard.BorderSizePixel = 0
+    uiCard.LayoutOrder = 2
+    Corner(uiCard,6) Stroke(uiCard,_K.Stroke,1)
+    local uiLbl = _I("TextLabel", uiCard)
+    uiLbl.BackgroundTransparency = 1
+    uiLbl.Position = _UO(10,0)
+    uiLbl.Size = _U2(1,-60,1,0)
+    uiLbl.Text = "Interface transparente"
+    uiLbl.TextColor3 = _K.Gray
+    uiLbl.Font = _GM
+    uiLbl.TextSize = 10
+    uiLbl.TextXAlignment = _XL
+    uiLbl.TextYAlignment = Enum.TextYAlignment.Center
+    local uiToggle = _I("TextButton", uiCard)
+    uiToggle.AnchorPoint = _V2(1,.5)
+    uiToggle.Position = _U2(1,-10,.5,0)
+    uiToggle.Size = _UO(38,20)
+    uiToggle.BackgroundColor3 = _RGB(40,40,50)
+    uiToggle.BorderSizePixel = 0
+    uiToggle.Text = ""
+    uiToggle.AutoButtonColor = false
+    Corner(uiToggle, 10)
+    local uiBol = _I("Frame", uiToggle)
+    uiBol.Size = _UO(14,14)
+    uiBol.Position = _UO(3,3)
+    uiBol.BackgroundColor3 = _RGB(120,120,130)
+    uiBol.BorderSizePixel = 0
+    Corner(uiBol, 7)
+    local transpAtivo = false
+    local function aplicarTransp(v)
+        local t = v and 0.35 or 0
+        Main.BackgroundTransparency = t
+        Sidebar.BackgroundTransparency = t
+        Content.BackgroundTransparency = t
+        Header.BackgroundTransparency = t
+        if v then
+            uiToggle.BackgroundColor3 = _K.Purple
+            uiBol.Position = _UO(21,3)
+            uiBol.BackgroundColor3 = _RGB(255,255,255)
+        else
+            uiToggle.BackgroundColor3 = _RGB(40,40,50)
+            uiBol.Position = _UO(3,3)
+            uiBol.BackgroundColor3 = _RGB(120,120,130)
+        end
+    end
+    uiToggle.MouseButton1Click:Connect(function()
+        transpAtivo = not transpAtivo
+        aplicarTransp(transpAtivo)
+        Notify("UI CONFIG",
+            transpAtivo and "Interface transparente ativada." or "Interface transparente desativada.",
+            transpAtivo and "Success" or "Orange")
+    end)
+    local discordCard = _I("Frame", _CH)
+    discordCard.Size = _U2(1,0,0,55)
+    discordCard.BackgroundColor3 = _RGB(88,101,242)
+    discordCard.BorderSizePixel = 0
+    discordCard.LayoutOrder = 10
+    Corner(discordCard,8)
+    local discordLbl = _I("TextLabel", discordCard)
+    discordLbl.BackgroundTransparency = 1
+    discordLbl.Position = _UO(14,0)
+    discordLbl.Size = _U2(1,-130,1,0)
+    discordLbl.Text = "💬 Entre no nosso Discord!\n" .. link
+    discordLbl.TextColor3 = _K.White
+    discordLbl.Font = _GB
+    discordLbl.TextSize = 11
+    discordLbl.TextWrapped = true
+    discordLbl.TextXAlignment = _XL
+    discordLbl.TextYAlignment = Enum.TextYAlignment.Center
+    local discordBtn = _I("TextButton", discordCard)
+    discordBtn.AnchorPoint = _V2(1,.5)
+    discordBtn.Position = _U2(1,-10,.5,0)
+    discordBtn.Size = _UO(90,32)
+    discordBtn.BackgroundColor3 = _RGB(255,255,255)
+    discordBtn.BorderSizePixel = 0
+    discordBtn.Text = "▶ ENTRAR"
+    discordBtn.TextColor3 = _RGB(88,101,242)
+    discordBtn.TextSize = 10
+    discordBtn.Font = _GB
+    discordBtn.AutoButtonColor = false
+    Corner(discordBtn,6)
+    discordBtn.MouseButton1Click:Connect(function()
         pcall(function() setclipboard(link) end)
         pcall(function() game:GetService("GuiService"):OpenBrowserWindow(link) end)
         Notify("DISCORD","Link copiado! Cole no navegador se não abrir.","Success")
     end)
-    Content.CanvasPosition=_V2()
+    Content.CanvasPosition = _V2()
 end
 
 -- =========================================================================
--- TEXTOS PRONTOS + IA
+-- TEXTOS PRONTOS
 -- =========================================================================
 do
     local CARD_COLORS = {
@@ -2169,13 +2557,9 @@ do
         { Header = _RGB(139, 92, 246), Body = _RGB(35, 30, 45) },
     }
     local C = {
-        Fundo      = _RGB(25, 25, 25),
-        Painel     = _RGB(35, 35, 35),
-        Borda      = _RGB(50, 50, 50),
-        Texto      = _RGB(255, 255, 255),
-        TextoDim   = _RGB(160, 160, 160),
-        Verde      = _RGB(16, 185, 129),
-        VerdeHover = _RGB(52, 211, 153),
+        Fundo = _RGB(25,25,25), Painel = _RGB(35,35,35), Borda = _RGB(50,50,50),
+        Texto = _RGB(255,255,255), TextoDim = _RGB(160,160,160),
+        Verde = _RGB(16,185,129), VerdeHover = _RGB(52,211,153),
     }
     local TEXTOS = {
         { Titulo = "POR QUE O EB É IMPORTANTE PRA SOCIEDADE?", Texto = "O EB não é apenas farda e arma: é o braço forte que guarda a pátria, socorre em tragédias, forma cidadãos de honra e defende a soberania. Sem ele, não há paz social nem futuro seguro pra ninguém." },
@@ -2208,37 +2592,49 @@ do
         tituloCard.AutomaticSize = Enum.AutomaticSize.Y
         tituloCard.BackgroundTransparency = 1
         tituloCard.Text = "🤫 " .. tema.Titulo
-        tituloCard.TextColor3 = C.Texto tituloCard.Font = _GB
-        tituloCard.TextSize = 12 tituloCard.TextXAlignment = _XL
+        tituloCard.TextColor3 = C.Texto
+        tituloCard.Font = _GB
+        tituloCard.TextSize = 12
+        tituloCard.TextXAlignment = _XL
         tituloCard.TextWrapped = true
         local cardBody = _I("Frame", card)
         cardBody.Size = _U2(1, 0, 0, 0)
         cardBody.AutomaticSize = Enum.AutomaticSize.Y
         cardBody.BackgroundColor3 = cor.Body
-        cardBody.BorderSizePixel = 0 cardBody.LayoutOrder = 2
+        cardBody.BorderSizePixel = 0
+        cardBody.LayoutOrder = 2
         local padBody = _I("UIPadding", cardBody)
         padBody.PaddingTop = _UD(0, 12) padBody.PaddingBottom = _UD(0, 12)
         padBody.PaddingLeft = _UD(0, 12) padBody.PaddingRight = _UD(0, 12)
         local bodyLayout = _I("UIListLayout", cardBody)
-        bodyLayout.Padding = _UD(0, 12) bodyLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        bodyLayout.Padding = _UD(0, 12)
+        bodyLayout.SortOrder = Enum.SortOrder.LayoutOrder
         local textoCard = _I("TextLabel", cardBody)
         textoCard.Size = _U2(1, 0, 0, 0)
         textoCard.AutomaticSize = Enum.AutomaticSize.Y
         textoCard.BackgroundTransparency = 1
-        textoCard.Text = tema.Texto textoCard.TextColor3 = C.TextoDim
-        textoCard.Font = _GM textoCard.TextSize = 11
-        textoCard.TextXAlignment = _XL textoCard.TextWrapped = true
+        textoCard.Text = tema.Texto
+        textoCard.TextColor3 = C.TextoDim
+        textoCard.Font = _GM
+        textoCard.TextSize = 11
+        textoCard.TextXAlignment = _XL
+        textoCard.TextWrapped = true
         textoCard.LineHeight = 1.2
         local btnContainer = _I("Frame", cardBody)
         btnContainer.Size = _U2(1, 0, 0, 28)
         btnContainer.BackgroundTransparency = 1
         local btnCopiar = _I("TextButton", btnContainer)
-        btnCopiar.Size = _UO(75, 28) btnCopiar.Position = _U2(1, 0, 0, 0)
+        btnCopiar.Size = _UO(75, 28)
+        btnCopiar.Position = _U2(1, 0, 0, 0)
         btnCopiar.AnchorPoint = Vector2.new(1, 0)
-        btnCopiar.BackgroundColor3 = C.Verde btnCopiar.Text = "Copiar"
-        btnCopiar.TextColor3 = C.Texto btnCopiar.Font = _GB
-        btnCopiar.TextSize = 11 btnCopiar.BorderSizePixel = 0
-        btnCopiar.AutoButtonColor = false Corner(btnCopiar, 6)
+        btnCopiar.BackgroundColor3 = C.Verde
+        btnCopiar.Text = "Copiar"
+        btnCopiar.TextColor3 = C.Texto
+        btnCopiar.Font = _GB
+        btnCopiar.TextSize = 11
+        btnCopiar.BorderSizePixel = 0
+        btnCopiar.AutoButtonColor = false
+        Corner(btnCopiar, 6)
         btnCopiar.MouseEnter:Connect(function() btnCopiar.BackgroundColor3 = C.VerdeHover end)
         btnCopiar.MouseLeave:Connect(function() btnCopiar.BackgroundColor3 = C.Verde end)
         btnCopiar.MouseButton1Click:Connect(function()
@@ -2263,155 +2659,34 @@ do
         Corner(header, 9) Stroke(header, C.Borda, 1)
         local title = _I("TextLabel", header)
         title.BackgroundTransparency = 1
-        title.Position = _UO(12, 7) title.Size = _U2(1, -24, 0, 25)
-        title.Text = "📋 TEXTOS PRONTOS + IA"
-        title.TextColor3 = C.Texto title.TextSize = 16
-        title.Font = _GB title.TextXAlignment = _XL
+        title.Position = _UO(12, 7)
+        title.Size = _U2(1, -24, 0, 25)
+        title.Text = "📋 TEXTOS PRONTOS"
+        title.TextColor3 = C.Texto
+        title.TextSize = 16
+        title.Font = _GB
+        title.TextXAlignment = _XL
         local sub = _I("TextLabel", header)
         sub.BackgroundTransparency = 1
-        sub.Position = _UO(13, 34) sub.Size = _U2(1, -26, 0, 15)
-        sub.Text = "Informações militares e gerador de texto inteligente"
-        sub.TextColor3 = C.TextoDim sub.TextSize = 9
-        sub.Font = _GM sub.TextXAlignment = _XL
+        sub.Position = _UO(13, 34)
+        sub.Size = _U2(1, -26, 0, 15)
+        sub.Text = "Textos prontos militares para copiar e colar"
+        sub.TextColor3 = C.TextoDim
+        sub.TextSize = 9
+        sub.Font = _GM
+        sub.TextXAlignment = _XL
         for i, tema in ipairs(TEXTOS) do
             local corIndex = ((i - 1) % #CARD_COLORS) + 1
             criarCard(tema, i, CARD_COLORS[corIndex])
         end
-        local aiCard = _I("Frame", _CH)
-        aiCard.Size = _U2(1, 0, 0, 0)
-        aiCard.AutomaticSize = Enum.AutomaticSize.Y
-        aiCard.BackgroundColor3 = _RGB(30, 30, 40)
-        aiCard.BorderSizePixel = 0
-        aiCard.LayoutOrder = 999
-        Corner(aiCard, 8)
-        Stroke(aiCard, _RGB(139, 92, 246), 1, 0.5)
-        aiCard.ClipsDescendants = true
-        local aiLayout = _I("UIListLayout", aiCard)
-        aiLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        local aiHeader = _I("Frame", aiCard)
-        aiHeader.Size = _U2(1, 0, 0, 35)
-        aiHeader.BackgroundColor3 = _RGB(139, 92, 246)
-        aiHeader.BorderSizePixel = 0
-        aiHeader.LayoutOrder = 1
-        Corner(aiHeader, 8)
-        local aiMask = _I("Frame", aiHeader)
-        aiMask.Size = _U2(1, 0, 0.5, 0)
-        aiMask.Position = _U2(0, 0.5, 0, 0)
-        aiMask.BackgroundColor3 = _RGB(139, 92, 246)
-        aiMask.BorderSizePixel = 0
-        local aiTitle = _I("TextLabel", aiHeader)
-        aiTitle.Size = _U2(1, -20, 0, 20)
-        aiTitle.Position = _UO(10, 8)
-        aiTitle.BackgroundTransparency = 1
-        aiTitle.Text = "🤖 GERADOR DE TEXTO IA (EB)"
-        aiTitle.TextColor3 = C.Texto
-        aiTitle.Font = _GB aiTitle.TextSize = 12 aiTitle.TextXAlignment = _XL
-        local aiBody = _I("Frame", aiCard)
-        aiBody.Size = _U2(1, 0, 0, 0)
-        aiBody.AutomaticSize = Enum.AutomaticSize.Y
-        aiBody.BackgroundColor3 = _RGB(30, 30, 40)
-        aiBody.BorderSizePixel = 0
-        aiBody.LayoutOrder = 2
-        local aiPad = _I("UIPadding", aiBody)
-        aiPad.PaddingTop = _UD(0, 10) aiPad.PaddingBottom = _UD(0, 10)
-        aiPad.PaddingLeft = _UD(0, 10) aiPad.PaddingRight = _UD(0, 10)
-        local aiBodyLayout = _I("UIListLayout", aiBody)
-        aiBodyLayout.Padding = _UD(0, 10)
-        aiBodyLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        local inputBox = _I("TextBox", aiBody)
-        inputBox.Size = _U2(1, 0, 0, 30)
-        inputBox.BackgroundColor3 = C.Fundo
-        inputBox.PlaceholderText = "Digite o tema (ex: Por que servir ao EB?)"
-        inputBox.PlaceholderColor3 = C.TextoDim
-        inputBox.Text = "" inputBox.TextColor3 = C.Texto
-        inputBox.Font = _GM inputBox.TextSize = 11
-        inputBox.TextXAlignment = _XL inputBox.BorderSizePixel = 0
-        Corner(inputBox, 6)
-        local btnGerar = _I("TextButton", aiBody)
-        btnGerar.Size = _U2(1, 0, 0, 35)
-        btnGerar.BackgroundColor3 = _RGB(139, 92, 246)
-        btnGerar.Text = "⚡ GERAR TEXTO"
-        btnGerar.TextColor3 = C.Texto btnGerar.Font = _GB
-        btnGerar.TextSize = 12 btnGerar.BorderSizePixel = 0
-        btnGerar.AutoButtonColor = false Corner(btnGerar, 8)
-        Stroke(btnGerar, _RGB(167, 139, 250), 1, 0.2)
-        local btnGrad = _I("UIGradient", btnGerar)
-        btnGrad.Color = ColorSequence.new(_RGB(139, 92, 246), _RGB(109, 40, 217))
-        btnGrad.Rotation = 90
-        btnGerar.MouseEnter:Connect(function() btnGerar.BackgroundColor3 = _RGB(167, 139, 250) end)
-        btnGerar.MouseLeave:Connect(function() btnGerar.BackgroundColor3 = _RGB(139, 92, 246) end)
-        local outputLabel = _I("TextLabel", aiBody)
-        outputLabel.Size = _U2(1, 0, 0, 0)
-        outputLabel.AutomaticSize = Enum.AutomaticSize.Y
-        outputLabel.BackgroundTransparency = 1
-        outputLabel.Text = "A resposta da IA aparecerá aqui..."
-        outputLabel.TextColor3 = C.TextoDim outputLabel.Font = _GM
-        outputLabel.TextSize = 11 outputLabel.TextXAlignment = _XL
-        outputLabel.TextWrapped = true outputLabel.LineHeight = 1.2
-        local aiBtnContainer = _I("Frame", aiBody)
-        aiBtnContainer.Size = _U2(1, 0, 0, 28)
-        aiBtnContainer.BackgroundTransparency = 1
-        aiBtnContainer.LayoutOrder = 4
-        local btnCopiarIA = _I("TextButton", aiBtnContainer)
-        btnCopiarIA.Size = _UO(75, 28) btnCopiarIA.Position = _U2(1, 0, 0, 0)
-        btnCopiarIA.AnchorPoint = Vector2.new(1, 0)
-        btnCopiarIA.BackgroundColor3 = C.Painel btnCopiarIA.Text = "Copiar"
-        btnCopiarIA.TextColor3 = C.TextoDim btnCopiarIA.Font = _GB
-        btnCopiarIA.TextSize = 11 btnCopiarIA.BorderSizePixel = 0
-        btnCopiarIA.AutoButtonColor = false Corner(btnCopiarIA, 6)
-        btnCopiarIA.MouseEnter:Connect(function()
-            if btnCopiarIA.BackgroundColor3 == C.Verde then btnCopiarIA.BackgroundColor3 = C.VerdeHover end
-        end)
-        btnCopiarIA.MouseLeave:Connect(function()
-            if btnCopiarIA.BackgroundColor3 == C.VerdeHover then btnCopiarIA.BackgroundColor3 = C.Verde end
-        end)
-        local textoAtual = nil
-        btnGerar.MouseButton1Click:Connect(function()
-            local temaDigitado = inputBox.Text
-            if temaDigitado == "" then
-                outputLabel.Text = "⚠️ Por favor, digite um tema primeiro."
-                outputLabel.TextColor3 = _RGB(245, 158, 11)
-                return
-            end
-            outputLabel.Text = "⏳ Gerando texto... aguarde."
-            outputLabel.TextColor3 = _RGB(245, 158, 11)
-            btnCopiarIA.BackgroundColor3 = C.Painel
-            btnCopiarIA.TextColor3 = C.TextoDim
-            textoAtual = nil
-            task.spawn(function()
-                local textoGerado, erro = GerarTextoIA(temaDigitado)
-                if textoGerado then
-                    textoAtual = textoGerado
-                    outputLabel.Text = textoGerado
-                    outputLabel.TextColor3 = C.Texto
-                    btnCopiarIA.BackgroundColor3 = C.Verde
-                    btnCopiarIA.TextColor3 = C.Texto
-                else
-                    outputLabel.Text = "❌ Erro: " .. tostring(erro)
-                    outputLabel.TextColor3 = _RGB(239, 68, 68)
-                end
-            end)
-        end)
-        btnCopiarIA.MouseButton1Click:Connect(function()
-            if not textoAtual then return end
-            if setclipboard then
-                pcall(setclipboard, textoAtual)
-                btnCopiarIA.Text = "Copiado!"
-                btnCopiarIA.BackgroundColor3 = C.VerdeHover
-                task.wait(1.5)
-                btnCopiarIA.Text = "Copiar"
-                btnCopiarIA.BackgroundColor3 = C.Verde
-            end
-        end)
         Content.CanvasPosition = _V2()
     end
 end
 
 -- =========================================================================
--- COMBATE — Aim (só mira) + Hitbox nos outros
+-- COMBATE
 -- =========================================================================
 local Cam = workspace.CurrentCamera
-
 local AIM_CONFIG = {
     Ativo=false, MostrarFOV=false, FOV=43, RingTransparency=0.3,
     Cor=Color3.fromRGB(150,80,255), Thickness=2,
@@ -2567,9 +2842,7 @@ function ShowCombate()
     CurrentPage = "Combate"
     ClearContent()
     Content.ScrollingEnabled = true
-
     local col1, col2 = CreateTwoColumns(_CH, 0)
-
     local hbCard = UI.Card(col1, 1, "🎯 Hitbox Modificador")
     UI.Toggle(hbCard, 1, "Ativar Hitbox", HB_CONFIG.Ativo, function(v)
         HB_CONFIG.Ativo = v
@@ -2578,7 +2851,6 @@ function ShowCombate()
     UI.Slider(hbCard, 2, "Tamanho", HB_CONFIG.Tamanho, 1, 20, false, function(v) HB_CONFIG.Tamanho = v end)
     UI.Slider(hbCard, 3, "Transparência", math.floor(HB_CONFIG.Transparencia*10+.5), 0, 10, false,
         function(v) HB_CONFIG.Transparencia = v/10 end)
-
     local corRow = _I("Frame", hbCard)
     corRow.Size = _U2(1,0,0,26)
     corRow.BackgroundTransparency = 1
@@ -2603,7 +2875,6 @@ function ShowCombate()
     corSwatch.Text = ""
     corSwatch.AutoButtonColor = false
     Corner(corSwatch, 4) Stroke(corSwatch, _K.Stroke, 1)
-
     local HB_Presets = {
         _RGB(255,0,0), _RGB(0,255,100), _RGB(0,150,255),
         _RGB(255,200,0), _RGB(255,0,255), _RGB(150,80,255),
@@ -2630,7 +2901,6 @@ function ShowCombate()
             corSwatch.BackgroundColor3 = cor
         end)
     end
-
     local aimCard = UI.Card(col2, 1, "🎯 Aim")
     UI.Toggle(aimCard, 1, "Ativar Aimbot", AIM_CONFIG.Ativo, function(v)
         AIM_CONFIG.Ativo = v
@@ -2638,12 +2908,10 @@ function ShowCombate()
     UI.Toggle(aimCard, 2, "Mostrar FOV", AIM_CONFIG.MostrarFOV, function(v)
         AIM_CONFIG.MostrarFOV = v
     end)
-
     local alvoWrap = _I("Frame", aimCard)
     alvoWrap.Size = _U2(1,0,0,44)
     alvoWrap.BackgroundTransparency = 1
     alvoWrap.LayoutOrder = 3
-
     local alvoLbl = _I("TextLabel", alvoWrap)
     alvoLbl.BackgroundTransparency = 1
     alvoLbl.Position = _UO(0,0)
@@ -2653,7 +2921,6 @@ function ShowCombate()
     alvoLbl.Font = _GM
     alvoLbl.TextSize = 10
     alvoLbl.TextXAlignment = _XL
-
     local btnFrame = _I("Frame", alvoWrap)
     btnFrame.Position = _UO(0,20)
     btnFrame.Size = _U2(1,0,0,24)
@@ -2662,7 +2929,6 @@ function ShowCombate()
     bfl.FillDirection = Enum.FillDirection.Horizontal
     bfl.Padding = _UD(0,4)
     bfl.Parent = btnFrame
-
     local opcoes = {"Cabeça","Tronco"}
     local btnAlvos = {}
     local function atualizarAlvos()
@@ -2697,17 +2963,14 @@ function ShowCombate()
         end)
     end
     atualizarAlvos()
-
     UI.Slider(aimCard, 4, "Tamanho FOV", AIM_CONFIG.FOV, 20, 200, false,
         function(v) AIM_CONFIG.FOV = v end)
     UI.Slider(aimCard, 5, "Transparência", AIM_CONFIG.RingTransparency, 0, 1, true,
         function(v) AIM_CONFIG.RingTransparency = v end)
-
     local coresWrap = _I("Frame", aimCard)
     coresWrap.Size = _U2(1,0,0,34)
     coresWrap.BackgroundTransparency = 1
     coresWrap.LayoutOrder = 6
-
     local coresLbl = _I("TextLabel", coresWrap)
     coresLbl.BackgroundTransparency = 1
     coresLbl.Position = _UO(0,0)
@@ -2717,7 +2980,6 @@ function ShowCombate()
     coresLbl.Font = _GM
     coresLbl.TextSize = 10
     coresLbl.TextXAlignment = _XL
-
     local coresInner = _I("Frame", coresWrap)
     coresInner.Position = _UO(0,18)
     coresInner.Size = _U2(1,0,0,16)
@@ -2740,7 +3002,6 @@ function ShowCombate()
         Corner(b,4) Stroke(b,_K.Stroke,1)
         b.MouseButton1Click:Connect(function() AIM_CONFIG.Cor = cor end)
     end
-
     Content.CanvasPosition = _V2()
 end
 
@@ -2861,6 +3122,1095 @@ do
 end
 
 -- =========================================================================
+-- EXTRA (hotbar: Visual / Posições)
+-- =========================================================================
+local ExtraSubPage = "Visual"
+
+local ExtraState = {
+    FullbrightAtivo = false,
+    FogAtivo = false,
+    ZoomUnlocked = false,
+    ZoomMaxOriginal = nil,
+    ZoomMinOriginal = nil,
+    FogOriginal = nil,
+    LightOriginal = nil
+}
+
+local function extraSalvarLighting()
+    if ExtraState.LightOriginal then return end
+    local L = game:GetService("Lighting")
+    ExtraState.LightOriginal = {
+        Brightness = L.Brightness,
+        ClockTime = L.ClockTime,
+        GlobalShadows = L.GlobalShadows,
+        Ambient = L.Ambient,
+        OutdoorAmbient = L.OutdoorAmbient
+    }
+end
+
+local function extraSalvarFog()
+    if ExtraState.FogOriginal then return end
+    local L = game:GetService("Lighting")
+    ExtraState.FogOriginal = {
+        FogEnd = L.FogEnd,
+        FogStart = L.FogStart,
+        FogColor = L.FogColor
+    }
+end
+
+local function ShowExtraVisualContent()
+    local card = UI.Card(_CH, 1, "👁️ Visual")
+
+    UI.Toggle(card, 1, "Fullbright (dia/claro)", ExtraState.FullbrightAtivo, function(v)
+        ExtraState.FullbrightAtivo = v
+        if v then
+            extraSalvarLighting()
+            pcall(function()
+                local L = game:GetService("Lighting")
+                L.Brightness = 3
+                L.ClockTime = 14
+                L.GlobalShadows = false
+                L.Ambient = _RGB(200,200,200)
+                L.OutdoorAmbient = _RGB(200,200,200)
+            end)
+            Notify("EXTRA", "Fullbright ativado.", "Success")
+        else
+            if ExtraState.LightOriginal then
+                pcall(function()
+                    local L = game:GetService("Lighting")
+                    L.Brightness = ExtraState.LightOriginal.Brightness
+                    L.ClockTime = ExtraState.LightOriginal.ClockTime
+                    L.GlobalShadows = ExtraState.LightOriginal.GlobalShadows
+                    L.Ambient = ExtraState.LightOriginal.Ambient
+                    L.OutdoorAmbient = ExtraState.LightOriginal.OutdoorAmbient
+                end)
+            end
+            Notify("EXTRA", "Fullbright desativado.", "Orange")
+        end
+    end)
+
+    UI.Toggle(card, 2, "Remover Névoa", ExtraState.FogAtivo, function(v)
+        ExtraState.FogAtivo = v
+        if v then
+            extraSalvarFog()
+            pcall(function()
+                local L = game:GetService("Lighting")
+                L.FogEnd = 100000
+                L.FogStart = 0
+            end)
+            Notify("EXTRA", "Névoa removida.", "Success")
+        else
+            if ExtraState.FogOriginal then
+                pcall(function()
+                    local L = game:GetService("Lighting")
+                    L.FogEnd = ExtraState.FogOriginal.FogEnd
+                    L.FogStart = ExtraState.FogOriginal.FogStart
+                    L.FogColor = ExtraState.FogOriginal.FogColor
+                end)
+            end
+            Notify("EXTRA", "Névoa restaurada.", "Orange")
+        end
+    end)
+
+    UI.Toggle(card, 3, "Unlock Zoom (Sem Limite)", ExtraState.ZoomUnlocked, function(v)
+        ExtraState.ZoomUnlocked = v
+        if not ExtraState.ZoomMaxOriginal then
+            ExtraState.ZoomMaxOriginal = Pl.CameraMaxZoomDistance
+            ExtraState.ZoomMinOriginal = Pl.CameraMinZoomDistance
+        end
+        if v then
+            pcall(function()
+                Pl.CameraMaxZoomDistance = math.huge
+                Pl.CameraMinZoomDistance = 0.5
+            end)
+            Notify("EXTRA", "Zoom desbloqueado!", "Success")
+        else
+            pcall(function()
+                Pl.CameraMaxZoomDistance = ExtraState.ZoomMaxOriginal
+                Pl.CameraMinZoomDistance = ExtraState.ZoomMinOriginal
+            end)
+            Notify("EXTRA", "Zoom restaurado.", "Orange")
+        end
+    end)
+end
+
+local function ShowExtraPosicoesContent()
+    local descCard = _I("Frame", _CH)
+    descCard.Size = _U2(1, 0, 0, 78)
+    descCard.BackgroundColor3 = _RGB(25, 22, 35)
+    descCard.BorderSizePixel = 0
+    descCard.LayoutOrder = 1
+    Corner(descCard, 8)
+    Stroke(descCard, _K.Purple, 1.5)
+
+    local descIcon = _I("TextLabel", descCard)
+    descIcon.BackgroundTransparency = 1
+    descIcon.Position = _UO(12, 8)
+    descIcon.Size = _UO(30, 30)
+    descIcon.Text = "📍"
+    descIcon.TextSize = 20
+    descIcon.Font = _GB
+    descIcon.TextXAlignment = _XC
+    descIcon.TextYAlignment = Enum.TextYAlignment.Center
+
+    local descText = _I("TextLabel", descCard)
+    descText.BackgroundTransparency = 1
+    descText.Position = _UO(48, 8)
+    descText.Size = _U2(1, -60, 0, 62)
+    descText.Text = "Aqui você pode salvar uma posição específica pra sempre que executar o script. Pontos como moita do STS central, pontos específicos pra matar civis e etc."
+    descText.TextColor3 = _K.White
+    descText.TextSize = 10
+    descText.Font = _GM
+    descText.TextWrapped = true
+    descText.TextXAlignment = _XL
+    descText.TextYAlignment = Enum.TextYAlignment.Top
+
+    local btnAdd = UI.ActionButton(_CH, 2, "", _K.Success, function() end)
+    local function atualizarBotaoAdd()
+        if #Persist.posicoes < Persist.limite_posicoes then
+            btnAdd.Text = "➕ Adicionar Posição  ("..#Persist.posicoes.."/"..Persist.limite_posicoes..")"
+            btnAdd.BackgroundColor3 = _K.Success
+        else
+            btnAdd.Text = "🚫 Limite atingido  ("..#Persist.posicoes.."/"..Persist.limite_posicoes..")"
+            btnAdd.BackgroundColor3 = _RGB(70,70,80)
+        end
+    end
+    atualizarBotaoAdd()
+
+    local container = _I("Frame", _CH)
+    container.Size = _U2(1, 0, 0, 0)
+    container.AutomaticSize = Enum.AutomaticSize.Y
+    container.BackgroundTransparency = 1
+    container.LayoutOrder = 3
+    local containerLay = _I("UIListLayout", container)
+    containerLay.Padding = _UD(0, 7)
+    containerLay.SortOrder = Enum.SortOrder.LayoutOrder
+    containerLay.Parent = container
+
+    local placeholder = nil
+    local function atualizarPlaceholder()
+        if #Persist.posicoes == 0 then
+            if not placeholder or not placeholder.Parent then
+                placeholder = _I("Frame", container)
+                placeholder.Size = _U2(1, 0, 0, 55)
+                placeholder.BackgroundColor3 = _RGB(18,18,24)
+                placeholder.BorderSizePixel = 0
+                placeholder.LayoutOrder = 0
+                Corner(placeholder, 8)
+                Stroke(placeholder, _K.Stroke, 1)
+                local lbl = _I("TextLabel", placeholder)
+                lbl.BackgroundTransparency = 1
+                lbl.Size = _U2(1, 1, 1, 0)
+                lbl.Text = "Nenhuma posição salva ainda.\nClique em '➕ Adicionar Posição' acima."
+                lbl.TextColor3 = _K.DarkGray
+                lbl.Font = _GM
+                lbl.TextSize = 10
+                lbl.TextWrapped = true
+                lbl.TextXAlignment = _XC
+                lbl.TextYAlignment = Enum.TextYAlignment.Center
+            end
+        else
+            if placeholder then
+                placeholder:Destroy()
+                placeholder = nil
+            end
+        end
+    end
+
+    local function acharIndice(alvo)
+        for j, p in ipairs(Persist.posicoes) do
+            if p == alvo then return j end
+        end
+        return nil
+    end
+
+    local function criarCardPosicao(pos, layoutOrder)
+        local card = _I("Frame", container)
+        card.Size = _U2(1, 0, 0, 94)
+        card.BackgroundColor3 = _RGB(18, 18, 24)
+        card.BorderSizePixel = 0
+        card.LayoutOrder = layoutOrder or 1
+        Corner(card, 8)
+        Stroke(card, _K.Stroke, 1)
+
+        local nomeLbl = _I("TextLabel", card)
+        nomeLbl.BackgroundTransparency = 1
+        nomeLbl.Position = _UO(12, 8)
+        nomeLbl.Size = _U2(1, -100, 0, 20)
+        nomeLbl.Text = "📍 "..pos.nome
+        nomeLbl.TextColor3 = _K.White
+        nomeLbl.Font = _GB
+        nomeLbl.TextSize = 12
+        nomeLbl.TextXAlignment = _XL
+
+        local btnEdit = _I("TextButton", card)
+        btnEdit.AnchorPoint = _V2(1, 0)
+        btnEdit.Position = _U2(1, -44, 0, 8)
+        btnEdit.Size = _UO(30, 26)
+        btnEdit.BackgroundColor3 = _RGB(50, 60, 90)
+        btnEdit.BorderSizePixel = 0
+        btnEdit.Text = "✏️"
+        btnEdit.TextColor3 = _K.White
+        btnEdit.Font = _GB
+        btnEdit.TextSize = 13
+        btnEdit.AutoButtonColor = false
+        Corner(btnEdit, 6)
+
+        local btnDel = _I("TextButton", card)
+        btnDel.AnchorPoint = _V2(1, 0)
+        btnDel.Position = _U2(1, -10, 0, 8)
+        btnDel.Size = _UO(30, 26)
+        btnDel.BackgroundColor3 = _RGB(120, 40, 40)
+        btnDel.BorderSizePixel = 0
+        btnDel.Text = "🗑️"
+        btnDel.TextColor3 = _K.White
+        btnDel.Font = _GB
+        btnDel.TextSize = 13
+        btnDel.AutoButtonColor = false
+        Corner(btnDel, 6)
+
+        local coordLbl = _I("TextLabel", card)
+        coordLbl.BackgroundTransparency = 1
+        coordLbl.Position = _UO(12, 32)
+        coordLbl.Size = _U2(1, -24, 0, 16)
+        coordLbl.Text = string.format("X: %.0f   Y: %.0f   Z: %.0f", pos.x, pos.y, pos.z)
+        coordLbl.TextColor3 = _K.DarkGray
+        coordLbl.Font = _GM
+        coordLbl.TextSize = 9
+        coordLbl.TextXAlignment = _XL
+
+        local btnSave = _I("TextButton", card)
+        btnSave.AnchorPoint = _V2(1, 1)
+        btnSave.Position = _U2(0.5, -5, 1, -10)
+        btnSave.Size = _U2(0.5, -20, 0, 32)
+        btnSave.BackgroundColor3 = _K.Success
+        btnSave.BorderSizePixel = 0
+        btnSave.Text = "💾 Salvar"
+        btnSave.TextColor3 = _K.White
+        btnSave.Font = _GB
+        btnSave.TextSize = 10
+        btnSave.AutoButtonColor = false
+        Corner(btnSave, 6)
+
+        local btnIr = _I("TextButton", card)
+        btnIr.AnchorPoint = _V2(1, 1)
+        btnIr.Position = _U2(1, -12, 1, -10)
+        btnIr.Size = _U2(0.5, -20, 0, 32)
+        btnIr.BackgroundColor3 = _K.Purple
+        btnIr.BorderSizePixel = 0
+        btnIr.Text = "📌 Ir"
+        btnIr.TextColor3 = _K.White
+        btnIr.Font = _GB
+        btnIr.TextSize = 10
+        btnIr.AutoButtonColor = false
+        Corner(btnIr, 6)
+
+        btnEdit.MouseButton1Click:Connect(function()
+            abrirModalEditarNome("✏️ Editar nome da posição", pos.nome, function(novoNome)
+                pos.nome = novoNome
+                nomeLbl.Text = "📍 "..novoNome
+                persistSalvar()
+                Notify("POSIÇÃO", "Nome atualizado: "..novoNome, "Success")
+            end)
+        end)
+
+        btnDel.MouseButton1Click:Connect(function()
+            local idxAtual = acharIndice(pos)
+            if not idxAtual then
+                Notify("POSIÇÃO", "Posição já foi removida.", "Orange")
+                return
+            end
+            local nomeRemovido = pos.nome
+            table.remove(Persist.posicoes, idxAtual)
+            persistSalvar()
+            card:Destroy()
+            atualizarPlaceholder()
+            atualizarBotaoAdd()
+            Notify("POSIÇÃO", "🗑️ '"..nomeRemovido.."' excluída!", "Orange")
+        end)
+
+        btnSave.MouseButton1Click:Connect(function()
+            if not RefreshCharacter() then
+                Notify("POSIÇÃO", "Personagem não encontrado.", "Error")
+                return
+            end
+            local cf = rootPart.CFrame
+            local rx, ry, rz = cf:ToEulerAnglesXYZ()
+            pos.x = cf.Position.X
+            pos.y = cf.Position.Y
+            pos.z = cf.Position.Z
+            pos.rx = rx; pos.ry = ry; pos.rz = rz
+            coordLbl.Text = string.format("X: %.0f   Y: %.0f   Z: %.0f", pos.x, pos.y, pos.z)
+            persistSalvar()
+            Notify("POSIÇÃO", "💾 '"..pos.nome.."' atualizada!", "Success")
+        end)
+
+        btnIr.MouseButton1Click:Connect(function()
+            if not RefreshCharacter() then
+                Notify("POSIÇÃO", "Personagem não encontrado.", "Error")
+                return
+            end
+            local cf = CFrame.new(pos.x, pos.y, pos.z) * CFrame.Angles(pos.rx or 0, pos.ry or 0, pos.rz or 0)
+            pcall(function() character:PivotTo(cf) end)
+            Notify("POSIÇÃO", "📌 Teleportado para '"..pos.nome.."'", "Success")
+        end)
+
+        return card
+    end
+
+    btnAdd.MouseButton1Click:Connect(function()
+        if #Persist.posicoes >= Persist.limite_posicoes then
+            Notify("POSIÇÃO", "Limite de "..Persist.limite_posicoes.." posições atingido.", "Error")
+            return
+        end
+        if not RefreshCharacter() then
+            Notify("POSIÇÃO", "Personagem não encontrado.", "Error")
+            return
+        end
+        local n = #Persist.posicoes + 1
+        local cf = rootPart.CFrame
+        local rx, ry, rz = cf:ToEulerAnglesXYZ()
+        local nova = {
+            nome = "Posição "..n,
+            x = cf.Position.X,
+            y = cf.Position.Y,
+            z = cf.Position.Z,
+            rx = rx, ry = ry, rz = rz
+        }
+        table.insert(Persist.posicoes, nova)
+        persistSalvar()
+        criarCardPosicao(nova, n)
+        atualizarPlaceholder()
+        atualizarBotaoAdd()
+        Notify("POSIÇÃO", "📍 Posição "..n.." adicionada!", "Success")
+    end)
+
+    for i, pos in ipairs(Persist.posicoes) do
+        criarCardPosicao(pos, i)
+    end
+    atualizarPlaceholder()
+end
+
+local function ShowExtra()
+    CurrentPage = "Extra"
+    ClearContent()
+
+    local hotbar = _I("Frame", _CH)
+    hotbar.Size = _U2(1, 0, 0, 30)
+    hotbar.BackgroundTransparency = 1
+    hotbar.LayoutOrder = 0
+
+    local hbLay = _I("UIListLayout", hotbar)
+    hbLay.FillDirection = Enum.FillDirection.Horizontal
+    hbLay.Padding = _UD(0, 18)
+    hbLay.VerticalAlignment = Enum.VerticalAlignment.Center
+    hbLay.Parent = hotbar
+
+    local tabs = {
+        {Nome = "Visual", Id = "Visual"},
+        {Nome = "Posições", Id = "Posicoes"}
+    }
+
+    for _, tab in ipairs(tabs) do
+        local sel = ExtraSubPage == tab.Id
+        local b = _I("TextButton", hotbar)
+        b.Size = _UO(110, 28)
+        b.BackgroundTransparency = 1
+        b.Text = tab.Nome
+        b.TextColor3 = sel and _K.White or _K.DarkGray
+        b.Font = _GB
+        b.TextSize = 12
+        b.AutoButtonColor = false
+        b.TextXAlignment = Enum.TextXAlignment.Center
+
+        b.MouseButton1Click:Connect(function()
+            ExtraSubPage = tab.Id
+            ShowExtra()
+        end)
+
+        if sel then
+            local line = _I("Frame", b)
+            line.AnchorPoint = _V2(0.5, 1)
+            line.Position = _U2(0.5, 0, 1, -2)
+            line.Size = _U2(0.6, 0, 0, 2)
+            line.BackgroundColor3 = _K.Purple
+            line.BorderSizePixel = 0
+            Corner(line, 1)
+        end
+    end
+
+    if ExtraSubPage == "Posicoes" then
+        ShowExtraPosicoesContent()
+    else
+        ShowExtraVisualContent()
+    end
+
+    Content.CanvasPosition = _V2()
+end
+
+-- =========================================================================
+-- SISTEMA DE GRAVAÇÃO
+-- =========================================================================
+local Gravacao = {
+    Estado = "idle",
+    Frames = {},
+    StartGravacao = 0,
+    UltimoFrame = -math.huge,
+    Velocidade = 30,           -- Hz de captura de frames
+    WalkSpeedGravar = 16,      -- WalkSpeed usado SÓ durante a gravação (ferramenta visual)
+    MostrarRota = true,
+    GravConn = nil,
+    RepConn = nil,
+    LinhasFolder = nil,
+    RotaSelecionada = nil,
+    MAX_FRAMES = 8000,
+    MAX_SEGUNDOS = 600,
+    OnEstadoMudou = {}
+}
+
+local function gravNotificarMudanca()
+    for _, cb in ipairs(Gravacao.OnEstadoMudou) do
+        pcall(cb)
+    end
+end
+
+local function gravClearLines()
+    if not Gravacao.LinhasFolder then return end
+    for _, o in ipairs(Gravacao.LinhasFolder:GetChildren()) do
+        o:Destroy()
+    end
+end
+
+local function gravCreateLine(a, b, cor)
+    if not a or not b then return end
+    local d = b - a
+    local dist = d.Magnitude
+    if dist < .01 then return end
+    if not Gravacao.LinhasFolder then
+        Gravacao.LinhasFolder = _I("Folder")
+        Gravacao.LinhasFolder.Name = "ZKY_GravacaoLines"
+        Gravacao.LinhasFolder.Parent = workspace
+    end
+    local l = _I("Part")
+    l.Name = "GravSeg"
+    l.Anchored = true
+    l.CanCollide = false
+    l.CanTouch = false
+    l.CanQuery = false
+    l.CastShadow = false
+    l.Material = Enum.Material.Neon
+    l.Color = cor or _RGB(150, 110, 240)
+    l.Transparency = 0.2
+    l.Size = Vector3.new(.15, .15, dist)
+    l.CFrame = CFrame.lookAt((a + b) / 2, b)
+    l.Parent = Gravacao.LinhasFolder
+end
+
+local function gravMostrarLinhas(frames, mostrar, cor)
+    gravClearLines()
+    if not mostrar then return end
+    if not frames or #frames < 2 then return end
+    local last = nil
+    for _, f in ipairs(frames) do
+        local p = Vector3.new(f.x, f.y, f.z)
+        if last then gravCreateLine(last, p, cor) end
+        last = p
+    end
+end
+
+local function gravIniciar()
+    if Gravacao.Estado == "gravando" then return end
+    if not RefreshCharacter() then
+        Notify("GRAVAÇÃO", "Personagem não encontrado.", "Error")
+        return
+    end
+    if Gravacao.RepConn then
+        Gravacao.RepConn:Disconnect()
+        Gravacao.RepConn = nil
+    end
+    Gravacao.Frames = {}
+    Gravacao.StartGravacao = os.clock()
+    Gravacao.UltimoFrame = -math.huge
+    Gravacao.Estado = "gravando"
+
+    -- ✅ Aplica WalkSpeed escolhido (ferramenta visual pro usuário)
+    if RefreshCharacter() then
+        humanoid.WalkSpeed = Gravacao.WalkSpeedGravar
+    end
+
+    Notify("GRAVAÇÃO", "⏺️ Gravando @ WalkSpeed "..Gravacao.WalkSpeedGravar, "Success")
+    gravNotificarMudanca()
+
+    Gravacao.GravConn = R.Heartbeat:Connect(function()
+        if Gravacao.Estado ~= "gravando" then return end
+        if not RefreshCharacter() then return end
+        if #Gravacao.Frames >= Gravacao.MAX_FRAMES then
+            Gravacao.Estado = "idle"
+            if Gravacao.GravConn then Gravacao.GravConn:Disconnect(); Gravacao.GravConn = nil end
+            Notify("GRAVAÇÃO", "Limite de frames atingido.", "Orange")
+            gravNotificarMudanca()
+            return
+        end
+        local agora = os.clock()
+        if agora - Gravacao.StartGravacao > Gravacao.MAX_SEGUNDOS then
+            Gravacao.Estado = "idle"
+            if Gravacao.GravConn then Gravacao.GravConn:Disconnect(); Gravacao.GravConn = nil end
+            Notify("GRAVAÇÃO", "Tempo máximo atingido.", "Orange")
+            gravNotificarMudanca()
+            return
+        end
+        if agora - Gravacao.UltimoFrame < (1 / Gravacao.Velocidade) then return end
+        Gravacao.UltimoFrame = agora
+
+        local cf = rootPart.CFrame
+        local rx, ry, rz = cf:ToEulerAnglesXYZ()
+        table.insert(Gravacao.Frames, {
+            t = agora - Gravacao.StartGravacao,
+            x = cf.Position.X,
+            y = cf.Position.Y,
+            z = cf.Position.Z,
+            rx = rx, ry = ry, rz = rz,
+            j = humanoid.Jump
+        })
+    end)
+end
+
+local function gravParar()
+    if Gravacao.Estado ~= "gravando" then return end
+    if Gravacao.GravConn then
+        Gravacao.GravConn:Disconnect()
+        Gravacao.GravConn = nil
+    end
+    if #Gravacao.Frames >= 2 then
+        Gravacao.Estado = "idle"
+        local ultimo = Gravacao.Frames[#Gravacao.Frames]
+        Notify("GRAVAÇÃO", "⏹️ Parado! "..#Gravacao.Frames.." frames ("..string.format("%.1f", ultimo.t).."s)", "Success")
+        if Gravacao.MostrarRota then
+            gravMostrarLinhas(Gravacao.Frames, true, _RGB(80, 210, 125))
+        end
+    else
+        Gravacao.Estado = "idle"
+        Gravacao.Frames = {}
+        Notify("GRAVAÇÃO", "Nada foi gravado (menos de 2 frames).", "Orange")
+    end
+    gravNotificarMudanca()
+end
+
+local function gravPararReproducao(silencioso)
+    if Gravacao.Estado ~= "reproduzindo" then return end
+    Gravacao.Estado = "idle"
+    if Gravacao.RepConn then
+        Gravacao.RepConn:Disconnect()
+        Gravacao.RepConn = nil
+    end
+    if RefreshCharacter() then
+        humanoid:Move(Vector3.zero, false)
+        humanoid.WalkSpeed = 16
+        pcall(function() humanoid.AutoRotate = true end)
+    end
+    pararAnimacaoAndar()
+    if not silencioso then
+        Notify("REPRODUÇÃO", "⏹️ Reprodução parada.", "Orange")
+    end
+    gravNotificarMudanca()
+end
+
+local function gravReproduzir(frames, nome)
+    if Gravacao.Estado == "reproduzindo" then return end
+    if Gravacao.Estado == "gravando" then
+        Notify("REPRODUÇÃO", "Pare a gravação antes.", "Error")
+        return
+    end
+    if Playback.Running then
+        Notify("REPRODUÇÃO", "Pare o Auto Parkour antes.", "Error")
+        return
+    end
+    if not frames or #frames < 2 then
+        Notify("REPRODUÇÃO", "Sem frames suficientes.", "Error")
+        return
+    end
+    if not RefreshCharacter() then
+        Notify("REPRODUÇÃO", "Personagem não encontrado.", "Error")
+        return
+    end
+
+    Gravacao.Estado = "reproduzindo"
+    pcall(function() humanoid.AutoRotate = false end)
+    humanoid.WalkSpeed = 16  -- velocidade normal do Roblox, não mexe
+
+    Notify("REPRODUÇÃO", "▶️ "..(nome or (#frames.." frames")), "Success")
+    gravNotificarMudanca()
+
+    local t0 = os.clock()
+    local idx = 1
+    local maxT = frames[#frames].t
+    local ultimaPos = Vector3.new(frames[1].x, frames[1].y, frames[1].z)
+    local animando = false
+
+    Gravacao.RepConn = R.RenderStepped:Connect(function()
+        if Gravacao.Estado ~= "reproduzindo" then return end
+        if not RefreshCharacter() then gravPararReproducao(true); return end
+
+        local elapsed = os.clock() - t0
+        if elapsed >= maxT then
+            gravPararReproducao(true)
+            Notify("REPRODUÇÃO", "✅ Finalizada!", "Success")
+            return
+        end
+
+        while idx < #frames - 1 and elapsed > frames[idx + 1].t do
+            idx = idx + 1
+        end
+
+        local a = frames[idx]
+        local b = frames[idx + 1] or a
+        local d = b.t - a.t
+        local alpha = d > 0 and math.clamp((elapsed - a.t) / d, 0, 1) or 0
+
+        local pa = Vector3.new(a.x, a.y, a.z)
+        local pb = Vector3.new(b.x, b.y, b.z)
+        local posAtual = pa:Lerp(pb, alpha)
+
+        local ra = CFrame.Angles(a.rx or 0, a.ry or 0, a.rz or 0)
+        local rb = CFrame.Angles(b.rx or 0, b.ry or 0, b.rz or 0)
+        local rotAtual = ra:Lerp(rb, alpha)
+
+        -- ✅ Só PivotTo (sem mexer em WalkSpeed, sem mexer em animação speed)
+        local cf = CFrame.new(posAtual + Vector3.new(0, CONFIG.GroundOffset, 0)) * rotAtual
+        pcall(function() character:PivotTo(cf) end)
+
+        -- ✅ Liga animação de andar quando está se movendo
+        local delta = (posAtual - ultimaPos).Magnitude
+        if delta > 0.005 then
+            if not animando then
+                iniciarAnimacaoAndar()
+                animando = true
+            end
+        else
+            if animando then
+                pararAnimacaoAndar()
+                animando = false
+            end
+        end
+
+        -- Pulo
+        if a.j and not b.j then
+            humanoid.Jump = true
+        end
+
+        ultimaPos = posAtual
+    end)
+end
+
+-- =========================================================================
+-- ABA: GRAVAR ROTA (UI limpa)
+-- =========================================================================
+local GravarRotaAbaAtiva = false
+
+local function ShowGravarRota()
+    CurrentPage = "GravarRota"
+    GravarRotaAbaAtiva = true
+    ClearContent()
+    Gravacao.OnEstadoMudou = {}
+
+    local col1, col2 = CreateTwoColumns(_CH, 0)
+
+    -- ============================================================
+    -- COLUNA ESQUERDA
+    -- ============================================================
+    local colEsq = _I("Frame", col1)
+    colEsq.Size = _U2(1, 0, 0, 0)
+    colEsq.AutomaticSize = Enum.AutomaticSize.Y
+    colEsq.BackgroundTransparency = 1
+    colEsq.LayoutOrder = 1
+    local colEsqLay = _I("UIListLayout", colEsq)
+    colEsqLay.Padding = _UD(0, 12)
+    colEsqLay.SortOrder = Enum.SortOrder.LayoutOrder
+    colEsqLay.Parent = colEsq
+
+    -- ============================================================
+    -- BOTÃO PRINCIPAL (Iniciar/Parar)
+    -- ============================================================
+    local btnPrincipal = _I("TextButton", colEsq)
+    btnPrincipal.Size = _U2(1, 0, 0, 58)
+    btnPrincipal.BorderSizePixel = 0
+    btnPrincipal.TextColor3 = _K.White
+    btnPrincipal.Font = _GB
+    btnPrincipal.TextSize = 15
+    btnPrincipal.AutoButtonColor = false
+    btnPrincipal.LayoutOrder = 1
+    Corner(btnPrincipal, 10)
+    local btnPrincipalStroke = Stroke(btnPrincipal, _K.Success, 2)
+
+    local function updateBotaoPrincipal()
+        if Gravacao.Estado == "gravando" then
+            btnPrincipal.Text = "⏹️  PARAR GRAVAÇÃO"
+            btnPrincipal.BackgroundColor3 = _RGB(160, 40, 40)
+            btnPrincipalStroke.Color = _K.Error
+        elseif Gravacao.Estado == "reproduzindo" then
+            btnPrincipal.Text = "⏹️  PARAR REPRODUÇÃO"
+            btnPrincipal.BackgroundColor3 = _RGB(160, 40, 40)
+            btnPrincipalStroke.Color = _K.Error
+        else
+            btnPrincipal.Text = "⏺️  INICIAR GRAVAÇÃO"
+            btnPrincipal.BackgroundColor3 = _RGB(40, 150, 80)
+            btnPrincipalStroke.Color = _K.Success
+        end
+    end
+    updateBotaoPrincipal()
+
+    btnPrincipal.MouseButton1Click:Connect(function()
+        if Gravacao.Estado == "gravando" then
+            gravParar()
+        elseif Gravacao.Estado == "reproduzindo" then
+            gravPararReproducao()
+        else
+            gravIniciar()
+        end
+        updateBotaoPrincipal()
+    end)
+
+    table.insert(Gravacao.OnEstadoMudou, updateBotaoPrincipal)
+
+    -- ============================================================
+    -- CARD "Rotas Temporárias"
+    -- ============================================================
+    local cardTemp = UI.Card(colEsq, 2, "📼 Rotas Temporárias")
+
+    local infoLbl = _I("TextLabel", cardTemp)
+    infoLbl.Size = _U2(1, 0, 0, 16)
+    infoLbl.BackgroundTransparency = 1
+    infoLbl.Text = "Nenhuma gravação."
+    infoLbl.TextColor3 = _K.DarkGray
+    infoLbl.Font = _GM
+    infoLbl.TextSize = 10
+    infoLbl.TextXAlignment = _XL
+    infoLbl.LayoutOrder = 0
+
+    local function updateInfo()
+        if #Gravacao.Frames >= 2 then
+            local u = Gravacao.Frames[#Gravacao.Frames]
+            infoLbl.Text = string.format("📊 %d frames  •  %.1fs  •  %s",
+                #Gravacao.Frames, u.t,
+                Gravacao.Estado == "gravando" and "gravando..." or "pronto")
+            infoLbl.TextColor3 = Gravacao.Estado == "gravando" and _K.Error or _K.Success
+        else
+            infoLbl.Text = Gravacao.Estado == "gravando" and "⏺️ gravando..." or "Nenhuma gravação."
+            infoLbl.TextColor3 = Gravacao.Estado == "gravando" and _K.Error or _K.DarkGray
+        end
+    end
+    updateInfo()
+    table.insert(Gravacao.OnEstadoMudou, updateInfo)
+
+    task.spawn(function()
+        while GravarRotaAbaAtiva and infoLbl.Parent do
+            task.wait(0.25)
+            if not infoLbl.Parent then break end
+            if Gravacao.Estado == "gravando" then
+                updateInfo()
+            end
+        end
+    end)
+
+    UI.Toggle(cardTemp, 1, "Mostrar Rota", Gravacao.MostrarRota, function(v)
+        Gravacao.MostrarRota = v
+        if v and #Gravacao.Frames >= 2 then
+            gravMostrarLinhas(Gravacao.Frames, true, _RGB(80, 210, 125))
+        else
+            gravClearLines()
+        end
+    end)
+
+    local btnRepTemp = UI.ActionButton(cardTemp, 2, "▶️ Reproduzir / Parar", _RGB(40, 40, 55), function()
+        if Gravacao.Estado == "reproduzindo" then
+            gravPararReproducao()
+        elseif Gravacao.Estado == "gravando" then
+            Notify("REPRODUÇÃO", "Pare a gravação antes.", "Error")
+        else
+            if #Gravacao.Frames < 2 then
+                Notify("REPRODUÇÃO", "Grave algo primeiro!", "Error")
+                return
+            end
+            gravReproduzir(Gravacao.Frames, "temporária")
+        end
+        updateBotaoPrincipal()
+    end)
+
+    local function updateBtnRepTemp()
+        if Gravacao.Estado == "reproduzindo" then
+            btnRepTemp.Text = "⏹️ Parar Reprodução"
+            btnRepTemp.BackgroundColor3 = _K.Error
+        else
+            btnRepTemp.Text = "▶️ Reproduzir / Parar"
+            btnRepTemp.BackgroundColor3 = _RGB(40, 40, 55)
+        end
+    end
+    updateBtnRepTemp()
+    table.insert(Gravacao.OnEstadoMudou, updateBtnRepTemp)
+
+    local nomeBox = UI.TextBox(cardTemp, 3, "Nome da Rota", "Vazio = Automático", "", function() end)
+
+    UI.ActionButton(cardTemp, 4, "💾 Salvar Rota", _K.Success, function()
+        if #Gravacao.Frames < 2 then
+            Notify("SALVAR", "Grave algo primeiro!", "Error")
+            return
+        end
+        if #Persist.rotas_salvas >= 30 then
+            Notify("SALVAR", "Limite de 30 rotas atingido.", "Error")
+            return
+        end
+        local nome = nomeBox.Text:gsub("^%s+",""):gsub("%s+$","")
+        if nome == "" then
+            nome = "Rota "..(#Persist.rotas_salvas + 1)
+        end
+        for _, r in ipairs(Persist.rotas_salvas) do
+            if r.nome == nome then
+                Notify("SALVAR", "Já existe rota '"..nome.."'.", "Error")
+                return
+            end
+        end
+        local copia = {}
+        for i, f in ipairs(Gravacao.Frames) do
+            copia[i] = { t = f.t, x = f.x, y = f.y, z = f.z,
+                rx = f.rx or 0, ry = f.ry or 0, rz = f.rz or 0,
+                j = f.j and true or false }
+        end
+        table.insert(Persist.rotas_salvas, { nome = nome, frames = copia })
+        persistSalvar()
+        Gravacao.Frames = {}
+        gravClearLines()
+        Notify("SALVAR", "✅ Rota '"..nome.."' salva! ("..#copia.." frames)", "Success")
+        task.defer(function()
+            task.wait(0.05)
+            if CurrentPage == "GravarRota" then ShowGravarRota() end
+        end)
+    end)
+
+    UI.ActionButton(cardTemp, 5, "🗑️ Descartar Gravação", _RGB(80, 40, 40), function()
+        if #Gravacao.Frames == 0 then
+            Notify("GRAVAÇÃO", "Nada pra descartar.", "Orange")
+            return
+        end
+        Gravacao.Frames = {}
+        gravClearLines()
+        Notify("GRAVAÇÃO", "Gravação descartada.", "Orange")
+        task.defer(function()
+            task.wait(0.05)
+            if CurrentPage == "GravarRota" then ShowGravarRota() end
+        end)
+    end)
+
+    -- ============================================================
+    -- CARD "Rotas Salvas"
+    -- ============================================================
+    local cardSalvas = UI.Card(colEsq, 3, "📁 Rotas Salvas ("..#Persist.rotas_salvas..")")
+
+    if #Persist.rotas_salvas == 0 then
+        local vazio = _I("TextLabel", cardSalvas)
+        vazio.Size = _U2(1, 0, 0, 30)
+        vazio.BackgroundTransparency = 1
+        vazio.Text = "Nenhuma rota salva ainda."
+        vazio.TextColor3 = _K.DarkGray
+        vazio.Font = _GM
+        vazio.TextSize = 10
+        vazio.LayoutOrder = 1
+    else
+        local nomes = {}
+        for _, r in ipairs(Persist.rotas_salvas) do
+            table.insert(nomes, r.nome)
+        end
+        local selAtual = Gravacao.RotaSelecionada or nomes[1]
+        if not table.find(nomes, selAtual) then selAtual = nomes[1] end
+        Gravacao.RotaSelecionada = selAtual
+
+        UI.Dropdown(cardSalvas, 1, "Selecionar Rota", nomes, selAtual, function(op)
+            Gravacao.RotaSelecionada = op
+            gravClearLines()
+        end)
+
+        local btnExec = UI.ActionButton(cardSalvas, 2, "▶️ Iniciar / Parar", _K.Purple, function()
+            if Gravacao.Estado == "reproduzindo" then
+                gravPararReproducao()
+                updateBotaoPrincipal()
+                return
+            end
+            if Gravacao.Estado == "gravando" then
+                Notify("REPRODUÇÃO", "Pare a gravação antes.", "Error")
+                return
+            end
+            local sel = Gravacao.RotaSelecionada
+            if not sel then
+                Notify("EXECUTAR", "Selecione uma rota.", "Error")
+                return
+            end
+            local rota = nil
+            for _, r in ipairs(Persist.rotas_salvas) do
+                if r.nome == sel then rota = r; break end
+            end
+            if not rota then
+                Notify("EXECUTAR", "Rota não encontrada.", "Error")
+                return
+            end
+            gravReproduzir(rota.frames, rota.nome)
+            updateBotaoPrincipal()
+        end)
+
+        local function updateBtnExec()
+            if Gravacao.Estado == "reproduzindo" then
+                btnExec.Text = "⏹️ Parar"
+                btnExec.BackgroundColor3 = _K.Error
+            else
+                btnExec.Text = "▶️ Iniciar / Parar"
+                btnExec.BackgroundColor3 = _K.Purple
+            end
+        end
+        updateBtnExec()
+        table.insert(Gravacao.OnEstadoMudou, updateBtnExec)
+
+        UI.Toggle(cardSalvas, 3, "Ver Rota", false, function(v)
+            local sel = Gravacao.RotaSelecionada
+            if not sel then
+                if v then Notify("VER ROTA", "Selecione uma rota.", "Error") end
+                return
+            end
+            local rota = nil
+            for _, r in ipairs(Persist.rotas_salvas) do
+                if r.nome == sel then rota = r; break end
+            end
+            if rota then
+                gravMostrarLinhas(rota.frames, v, _RGB(150, 110, 240))
+            end
+        end)
+
+        local renomeBox = UI.TextBox(cardSalvas, 4, "Renomear Rota", "Novo nome...", "", function() end)
+
+        local linhaBts = _I("Frame", cardSalvas)
+        linhaBts.Size = _U2(1, 0, 0, 32)
+        linhaBts.BackgroundTransparency = 1
+        linhaBts.LayoutOrder = 5
+        local lbLay = _I("UIListLayout", linhaBts)
+        lbLay.FillDirection = Enum.FillDirection.Horizontal
+        lbLay.Padding = _UD(0, 6)
+        lbLay.Parent = linhaBts
+
+        local btnRen = _I("TextButton", linhaBts)
+        btnRen.Size = _U2(0.5, -3, 1, 0)
+        btnRen.BackgroundColor3 = _RGB(50, 60, 90)
+        btnRen.BorderSizePixel = 0
+        btnRen.Text = "✏️ Renomear"
+        btnRen.TextColor3 = _K.White
+        btnRen.Font = _GB
+        btnRen.TextSize = 10
+        btnRen.AutoButtonColor = false
+        Corner(btnRen, 6)
+        Stroke(btnRen, _K.Stroke, 1)
+
+        local btnDel = _I("TextButton", linhaBts)
+        btnDel.Size = _U2(0.5, -3, 1, 0)
+        btnDel.BackgroundColor3 = _RGB(120, 40, 40)
+        btnDel.BorderSizePixel = 0
+        btnDel.Text = "🗑️ Excluir"
+        btnDel.TextColor3 = _K.White
+        btnDel.Font = _GB
+        btnDel.TextSize = 10
+        btnDel.AutoButtonColor = false
+        Corner(btnDel, 6)
+        Stroke(btnDel, _RGB(180, 60, 60), 1)
+
+        btnRen.MouseButton1Click:Connect(function()
+            local sel = Gravacao.RotaSelecionada
+            if not sel then
+                Notify("RENOMEAR", "Selecione uma rota.", "Error")
+                return
+            end
+            local novo = renomeBox.Text:gsub("^%s+",""):gsub("%s+$","")
+            if novo == "" then
+                Notify("RENOMEAR", "Digite o novo nome no campo acima.", "Error")
+                return
+            end
+            for _, r in ipairs(Persist.rotas_salvas) do
+                if r.nome == novo and r.nome ~= sel then
+                    Notify("RENOMEAR", "Já existe com esse nome.", "Error")
+                    return
+                end
+            end
+            for _, r in ipairs(Persist.rotas_salvas) do
+                if r.nome == sel then r.nome = novo; break end
+            end
+            Gravacao.RotaSelecionada = novo
+            persistSalvar()
+            Notify("RENOMEAR", "✅ '"..novo.."'", "Success")
+            task.defer(function()
+                task.wait(0.05)
+                if CurrentPage == "GravarRota" then ShowGravarRota() end
+            end)
+        end)
+
+        btnDel.MouseButton1Click:Connect(function()
+            local sel = Gravacao.RotaSelecionada
+            if not sel then
+                Notify("EXCLUIR", "Selecione uma rota.", "Error")
+                return
+            end
+            for i, r in ipairs(Persist.rotas_salvas) do
+                if r.nome == sel then
+                    table.remove(Persist.rotas_salvas, i)
+                    break
+                end
+            end
+            Gravacao.RotaSelecionada = nil
+            persistSalvar()
+            gravClearLines()
+            Notify("EXCLUIR", "🗑️ '"..sel.."' excluída.", "Orange")
+            task.defer(function()
+                task.wait(0.05)
+                if CurrentPage == "GravarRota" then ShowGravarRota() end
+            end)
+        end)
+    end
+
+    -- ============================================================
+    -- COLUNA DIREITA: Configurações do Motor
+    -- ============================================================
+    local cardMotor = UI.Card(col2, 1, "⚙️ Configurações do Motor")
+
+    UI.Slider(cardMotor, 1, "Velocidade do Personagem (gravação)", Gravacao.WalkSpeedGravar, 5, 40, false, function(v)
+        Gravacao.WalkSpeedGravar = v
+        if Gravacao.Estado == "gravando" and RefreshCharacter() then
+            humanoid.WalkSpeed = v
+        end
+    end)
+
+    UI.Slider(cardMotor, 2, "Taxa de Captura (Hz)", Gravacao.Velocidade, 10, 30, false, function(v)
+        Gravacao.Velocidade = v
+    end)
+
+    local infoCard = _I("Frame", cardMotor)
+    infoCard.Size = _U2(1, 0, 0, 0)
+    infoCard.AutomaticSize = Enum.AutomaticSize.Y
+    infoCard.BackgroundColor3 = _RGB(15, 15, 20)
+    infoCard.BorderSizePixel = 0
+    infoCard.LayoutOrder = 3
+    Corner(infoCard, 6)
+    Stroke(infoCard, _K.Stroke, 1)
+    Padding(infoCard, 10, 10, 10, 10)
+
+    local infoTxt = _I("TextLabel", infoCard)
+    infoTxt.Size = _U2(1, 0, 0, 0)
+    infoTxt.AutomaticSize = Enum.AutomaticSize.Y
+    infoTxt.BackgroundTransparency = 1
+    infoTxt.Text = "💡 Como usar:\n1. Ajuste a velocidade do personagem\n2. Clique em INICIAR GRAVAÇÃO\n3. Ande, pule, corra pelo mapa\n4. Clique em PARAR GRAVAÇÃO\n5. Dê um nome e clique em Salvar\n\n⚡ Na reprodução, o boneco anda no ritmo em que você gravou, com a animação normal do Roblox."
+    infoTxt.TextColor3 = _K.DarkGray
+    infoTxt.Font = _GM
+    infoTxt.TextSize = 9
+    infoTxt.TextWrapped = true
+    infoTxt.TextXAlignment = _XL
+    infoTxt.TextYAlignment = Enum.TextYAlignment.Top
+
+    Content.CanvasPosition = _V2()
+end
+
+-- =========================================================================
 -- SELEÇÃO DE ABA
 -- =========================================================================
 local function SelectButton(b)
@@ -2876,6 +4226,9 @@ end
 ebDeltaButton.MouseButton1Click:Connect(function()
     SelectButton(ebDeltaButton) ShowEBDelta()
 end)
+gravarRotaButton.MouseButton1Click:Connect(function()
+    SelectButton(gravarRotaButton) ShowGravarRota()
+end)
 taffsButton.MouseButton1Click:Connect(function()
     SelectButton(taffsButton) ShowTAFFS()
 end)
@@ -2883,7 +4236,7 @@ volversButton.MouseButton1Click:Connect(function()
     SelectButton(volversButton) ShowVolvers()
 end)
 iaButton.MouseButton1Click:Connect(function()
-    SelectButton(iaButton) ShowAutoCorrecao()
+    SelectButton(iaButton) ShowIA()
 end)
 combateButton.MouseButton1Click:Connect(function()
     SelectButton(combateButton) ShowCombate()
@@ -2896,6 +4249,9 @@ creditosButton.MouseButton1Click:Connect(function()
 end)
 lojaButton.MouseButton1Click:Connect(function()
     SelectButton(lojaButton) ShowLoja()
+end)
+extraButton.MouseButton1Click:Connect(function()
+    SelectButton(extraButton) ShowExtra()
 end)
 
 -- =========================================================================
@@ -2975,6 +4331,14 @@ task.defer(function()
     ShowEBDelta()
     Notify("ZKY PARKOUR",loaded.."/4 parkours • Torre 1: "..(lt1 and "OK" or "ERRO").." • Torre 2: "..lt2.."/4",
         loaded==4 and lt1 and lt2==4 and "Success" or "Error")
+
+    if SUPORTA_SALVAR then
+        task.wait(0.5)
+        Notify("PERSISTÊNCIA","💾 Carregado: "..#Persist.posicoes.." posições • "..#Persist.rotas_salvas.." rotas","Success")
+    else
+        task.wait(0.5)
+        Notify("PERSISTÊNCIA","⚠️ Executor não suporta salvar dados.","Orange")
+    end
 end)
 
-print("AKIRA MENU V2.2.1 carregado com sucesso!")
+print("AKIRA MENU V2.2.8 carregado com sucesso!")
